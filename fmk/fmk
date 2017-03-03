@@ -1,0 +1,17 @@
+  /home/jcgonzalez/ws/nanomsg/tests/nncomp/fmk:
+  total used in directory 84 available 116922028
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  412 mar  1 16:58 channels.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez 1199 mar  2 09:39 CMakeLists.txt
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  188 feb 24 14:53 datamng.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  250 feb 24 14:53 datamng.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez 1032 feb 24 14:53 evtmng.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  282 feb 24 14:53 evtmng.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  183 feb 24 14:53 logmng.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  245 feb 24 14:53 logmng.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez 3903 mar  1 16:26 message.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  220 feb 24 14:53 tskage.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  282 feb 24 14:53 tskage.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  953 feb 24 14:53 tskmng.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  282 feb 24 14:53 tskmng.h
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  998 feb 24 14:53 tskorc.cpp
+  -rw-rw-r-- 1 jcgonzalez jcgonzalez  282 feb 24 14:53 tskorc.h
