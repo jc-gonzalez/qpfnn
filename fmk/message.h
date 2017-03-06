@@ -3,113 +3,158 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include "json/json.h"
+#include "datatypes.h"
 
-typedef Json::Value  json;
-
-class JValue {
+//==========================================================================
+// Class: MsgHeader
+//==========================================================================
+class MsgHeader : public JRecord {
 public:
-    JValue() {}
-    JValue(json val) { value = val; }
-    JValue operator()(std::string key) { return JValue(value[key]); }
-    json & operator[](std::string key) { return value[key]; }
-    std::string str() {
-        if (value.isObject()) {
-            Json::FastWriter w;
-            return w.write(value);
-        } else {
-            return value.asString();
-        }
+    MsgHeader() {}
+    MsgHeader(json v) : JRecord(v) {}
+    virtual void dump() {
+            DUMPJSTR(id);
+            DUMPJSTR(type);
+            DUMPJSTR(version);
+            DUMPJSTR(source);
+            DUMPJSTR(target);
+            DUMPJSTR(dateCreation);
+            DUMPJSTR(dateTransmission);
+            DUMPJSTR(dateReception);
+            DUMPJINT(rc);
+            DUMPJSTRVEC(path);
     }
-    json & val() { return value; }
-private:
-    json value;
+    JSTR(id);
+    JSTR(type);
+    JSTR(version);
+    JSTR(source);
+    JSTR(target);
+    JSTR(dateCreation);
+    JSTR(dateTransmission);
+    JSTR(dateReception);
+    JINT(rc);
+    JSTRVEC(path);
 };
 
-class Message {
-
+//==========================================================================
+// Class: MessageBase
+//==========================================================================
+class MessageBase : public JRecord {
 public:
-    Message(json val) : value(val) {}
-    Message(std::string content = std::string()) {
-        Json::Reader reader;
-        json val;
-        reader.parse(content, val);
-        value = JValue(val);
+    MessageBase() {}
+    MessageBase(std::string s) : JRecord(s) { init(); }
+    MessageBase(json v) : JRecord(v) { init(); }
+    virtual void init() {
+        header = MsgHeader(value["header"]);
     }
-    void setHeader(std::string msgId,
-                   std::string msgType,
-                   int msgVersion,
-                   std::string source,
-                   std::string target,
-                   std::string dateCreation,
-                   std::string dateTransmission,
-                   std::string dateReception,
-                   int crc,
-                   std::vector<std::string> path) {
-        json data;
-        data["id"           ] = msgId;
-        data["type"         ] = msgType;
-        data["version"      ] = msgVersion;
-        data["source"          ] = source;
-        data["target"          ] = target;
-        data["dateCreation"    ] = dateCreation;
-        data["dateTransmission"] = dateTransmission;
-        data["dateReception"   ] = dateReception;
-        data["crc"             ] = crc;
-        json pathValue(Json::arrayValue);
-        for (int i = 0; i < path.size(); ++i) { pathValue[i] = path.at(i); }
-        data["path"            ] = pathValue;
-        value["header"] = data;
+    virtual void dump() {
+        header.dump();
     }
-    void setData(json val) { value["data"] = val; }
-    void seth(std::string key, json val) {
-        value["header"][key.c_str()] = val;
+    MsgHeader   header;
+};
+
+//==========================================================================
+// Class: MsgBodyCMD
+//==========================================================================
+class MsgBodyCMD : public JRecord {
+public:
+    MsgBodyCMD() {}
+    MsgBodyCMD(std::string s) : JRecord(s) {}
+    MsgBodyCMD(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(cmd);
     }
-    std::string id() { return value["header"]["id"].asString(); }
-    std::string type() { return value["header"]["type"].asString(); }
-    std::string version() { return value["header"]["version"].asString(); }
-    std::string source() { return value["header"]["source"].asString(); }
-    std::string target() { return value["header"]["target"].asString(); }
-    void newTargetIs(std::string newTarget) {
-        std::string lastSource = value["header"]["source"].asString();
-        std::string lastTarget = value["header"]["target"].asString();
-        value["header"]["path"].append(lastSource);
-        value["header"]["source"] = lastTarget;
-        value["header"]["target"] = newTarget;
+    JSTR(cmd);
+};
+
+//==========================================================================
+// Class: MsgBodyINDATA
+//==========================================================================
+class MsgBodyINDATA : public JRecord {
+public:
+    MsgBodyINDATA() {}
+    MsgBodyINDATA(std::string s) : JRecord(s) {}
+    MsgBodyINDATA(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(cmd);
     }
-    std::vector<std::string> path() {
-        std::vector<std::string> v;
-        json jpth = value["header"]["path"];
-        Json::ValueIterator it = jpth.begin();
-        while (it != jpth.end()) { v.push_back((*it).asString()); ++it; }
-        return v;
+    JSTR(cmd);
+};
+
+//==========================================================================
+// Class: MsgBodyMONIT
+//==========================================================================
+class MsgBodyMONIT : public JRecord {
+public:
+    MsgBodyMONIT() {}
+    MsgBodyMONIT(std::string s) : JRecord(s) {}
+    MsgBodyMONIT(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(info);
     }
-    void set(std::string key, json val) {
-        value["data"][key.c_str()] = val;
+    JSTR(info);
+};
+
+//==========================================================================
+// Class: MsgBodyTSKSCHED
+//==========================================================================
+class MsgBodyTSKSCHED : public JRecord {
+public:
+    MsgBodyTSKSCHED() {}
+    MsgBodyTSKSCHED(std::string s) : JRecord(s) {}
+    MsgBodyTSKSCHED(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(info);
     }
-    void set(std::string key, std::string s) {
-        value["data"][key.c_str()] = s;
+    JSTR(info);
+};
+
+//==========================================================================
+// Class: MsgBodyTSKMONIT
+//==========================================================================
+class MsgBodyTSKMONIT : public JRecord {
+public:
+    MsgBodyTSKMONIT() {}
+    MsgBodyTSKMONIT(std::string s) : JRecord(s) {}
+    MsgBodyTSKMONIT(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(info);
     }
-    void set(std::string key, const char * s) {
-        value["data"][key.c_str()] = s;
+    JSTR(info);
+};
+
+//==========================================================================
+// Class: MsgBodyTSKREP
+//==========================================================================
+class MsgBodyTSKREP : public JRecord {
+public:
+    MsgBodyTSKREP() {}
+    MsgBodyTSKREP(std::string s) : JRecord(s) {}
+    MsgBodyTSKREP(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(info);
     }
-    void set(std::string key, int n) {
-        value["data"][key.c_str()] = n;
+    JSTR(info);
+};
+
+//==========================================================================
+// Template Class: Message
+//==========================================================================
+template<class T>
+class Message : public MessageBase {
+public:
+    Message() {}
+    Message(std::string s) : MessageBase(s) { init(); }
+    Message(json v) : MessageBase(v) { init(); }
+    virtual void init() {
+        header = MsgHeader(value["header"]);
+        body   = T(value["body"]);
     }
-    void set(std::string key, double x) {
-        value["data"][key.c_str()] = x;
+    virtual void dump() {
+        header.dump();
+        body.dump();
     }
-    JValue operator()(std::string key) { return value(key); }
-    JValue hdr() { return value("header"); }
-    JValue data() { return value("data"); }
-    std::string hdrStr() { return value("header").str(); }
-    std::string dataStr() { return value("data").str(); }
-    json & operator[](std::string key) { return value[key]; }
-    json & jhdr() { return value["header"]; }
-    json & jdata() { return value["data"]; }
-    std::string str() { return value.str(); }
-private:
-    JValue value;
+    T body;
 };
 
 #endif

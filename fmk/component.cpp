@@ -1,27 +1,175 @@
+/******************************************************************************
+ * File:    component.cpp
+ *          This file is part of QLA Processing Framework
+ *
+ * Domain:  QPF.libQPF.component
+ *
+ * Version:  1.1
+ *
+ * Date:    2015/07/01
+ *
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Implement Component class
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <ChangelEUCog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
 #include "component.h"
 
+//#include "dbhdlpostgre.h"
+//#include "except.h"
+
+//using LibComm::Log;
+//#include "tools.h"
+//#include "str.h"
+//using namespace LibComm;
+
+//#include <sys/time.h>
+//#include <unistd.h>
+//#include <time.h>
+
+//#define WRITE_MESSAGE_FILES
+
+////////////////////////////////////////////////////////////////////////////
+// Namespace: QPF
+// -----------------------
+//
+// Library namespace
+////////////////////////////////////////////////////////////////////////////
+//namespace QPF {
+
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 Component::Component(const char * name, const char * addr)
     : CommNode(name, addr)
 {
-    iteration = 0;
+    init();
 }
 
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
 Component::Component(std::string name, std::string addr)
     : CommNode(name, addr)
 {
-    iteration = 0;
+    init();
 }
 
+//----------------------------------------------------------------------
+// Method: periodicMsgInChannel
+//----------------------------------------------------------------------
 void Component::periodicMsgInChannel(ChannelDescriptor chnl, int period, MessageString msg)
 {
     periodicMsgs[chnl][period] = msg;
 }
 
+//----------------------------------------------------------------------
+// Method: init
+// Initialize the component
+//----------------------------------------------------------------------
+void Component::init()
+{
+    iteration = 0;
+
+    stepSize = 200;
+
+    // Every component must respond to MONIT_RQST messages (at least the
+    // state might be requested)
+    //canProcessMessage(MSG_MONIT_RQST_IDX);
+
+    /*
+    isPeerLogMng = isPeer("LogMng") && (selfPeer()->name != "LogMng");
+    isRemote     = (!ConfigurationInfo::data().isMaster);
+    session      = ConfigurationInfo::data().session;
+    */
+    // Define log output
+    Log::setLogBaseDir(Config::PATHBase + "/log");
+    Log::defineLogSystem(compName);
+
+    // Define valid state transitions
+    defineValidTransitions();
+
+    // Transit to INITIALISED
+    transitTo(INITIALISED);
+    InfoMsg("New state: " + getStateName(getState()));
+}
+
+//----------------------------------------------------------------------
+// Method: fromInitialisedToRunning
+//----------------------------------------------------------------------
+void Component::fromInitialisedToRunning()
+{
+    setGo(false);
+    while (!getGo()) {}
+
+    transitTo(RUNNING);
+    InfoMsg("New state: " + getStateName(getState()));
+}
+
+//----------------------------------------------------------------------
+// Method: fromRunningToOperational
+//----------------------------------------------------------------------
+void Component::fromRunningToOperational()
+{
+    transitTo(OPERATIONAL);
+    InfoMsg("New state: " + getStateName(getState()));
+}
+
+//----------------------------------------------------------------------
+// Method: fromOperationalToRunning
+//----------------------------------------------------------------------
+void Component::fromOperationalToRunning()
+{
+    transitTo(RUNNING);
+    InfoMsg("New state: " + getStateName(getState()));
+}
+
+//----------------------------------------------------------------------
+// Method: fromRunningToOff
+//----------------------------------------------------------------------
+void Component::fromRunningToOff()
+{
+    transitTo(OFF);
+    InfoMsg("New state: " + getStateName(getState()));
+    InfoMsg("Ending . . . ");
+}
+
+//----------------------------------------------------------------------
+// Method: updateConnections
+//----------------------------------------------------------------------
 void Component::updateConnections()
 {
     for (auto & kv: connections) { kv.second->update(); }
 }
 
+//----------------------------------------------------------------------
+// Method: sendPeriodicMsgs
+//----------------------------------------------------------------------
 void Component::sendPeriodicMsgs()
 {
     for (auto & kv: periodicMsgs) {
@@ -41,10 +189,16 @@ void Component::sendPeriodicMsgs()
     }
 }
 
+//----------------------------------------------------------------------
+// Method: runEachIteration
+//----------------------------------------------------------------------
 void Component::runEachIteration()
 {
 }
 
+//----------------------------------------------------------------------
+// Method: step
+//----------------------------------------------------------------------
 void Component::step()
 {
     /*
@@ -55,17 +209,98 @@ void Component::step()
     std::this_thread::sleep_until(system_clock::from_time_t(mktime(ptm))); */
     // Sleep for 200 milliseconds
     //auto start = std::chrono::high_resolution_clock::now();
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(stepSize));
 }
 
+//----------------------------------------------------------------------
+// Method: run
+//----------------------------------------------------------------------
 void Component::run()
 {
-    setGo(false);
-    while (!getGo()) {}
+    // State: Initialised
+    // Transition to: Running
+    fromInitialisedToRunning();
+
+    // State: Initialised
+    // Transition to: Running
+    fromRunningToOperational();
+
     for (;;++iteration) {
         updateConnections();
         sendPeriodicMsgs();
         runEachIteration();
         step();
     }
+
+    // State: Initialised
+    // Transition to: Running
+    fromOperationalToRunning();
+
+    // State: Initialised
+    // Transition to: Running
+    fromRunningToOff();
+
 }
+
+//----------------------------------------------------------------------
+// Method: setStep
+//----------------------------------------------------------------------
+void Component::setStep(int s)
+{
+    mtxStepSize.lock();
+    stepSize = s;
+    mtxStepSize.unlock();
+}
+
+//----------------------------------------------------------------------
+// Method: defineValidTransitions
+// Define the valid state transitions for the node
+//----------------------------------------------------------------------
+void Component::defineValidTransitions()
+{
+    defineState(ERROR,        "ERROR");
+    defineState(OFF,          "OFF");
+    defineState(INITIALISED,  "INITIALISED");
+    defineState(RUNNING,      "RUNNING");
+    defineState(OPERATIONAL,  "OPERATIONAL");
+
+    defineValidTransition(ERROR,        OFF);
+    defineValidTransition(OFF,          INITIALISED);
+    defineValidTransition(INITIALISED,  RUNNING);
+    defineValidTransition(INITIALISED,  OFF);
+    defineValidTransition(INITIALISED,  ERROR);
+    defineValidTransition(RUNNING,      OPERATIONAL);
+    defineValidTransition(RUNNING,      OFF);
+    defineValidTransition(RUNNING,      ERROR);
+    defineValidTransition(OPERATIONAL,  RUNNING);
+    defineValidTransition(OPERATIONAL,  OFF);
+    defineValidTransition(OPERATIONAL,  ERROR);
+
+    setState(OFF);
+}
+
+//----------------------------------------------------------------------
+// Method: afterTransition
+//----------------------------------------------------------------------
+void Component::afterTransition(int fromState, int toState)
+{
+    /*
+    // Save task information in task_info table
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+
+    try {
+        // Check that connection with the DB is possible
+        dbHdl->openConnection();
+        // Store new state
+        dbHdl->storeState(session, selfPeer()->name, getStateName(toState));
+    } catch (RuntimeException & e) {
+        ErrMsg(e.what());
+        return;
+    }
+
+    // Close connection
+    dbHdl->closeConnection();
+    */
+}
+
+//}

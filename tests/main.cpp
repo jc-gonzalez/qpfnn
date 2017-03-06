@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "protlayer.h"
 
@@ -11,6 +13,107 @@
 
 #include "message.h"
 #include "channels.h"
+#include "config.h"
+
+struct MasterNodeElements {
+    EvtMng  * evtMng;
+    DataMng * datMng;
+    LogMng  * logMng;
+    TskOrc  * tskOrc;
+    TskMng  * tskMng;
+};
+typedef MasterNodeElements * MasterNodeElementsPtr;
+
+//----------------------------------------------------------------------
+// createElementsNetwork
+//----------------------------------------------------------------------
+std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
+                                                 std::vector<CommNode*>  & ag,
+                                                 std::string masterAddress,
+                                                 std::string agentsAddress)
+{
+    //========================================
+    // 1. Create the elements
+    //========================================
+    m.evtMng = new EvtMng  ("EvtMng",  masterAddress);
+    m.datMng = new DataMng ("DataMng", masterAddress);
+    m.logMng = new LogMng  ("LogMng",  masterAddress);
+    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress);
+    m.tskMng = new TskMng  ("TskMng",  masterAddress);
+
+    ag.push_back(new TskAge("TskAgent1", agentsAddress));
+    ag.push_back(new TskAge("TskAgent2", agentsAddress));
+    ag.push_back(new TskAge("TskAgent3", agentsAddress));
+
+
+    //========================================
+    // 2. Create the connection channels
+    //========================================
+
+    auto concat = [](std::vector<CommNode*> a, std::vector<CommNode*> b)
+        -> std::vector<CommNode*> { a.insert(a.end(), b.begin(), b.end()); return a;};
+
+    std::vector<CommNode*> allCommNodes =
+        concat(std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}, ag);
+
+    //-----------------------------------------------------------------
+    // Channel CMD - SURVEY
+    // - Surveyor: EvtMng
+    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+    ProtocolLayer p1;
+    p1.createSurvey(ChnlCmd, m.evtMng, allCommNodes, 5555);
+
+    //-----------------------------------------------------------------
+    // Channel INDATA -  PUBSUB
+    // - Publisher: EvtMng
+    // - Subscriber: DataMng TskOrc
+    ProtocolLayer p2;
+    p2.createPubSub(ChnlInData,
+                   std::vector<CommNode*> {m.evtMng},
+                   std::vector<CommNode*> {m.datMng, m.tskOrc});
+
+    //-----------------------------------------------------------------
+    // Channel MONITORING - BUS
+    // - Connected: EvtMng QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+    ProtocolLayer p3;
+    p3.createBus(ChnlMonit,
+                 std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng});
+
+    //-----------------------------------------------------------------
+    // Channel TASK-SCHEDULING - PUBSUB
+    // - Publisher: TskOrc
+    // - Subscriber: DataMng TskMng
+    ProtocolLayer p4;
+    p4.createPubSub(ChnlTskSched,
+                    std::vector<CommNode*> {m.tskOrc},
+                    std::vector<CommNode*> {m.datMng, m.tskMng});
+
+    //-----------------------------------------------------------------
+    // Channel TASK-PROCESSING - PIPELINE
+    // - Out/In: TskMng/TskAge*
+    ProtocolLayer p5;
+    for (auto & c: ag) {
+        p5.createPipeline(ChnlTskProc + "_" + c->getName(), m.tskMng, c);
+    }
+
+    //-----------------------------------------------------------------
+    // Channel TASK-MONITORING - SURVEY
+    // - Surveyor: TskMng
+    // - Respondent: TskAge*
+    ProtocolLayer p6;
+    p6.createSurvey(ChnlTskMonit, m.tskMng, ag, 5557);
+
+    //-----------------------------------------------------------------
+    // Channel TASK-REPORTING - PUBSUB
+    // - Publisher: TskMng
+    // - Subscriber: DataMng EvtMng QPFHMI
+    ProtocolLayer p7;
+    p7.createPubSub(ChnlTskRep,
+                    std::vector<CommNode*> {m.tskMng},
+                    std::vector<CommNode*> {m.datMng, m.evtMng});
+
+    return std::vector<ProtocolLayer> {p1, p2, p3, p4, p5, p6, p7};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // MAIN
@@ -22,6 +125,7 @@ int main(int argc, char * argv[])
                           "              \"type\": \"MSG_MONIT_RQST\"},"
                           "\"data\": {\"rqst\": \"GIMMEALL\", "
                           "           \"when\": \"NOW\" }}");
+    /*
     Message msg(content);
 
     json hdr = msg["header"];
@@ -45,91 +149,52 @@ int main(int argc, char * argv[])
     DBG(msg.str());
 
     msg.newTargetIs("four");
+    */
+
+    MessageBase msg(JValue(content).val());
+    Message<MsgBodyCMD> msgCmd("{\"header\": " + msg("header").str() + ", "
+                               "\"body\": " + MsgBodyCMD(std::string("{\"cmd\": \"time 50\"}")).str() + "}");
+
+    msg.dump();
+    msgCmd.dump();
 
     DBG(msg.str());
+    DBG(msgCmd.str());
 
-    EvtMng  evtMng("EvtMng",  "127.0.0.1");
-    DataMng datMng("DataMng", "127.0.0.1");
-    LogMng  logMng("LogMng",  "127.0.0.1");
-    TskOrc  tskOrc("TskOrc",  "127.0.0.1");
-    TskMng  tskMng("TskMng",  "127.0.0.1");
+    //------------------------------------------------------------
 
-    std::vector<CommNode*> tskAgents;
-    tskAgents.push_back(new TskAge("TskAgent1", "127.0.0.1"));
-    tskAgents.push_back(new TskAge("TskAgent2", "127.0.0.1"));
-    tskAgents.push_back(new TskAge("TskAgent3", "127.0.0.1"));
+    std::ifstream cfgFile("/home/jcgonzalez/file.cfg");
+    std::stringstream buffer;
+    buffer << cfgFile.rdbuf();
 
-    auto concat = [](std::vector<CommNode*> a, std::vector<CommNode*> b)
-        -> std::vector<CommNode*> { a.insert(a.end(), b.begin(), b.end()); return a;};
+    JValue v;
+    v.fromStr(buffer.str());
 
-    std::vector<CommNode*> allCommNodes =
-        concat(std::vector<CommNode*> {&datMng, &logMng, &tskOrc, &tskMng}, tskAgents);
-
-    std::string channel;
-    std::string address;
-
-    //-----------------------------------------------------------------
-    // Channel CMD - SURVEY
-    // - Surveyor: EvtMng
-    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    ProtocolLayer p1;
-    p1.createSurvey(ChnlCmd, &evtMng, allCommNodes, 5555);
-
-    //-----------------------------------------------------------------
-    // Channel INDATA - PUBSUB
-    // - Publisher: EvtMng
-    // - Subscriber: DataMng TskOrc
-    ProtocolLayer p2;
-    p2.createPubSub(ChnlInData,
-                   std::vector<CommNode*> {&evtMng},
-                   std::vector<CommNode*> {&datMng, &tskOrc});
-
-    //-----------------------------------------------------------------
-    // Channel MONITORING - BUS
-    // - Connected: EvtMng QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    ProtocolLayer p3;
-    p3.createBus(ChnlMonit,
-                 std::vector<CommNode*> {&datMng, &logMng, &tskOrc, &tskMng});
-
-    //-----------------------------------------------------------------
-    // Channel TASK-SCHEDULING - PUBSUB
-    // - Publisher: TskOrc
-    // - Subscriber: DataMng TskMng
-    ProtocolLayer p4;
-    p4.createPubSub(ChnlTskSched,
-                    std::vector<CommNode*> {&tskOrc},
-                    std::vector<CommNode*> {&datMng, &tskMng});
-
-    //-----------------------------------------------------------------
-    // Channel TASK-PROCESSING - PIPELINE
-    // - Out/In: TskMng/TskAge*
-    ProtocolLayer p5;
-    for (auto & c: tskAgents) {
-        p5.createPipeline(ChnlTskProc + "_" + c->getName(), &tskMng, c);
+    Config cfg(v.val());
+    std::cerr << cfg.str() << std::endl;
+    std::cerr << cfg.general.appName() << std::endl;
+    std::cerr << cfg.network.masterNode() << std::endl;
+    for (auto & kv : cfg.network.processingNodes()) {
+        std::cerr << kv.first << ": " << kv.second << std::endl;
     }
 
-    //-----------------------------------------------------------------
-    // Channel TASK-MONITORING - SURVEY
-    // - Surveyor: TskMng
-    // - Respondent: TskAge*
-    ProtocolLayer p6;
-    p6.createSurvey(ChnlTskMonit, &tskMng, tskAgents, 5557);
+    //cfg.dump();
 
-    //-----------------------------------------------------------------
-    // Channel TASK-REPORTING - PUBSUB
-    // - Publisher: TskMng
-    // - Subscriber: DataMng EvtMng QPFHMI
-    ProtocolLayer p7;
-    p7.createPubSub(ChnlTskRep,
-                    std::vector<CommNode*> {&tskMng},
-                    std::vector<CommNode*> {&datMng, &evtMng});
+    //------------------------------------------------------------
+
+    MasterNodeElements masterNodeElems;
+    std::vector<CommNode*> agentsNodes;
+
+    std::vector<ProtocolLayer> network =
+        createElementsNetwork(masterNodeElems, agentsNodes,
+                              "127.0.0.1",     "127.0.0.1");
 
     // Define periodic message in  a certain channel at component level
     MessageString msgStr = msg.str();
-    evtMng.periodicMsgInChannel(ChnlInData, 13, msgStr);
+    masterNodeElems.evtMng->periodicMsgInChannel(ChnlInData, 13, msgStr);
 
     // START!
-    for (auto p: {p1, p2, p3, p4, p5, p6, p7}) { p.go(); }
+    for (auto p: network) { p.go(); }
 
     // FOREVER
     for(;;) {}
