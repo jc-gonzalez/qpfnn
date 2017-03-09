@@ -16,6 +16,7 @@ set (libfmk_hdr
   datatypes.h
   message.h
   config.h
+  filenamespec.h
   component.h
 #  dbhdl.h
 #  dbhdlpostgre.h
@@ -25,10 +26,12 @@ set (libfmk_hdr
   tskage.h
   tskmng.h
   tskorc.h
+  sync.h
 )
 
 set (libfmk_src
   config.cpp
+  filenamespec.cpp
   component.cpp
 #  dbhdlpostgre.cpp
   datamng.cpp
@@ -83,7 +86,7 @@ target_include_directories (fmk PUBLIC .
   ${UUID_ROOT_DIR}
   ${FMK_ROOT_DIR})
 target_link_libraries (fmk
-  json log str tools uuid nncomm
+  json str log tools uuid nncomm
   nanomsg ${PSQLLIB} pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmk

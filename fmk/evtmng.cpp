@@ -39,6 +39,8 @@
  ******************************************************************************/
 
 #include "evtmng.h"
+#include "filenamespec.h"
+#include "message.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -51,31 +53,15 @@
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-EvtMng::EvtMng(const char * name, const char * addr) : Component(name, addr)
+EvtMng::EvtMng(const char * name, const char * addr, Synchronizer * s) : Component(name, addr, s)
 {
 }
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-EvtMng::EvtMng(std::string name, std::string addr)  : Component(name, addr)
+EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)  : Component(name, addr, s)
 {
-}
-
-//----------------------------------------------------------------------
-// Method: fromInitialisedToRunning
-//----------------------------------------------------------------------
-void EvtMng::fromInitialisedToRunning()
-{
-    // Establish communications with other peer
-    //establishCommunications();
-    //while (waitingForGO) {}
-
-    // Broadcast START message
-    InfoMsg("Broadcasting START message . . .");
-    //PeerMessage * startMsg = buildPeerMsg("", "Wake up!", MSG_START);
-    //registerMsg(selfPeer()->name, *startMsg, true);
-    //broadcast(startMsg);
 }
 
 //----------------------------------------------------------------------
@@ -85,6 +71,10 @@ void EvtMng::fromRunningToOperational()
 {
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(Config::PATHBase + "/data/inbox");
+    InfoMsg("DirWatcher installed at " + Config::PATHBase + "/data/inbox");
+
+    transitTo(OPERATIONAL);
+    InfoMsg("New state: " + getStateName(getState()));
 }
 
 //----------------------------------------------------------------------
@@ -92,14 +82,12 @@ void EvtMng::fromRunningToOperational()
 //----------------------------------------------------------------------
 void EvtMng::fromOperationalToRunning()
 {
+    InfoMsg("New state: " + getStateName(getState()));
+
     // stop watching inbox folder
     dw->stop();
 
-    // Broadcast STOP message
-    InfoMsg("Broadcasting STOP message . . .");
-    //PeerMessage * stopMsg = buildPeerMsg("", "Shut down!", MSG_STOP);
-    //registerMsg(selfPeer()->name, *stopMsg, true);
-    //broadcast(stopMsg);
+    transitTo(OFF);
 }
 
 //----------------------------------------------------------------------
@@ -107,15 +95,18 @@ void EvtMng::fromOperationalToRunning()
 //----------------------------------------------------------------------
 void EvtMng::fromRunningToOff()
 {
+    InfoMsg("New state: " + getStateName(getState()));
     InfoMsg("Ending . . . ");
+
+    synchro->notify();
 }
 
 //----------------------------------------------------------------------
-// Method: execAdditonalLoopTasks
+// Method: runEachIteration
 //----------------------------------------------------------------------
-void EvtMng::execAdditonalLoopTasks()
+void EvtMng::runEachIteration()
 {
-    // Check DirWatcher events from inbox folder
+    // 1. Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
         std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
@@ -123,15 +114,47 @@ void EvtMng::execAdditonalLoopTasks()
         // Process only files
         // TODO: Process directories that appear at inbox
         if (! e.isDir) {
-            /*
             std::string file(e.path + "/" + e.name);
             // Set new content for InData Message
             FileNameSpec fs;
             ProductMetadata m;
             fs.parseFileName(file, m);
-            ProductCollection products;
-            products.productList[m.productType] = m;
+            m["productType"] = "LE1_VIS";
+            m["instrument"] = "VIS";
+            m["mission"] = "EUC";
+            m["obsMode"] = "W";
+            m["params"] = "";
+            m["procFunc"] = "LE1";
+            m["productVersion"] = "01.00";
+            m["startTime"] = "20200101T000000.0Z";
+            m["endTime"] = "20200101T120000.0Z";
+            m["productId"] = "EUC_LE1_VIS-W-00034-1_20200707T144425.0Z_03.04";
+            m["signature"] = "00034-W-1";
 
+            std::string prodType(m.productType());
+
+            Message<MsgBodyINDATA> msg;
+            msg.buildHdr(ChnlInData,
+                         ChnlInData,
+                         "1.0",
+                         compName,
+                         "DataMng",
+                         "", "", "");
+
+            MsgBodyINDATA body;
+            JValue record("{\"" + prodType + "\": " + m.str() + "}");
+            body["products"] = record.val();
+            msg.buildBody(body);
+
+            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+            it = connections.find(ChnlInData);
+            if (it != connections.end()) {
+                ScalabilityProtocolRole * conn = it->second;
+                conn->setMsgOut(msg.str());
+            }
+
+
+            /*
             // Create message and send it to appropriate targets
             std::array<std::string,1> fwdRecip = {"DataMng"};
             for (std::string & recip : fwdRecip) {
@@ -145,13 +168,12 @@ void EvtMng::execAdditonalLoopTasks()
                 PeerMessage * pmsg = buildPeerMsg(hdr.destination, msg.getDataString(), MSG_INDATA);
                 registerMsg(selfPeer()->name, *pmsg);
                 setTransmissionToPeer(hdr.destination, pmsg);
-            }
-            */
+                }*/
+
         }
     }
-
+/*
     // 2. Check possible commands in DB
-    /*
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     std::string cmdSource;
     std::string cmdContent;
@@ -179,14 +201,7 @@ void EvtMng::execAdditonalLoopTasks()
     }
     // Close connection
     dbHdl->closeConnection();
-    */
-}
-
-//----------------------------------------------------------------------
-// Method: runEachIteration
-//----------------------------------------------------------------------
-void EvtMng::runEachIteration()
-{
+*/
     if (((iteration + 1) % 10) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
@@ -207,6 +222,8 @@ void EvtMng::runEachIteration()
             conn->setMsgOut(msg);
         }
     }
+
+    if (iteration > 1000) { transitTo(RUNNING); }
 }
 
 //}

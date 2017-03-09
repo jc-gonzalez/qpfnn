@@ -55,7 +55,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //==========================================================================
 // Namespace: str
@@ -250,4 +250,4 @@ std::string tagToTimestamp(std::string tag, bool withDecimals)
 
 }
 
-}
+//}

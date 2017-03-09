@@ -66,8 +66,12 @@ void ScalabilityProtocolRole::getIncommingMessageStrings()
     TRC(elemName << ": checking incomming messages... " << rev);
     if (rev & NN_IN == NN_IN) {
         rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);
-        TRC("rc = " << rc);
-        iMsgList.push(MessageString(buf));
+        if (rc > 0) {
+            memset((void*)(buf + rc), 0, MAX_MESSAGE_SIZE - rc);
+            iMsgList.push(MessageString(buf));
+        } else {
+            TRC("rc = " << rc);
+        }
     }
 }
 

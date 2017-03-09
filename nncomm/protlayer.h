@@ -13,7 +13,6 @@ public:
     ProtocolLayer();
 
     ProtocolLayerClass getClass();
-    void go();
 
     void createPipeline(ChannelDescriptor chnl,
                         CommNode* pusher,

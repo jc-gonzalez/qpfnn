@@ -76,9 +76,33 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
-//==========================================================================
+//============================================================
+// Group: Constants
+//============================================================
+
+//------------------------------------------------------------
+// Topic: Spaces for product files
+//------------------------------------------------------------
+
+const std::string ExternalSpace("EXTERNAL");
+const std::string UserSpace("USER");
+const std::string InboxSpace("INBOX");
+const std::string LocalArchSpace("LOCAL_ARCHIVE");
+const std::string GatewaySpace("GATEWAY");
+const std::string ProcessingSpace("PROCESSING");
+const std::string ReprocessingSpace("REPROCESSING");
+
+const std::set<std::string> URLSpaces
+      { ExternalSpace,
+        UserSpace,
+        InboxSpace,
+        LocalArchSpace,
+        GatewaySpace,
+        ProcessingSpace };
+
+//============================================================
 // Group: JSON based macros and classes
-//==========================================================================
+//============================================================
 
 #include "json/json.h"
 
@@ -189,8 +213,12 @@ public:
     virtual void dump() {}
 };
 
+//============================================================
+// Group: Basic datatypes
+//============================================================
+
 //------------------------------------------------------------
-// Topic: Basic datatypes
+// Topic: Elementary types
 //------------------------------------------------------------
 
 typedef std::string   ProductType;

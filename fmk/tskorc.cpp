@@ -2,15 +2,16 @@
 
 #include "channels.h"
 
-TskOrc::TskOrc(const char * name, const char * addr) : Component(name, addr)
+TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s) : Component(name, addr, s)
 {
 }
 
-TskOrc::TskOrc(std::string name, std::string addr)  : Component(name, addr)
+TskOrc::TskOrc(std::string name, std::string addr, Synchronizer * s)  : Component(name, addr, s)
 {
 }
 
 void TskOrc::runEachIteration() {
+    /*
     if (((iteration + 1) % 12) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlTskSched);
@@ -30,4 +31,5 @@ void TskOrc::runEachIteration() {
             conn->setMsgOut(msg);
         }
     }
+    */
 }

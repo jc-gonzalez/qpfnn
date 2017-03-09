@@ -73,17 +73,17 @@ public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(const char * name, const char * addr = 0);
+    EvtMng(const char * name, const char * addr = 0, Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(std::string name, std::string addr = std::string());
+    EvtMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
-    // Method: fromInitialisedToRunning
+    // Method: start
     //----------------------------------------------------------------------
-    virtual void fromInitialisedToRunning();
+    void start();
 
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational
@@ -99,11 +99,6 @@ public:
     // Method: fromRunningToOff
     //----------------------------------------------------------------------
     virtual void fromRunningToOff();
-
-    //----------------------------------------------------------------------
-    // Method: execAdditonalLoopTasks
-    //----------------------------------------------------------------------
-    virtual void execAdditonalLoopTasks();
 
     //----------------------------------------------------------------------
     // Method: runEachIteration

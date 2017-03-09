@@ -50,6 +50,9 @@
 //   - chrono
 //   - ctime
 //------------------------------------------------------------
+#include <map>
+#include <thread>
+#include <mutex>
 #include <chrono>
 #include <ctime>
 
@@ -71,6 +74,7 @@ using std::chrono::system_clock;
 #include "config.h"
 #include "channels.h"
 #include "log.h"
+#include "sync.h"
 
 #ifdef LogMsg
 
@@ -113,6 +117,7 @@ using std::chrono::system_clock;
 
 class Component : public CommNode, public StateMachine {
 
+protected:
     // Valid Manager states
     static const int ERROR        = -1;
     static const int OFF          =  0;
@@ -124,17 +129,23 @@ public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    Component(const char * name, const char * addr = 0);
+    Component(const char * name, const char * addr = 0, Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    Component(std::string name, std::string addr = std::string());
+    Component(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Method: run
     //----------------------------------------------------------------------
     virtual void run();
+
+    //----------------------------------------------------------------------
+    // Method: addConnection
+    //----------------------------------------------------------------------
+    virtual void addConnection(ChannelDescriptor & chnl,
+                               ScalabilityProtocolRole * conct);
 
     //----------------------------------------------------------------------
     // Method: periodicMsgInChannel
@@ -146,11 +157,21 @@ public:
     //----------------------------------------------------------------------
     virtual void setStep(int s);
 
+    //----------------------------------------------------------------------
+    // Method: getName
+    //----------------------------------------------------------------------
+    virtual std::string getName() { return compName; }
+
+    //----------------------------------------------------------------------
+    // Method: getAddress
+    //----------------------------------------------------------------------
+    virtual std::string getAddress() { return compAddress; }
+
 protected:
     //----------------------------------------------------------------------
     // Method: init
     //----------------------------------------------------------------------
-    virtual void init();
+    virtual void init(std::string name, std::string addr, Synchronizer * s);
 
     //----------------------------------------------------------------------
     // Method: fromInitialisedToRunning
@@ -205,9 +226,18 @@ private:
     virtual void step();
 
 protected:
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;
     std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;
-    int iteration;
+
+    std::string compName;
+    std::string compAddress;
+
     std::mutex mtxStepSize;
+
+    std::thread thrId;
+
+    Synchronizer * synchro;
+    int iteration;
     int stepSize;
 };
 

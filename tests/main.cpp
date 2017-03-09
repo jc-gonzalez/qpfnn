@@ -24,27 +24,28 @@ struct MasterNodeElements {
 };
 typedef MasterNodeElements * MasterNodeElementsPtr;
 
+Synchronizer synchro;
+
 //----------------------------------------------------------------------
 // createElementsNetwork
 //----------------------------------------------------------------------
-std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
-                                                 std::vector<CommNode*>  & ag,
-                                                 std::string masterAddress,
-                                                 std::string agentsAddress)
+std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
+                                             std::vector<CommNode*>  & ag,
+                                             std::string masterAddress,
+                                             std::string agentsAddress)
 {
     //========================================
     // 1. Create the elements
     //========================================
-    m.evtMng = new EvtMng  ("EvtMng",  masterAddress);
-    m.datMng = new DataMng ("DataMng", masterAddress);
-    m.logMng = new LogMng  ("LogMng",  masterAddress);
-    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress);
-    m.tskMng = new TskMng  ("TskMng",  masterAddress);
+    m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
+    m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
+    m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
+    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
+    m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
 
-    ag.push_back(new TskAge("TskAgent1", agentsAddress));
-    ag.push_back(new TskAge("TskAgent2", agentsAddress));
-    ag.push_back(new TskAge("TskAgent3", agentsAddress));
-
+    ag.push_back(new TskAge("TskAgent1", agentsAddress, &synchro));
+    ag.push_back(new TskAge("TskAgent2", agentsAddress, &synchro));
+    ag.push_back(new TskAge("TskAgent3", agentsAddress, &synchro));
 
     //========================================
     // 2. Create the connection channels
@@ -61,7 +62,7 @@ std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
     ProtocolLayer p1;
-    p1.createSurvey(ChnlCmd, m.evtMng, allCommNodes, 5555);
+    p1.createSurvey(ChnlCmd, m.evtMng, allCommNodes);
 
     //-----------------------------------------------------------------
     // Channel INDATA -  PUBSUB
@@ -93,7 +94,7 @@ std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
     // - Out/In: TskMng/TskAge*
     ProtocolLayer p5;
     for (auto & c: ag) {
-        p5.createPipeline(ChnlTskProc + "_" + c->getName(), m.tskMng, c);
+        p5.createPipeline(ChnlTskProc + "_" + dynamic_cast<Component*>(c)->getName(), m.tskMng, c);
     }
 
     //-----------------------------------------------------------------
@@ -101,7 +102,7 @@ std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
     // - Surveyor: TskMng
     // - Respondent: TskAge*
     ProtocolLayer p6;
-    p6.createSurvey(ChnlTskMonit, m.tskMng, ag, 5557);
+    p6.createSurvey(ChnlTskMonit, m.tskMng, ag, 5555);
 
     //-----------------------------------------------------------------
     // Channel TASK-REPORTING - PUBSUB
@@ -112,7 +113,10 @@ std::vector<ProtocolLayer> createElementsNetwork(MasterNodeElements & m,
                     std::vector<CommNode*> {m.tskMng},
                     std::vector<CommNode*> {m.datMng, m.evtMng});
 
-    return std::vector<ProtocolLayer> {p1, p2, p3, p4, p5, p6, p7};
+    allCommNodes.push_back(m.evtMng);
+
+    return allCommNodes;
+//    return std::vector<ProtocolLayer> {p1, p2, p3, p4, p5, p6, p7};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,19 +189,22 @@ int main(int argc, char * argv[])
     MasterNodeElements masterNodeElems;
     std::vector<CommNode*> agentsNodes;
 
-    std::vector<ProtocolLayer> network =
+    std::vector<CommNode*> allCommNodes =
         createElementsNetwork(masterNodeElems, agentsNodes,
                               "127.0.0.1",     "127.0.0.1");
+    // std::vector<ProtocolLayer> network =
 
     // Define periodic message in  a certain channel at component level
     MessageString msgStr = msg.str();
     masterNodeElems.evtMng->periodicMsgInChannel(ChnlInData, 13, msgStr);
 
     // START!
-    for (auto p: network) { p.go(); }
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    synchro.notify();
 
     // FOREVER
-    for(;;) {}
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    synchro.wait();
 
     return 0;
 }

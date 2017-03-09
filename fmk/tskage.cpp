@@ -2,11 +2,11 @@
 
 #include "channels.h"
 
-TskAge::TskAge(const char * name, const char * addr) : Component(name, addr)
+TskAge::TskAge(const char * name, const char * addr, Synchronizer * s) : Component(name, addr, s)
 {
 }
 
-TskAge::TskAge(std::string name, std::string addr)  : Component(name, addr)
+TskAge::TskAge(std::string name, std::string addr, Synchronizer * s)  : Component(name, addr, s)
 {
 }
 

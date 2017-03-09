@@ -23,7 +23,7 @@
 
 #define MAX_MESSAGE_SIZE 1024
 
-#define WAIT_BINDING 10000
+#define WAIT_BINDING 100000
 
 typedef std::string                  MessageString;
 typedef nn::socket                   Socket;

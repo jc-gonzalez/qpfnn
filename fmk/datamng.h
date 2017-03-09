@@ -7,7 +7,7 @@
 
 class DataMng : public Component {
 public:
-    DataMng(const char * name, const char * addr = 0);
-    DataMng(std::string name, std::string addr = std::string());
+    DataMng(const char * name, const char * addr = 0, Synchronizer * s = 0);
+    DataMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 };
 #endif

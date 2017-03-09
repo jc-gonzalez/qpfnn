@@ -2,14 +2,15 @@
 
 #include "channels.h"
 
-TskMng::TskMng(const char * name, const char * addr) : Component(name, addr)
+TskMng::TskMng(const char * name, const char * addr, Synchronizer * s) : Component(name, addr, s)
 {
 }
 
-TskMng::TskMng(std::string name, std::string addr) : Component(name, addr)
+TskMng::TskMng(std::string name, std::string addr, Synchronizer * s) : Component(name, addr, s)
 {
 }
 
+/*
 void TskMng::runEachIteration() {
     if (((iteration + 1) % 21) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
@@ -30,3 +31,4 @@ void TskMng::runEachIteration() {
         }
     }
 }
+*/

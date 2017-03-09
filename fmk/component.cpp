@@ -65,38 +65,31 @@
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-Component::Component(const char * name, const char * addr)
-    : CommNode(name, addr)
+Component::Component(const char * name, const char * addr, Synchronizer * s)
 {
-    init();
+    init(std::string(name), std::string(addr), s);
 }
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-Component::Component(std::string name, std::string addr)
-    : CommNode(name, addr)
+Component::Component(std::string name, std::string addr, Synchronizer * s)
 {
-    init();
-}
-
-//----------------------------------------------------------------------
-// Method: periodicMsgInChannel
-//----------------------------------------------------------------------
-void Component::periodicMsgInChannel(ChannelDescriptor chnl, int period, MessageString msg)
-{
-    periodicMsgs[chnl][period] = msg;
+    init(name, addr, s);
 }
 
 //----------------------------------------------------------------------
 // Method: init
 // Initialize the component
 //----------------------------------------------------------------------
-void Component::init()
+void Component::init(std::string name, std::string addr, Synchronizer * s)
 {
-    iteration = 0;
+    compName    = name;
+    compAddress = addr;
+    synchro     = s;
 
-    stepSize = 200;
+    iteration = 0;
+    stepSize  = 50;
 
     // Every component must respond to MONIT_RQST messages (at least the
     // state might be requested)
@@ -117,6 +110,28 @@ void Component::init()
     // Transit to INITIALISED
     transitTo(INITIALISED);
     InfoMsg("New state: " + getStateName(getState()));
+
+    TRC("Creating thread for " << compName << " in " << compAddress);
+    thrId = std::thread(&Component::run, this);
+    thrId.detach();
+}
+
+//----------------------------------------------------------------------
+// Method: addConnection
+//----------------------------------------------------------------------
+void Component::addConnection(ChannelDescriptor & chnl,
+                              ScalabilityProtocolRole * conct)
+{
+    conct->setName(compName);
+    connections[chnl] = conct;
+}
+
+//----------------------------------------------------------------------
+// Method: periodicMsgInChannel
+//----------------------------------------------------------------------
+void Component::periodicMsgInChannel(ChannelDescriptor chnl, int period, MessageString msg)
+{
+    periodicMsgs[chnl][period] = msg;
 }
 
 //----------------------------------------------------------------------
@@ -124,9 +139,6 @@ void Component::init()
 //----------------------------------------------------------------------
 void Component::fromInitialisedToRunning()
 {
-    setGo(false);
-    while (!getGo()) {}
-
     transitTo(RUNNING);
     InfoMsg("New state: " + getStateName(getState()));
 }
@@ -217,6 +229,18 @@ void Component::step()
 //----------------------------------------------------------------------
 void Component::run()
 {
+    // Wait for synchronisation signal
+    synchro->wait();
+
+    // Show connections
+    for (auto & kv: connections) {
+        ChannelDescriptor chnl = kv.first;
+        ScalabilityProtocolRole * role = kv.second;
+        TRC(role->getName() << "(" << this << ") in Channel " << chnl
+            << " with address " << role->getAddress()
+            << " - " << role->getClass());
+    }
+
     // State: Initialised
     // Transition to: Running
     fromInitialisedToRunning();
@@ -225,12 +249,14 @@ void Component::run()
     // Transition to: Running
     fromRunningToOperational();
 
-    for (;;++iteration) {
+    do {
+        ++iteration;
+
         updateConnections();
         sendPeriodicMsgs();
         runEachIteration();
         step();
-    }
+    } while (getState() == OPERATIONAL);
 
     // State: Initialised
     // Transition to: Running
@@ -239,7 +265,6 @@ void Component::run()
     // State: Initialised
     // Transition to: Running
     fromRunningToOff();
-
 }
 
 //----------------------------------------------------------------------
@@ -247,9 +272,8 @@ void Component::run()
 //----------------------------------------------------------------------
 void Component::setStep(int s)
 {
-    mtxStepSize.lock();
+    std::unique_lock<std::mutex> ulck(mtxStepSize);
     stepSize = s;
-    mtxStepSize.unlock();
 }
 
 //----------------------------------------------------------------------

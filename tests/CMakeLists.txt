@@ -18,16 +18,23 @@ set (fmktest_src
 #===== Project sections/libraries =======
 
 set (NNMSG_ROOT_DIR /usr/local)
-set (NNCOMM_ROOT_DIR ../nncomm)
-set (FMK_ROOT_DIR ../fmk)
-set (JSON_ROOT_DIR ../json)
-set (INFIX_ROOT_DIR ../infix)
+
+set (JSON_ROOT_DIR    ../json)
+set (NNCOMM_ROOT_DIR  ../nncomm)
+set (FMK_ROOT_DIR     ../fmk)
+set (INFIX_ROOT_DIR   ../infix)
+set (LOG_ROOT_DIR     ../log)
+set (STR_ROOT_DIR     ../str)
+set (UUID_ROOT_DIR    ../uuid)
 
 link_directories (
   ${NNMSG_ROOT_DIR}/lib
   ${NNCOMM_ROOT_DIR}
   ${FMK_ROOT_DIR}
   ${JSON_ROOT_DIR}
+  ${LOG_ROOT_DIR}
+  ${STR_ROOT_DIR}
+  ${UUID_ROOT_DIR}
   ${INFIX_ROOT_DIR}
 )
 
@@ -37,8 +44,13 @@ target_include_directories (fmktest PUBLIC .
   ${NNCOMM_ROOT_DIR}
   ${FMK_ROOT_DIR}
   ${JSON_ROOT_DIR}
+  ${LOG_ROOT_DIR}
+  ${STR_ROOT_DIR}
+  ${UUID_ROOT_DIR}
   ${INFIX_ROOT_DIR})
-target_link_libraries (fmktest nanomsg nncomm json fmk infix pthread)
+target_link_libraries (fmktest
+  fmk json nncomm infix str uuid log
+  nanomsg pthread)
 set_target_properties (fmktest PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmktest
          RUNTIME DESTINATION bin

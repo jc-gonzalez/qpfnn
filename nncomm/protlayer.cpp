@@ -17,18 +17,12 @@ ProtocolLayer::ProtocolLayerClass ProtocolLayer::getClass()
     return protLayerClass;
 }
 
-void ProtocolLayer::go()
-{
-    if (protLayerClass == UNDEFINED) { return; }
-
-    for (auto & c: components) { c->go(); }
-}
-
 void ProtocolLayer::createPipeline(ChannelDescriptor chnl,
                                    CommNode* pusher,
                                    CommNode* puller,
                                    int port)
 {
+    TRC("Creating Pipeline " << chnl);
     std::string bindAddr;
     std::string connAddr;
     if (port <= 0) {
@@ -56,6 +50,7 @@ void ProtocolLayer::createPubSub(ChannelDescriptor chnl,
                                  std::vector<CommNode*> subscribers,
                                  int port)
 {
+    TRC("Creating PubSub " << chnl);
     std::string bindAddr;
     std::string connAddr;
     if (port <= 0) {
@@ -84,6 +79,7 @@ void ProtocolLayer::createSurvey(ChannelDescriptor chnl,
                                  CommNode * surveyor, std::vector<CommNode*> respondents,
                                  int port)
 {
+    TRC("Creating Survey " << chnl);
     std::string bindAddr;
     std::string connAddr;
     if (port <= 0) {
@@ -110,6 +106,7 @@ void ProtocolLayer::createBus(ChannelDescriptor chnl,
                               std::vector<CommNode*> elements,
                               int port)
 {
+    TRC("Creating Bus " << chnl);
     std::string addr;
     std::vector<std::string> addresses;
     int i = 1;

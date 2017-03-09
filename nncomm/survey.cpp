@@ -44,7 +44,7 @@ void Survey::init(int elemCls, const char * addr)
     createSocket(elemClass);
     if (elemClass == NN_SURVEYOR) {
         int deadline = WAIT_BINDING;
-        sck->setsockopt(NN_SURVEYOR, NN_SURVEYOR_DEADLINE, &deadline, sizeof(int));
+        //sck->setsockopt(NN_SURVEYOR, NN_SURVEYOR_DEADLINE, &deadline, sizeof(int));
         endPoint = sck->bind(addr);
     } else {
         endPoint = sck->connect(addr);

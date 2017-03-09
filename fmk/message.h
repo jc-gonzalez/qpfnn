@@ -76,9 +76,9 @@ public:
     MsgBodyINDATA(std::string s) : JRecord(s) {}
     MsgBodyINDATA(json v) : JRecord(v) {}
     virtual void dump() {
-        DUMPJSTR(cmd);
+        DUMPJSTRSTRMAP(products);
     }
-    JSTR(cmd);
+    JSTRSTRMAP(products);
 };
 
 //==========================================================================
@@ -153,6 +153,28 @@ public:
     virtual void dump() {
         header.dump();
         body.dump();
+    }
+    void buildHdr(std::string id,
+                  std::string type,
+                  std::string version,
+                  std::string source,
+                  std::string target,
+                  std::string dateCreation,
+                  std::string dateTransmission,
+                  std::string dateReception) {
+        header["id"]               = id;
+        header["type"]             = type;
+        header["version"]          = version;
+        header["source"]           = source;
+        header["target"]           = target;
+        header["dateCreation"]     = dateCreation;
+        header["dateTransmission"] = dateTransmission;
+        header["dateReception"]    = dateReception;
+        value["header"] = header.val();
+    }
+    void buildBody(T & bdy) {
+        body = bdy;
+        value["body"] = bdy.val();
     }
     T body;
 };

@@ -7,8 +7,8 @@
 
 class TskOrc : public Component {
 public:
-    TskOrc(const char * name, const char * addr = 0);
-    TskOrc(std::string name, std::string addr = std::string());
+    TskOrc(const char * name, const char * addr = 0, Synchronizer * s = 0);
+    TskOrc(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
     virtual void runEachIteration();
 };
 #endif

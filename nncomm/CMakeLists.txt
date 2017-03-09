@@ -32,7 +32,7 @@ set (libnncomm_src
   pipeline.cpp
   pubsub.cpp
   survey.cpp
-  commnode.cpp
+#  commnode.cpp
   protlayer.cpp
 )
 
