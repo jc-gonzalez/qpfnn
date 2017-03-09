@@ -1,0 +1,1812 @@
+
+build/CMakeCache.txt,2192
+CMAKE_AR:FILEPATH=FILEPATH18,675
+fmk_LIB_DEPENDS:STATIC=general;json;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;nanomsg;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;nanomsg;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;nanomsg;general;pq;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;nanomsg;general;pq;general;193,5819
+fmk_LIB_DEPENDS:STATIC=general;json;general;str;general;log;general;tools;general;uuid;general;nncomm;general;nanomsg;general;pq;general;pthread;193,5819
+fmk_SOURCE_DIR:STATIC=STATIC196,5992
+nncomm_LIB_DEPENDS:STATIC=general;nanomsg;235,7142
+nncomm_LIB_DEPENDS:STATIC=general;nanomsg;general;235,7142
+nncomm_LIB_DEPENDS:STATIC=general;nanomsg;general;pthread;235,7142
+nncomm_SOURCE_DIR:STATIC=STATIC238,7228
+tools_LIB_DEPENDS:STATIC=general;json;253,7677
+tools_LIB_DEPENDS:STATIC=general;json;general;253,7677
+tools_LIB_DEPENDS:STATIC=general;json;general;pthread;253,7677
+tools_SOURCE_DIR:STATIC=STATIC256,7759
+
+build/Makefile,17
+SUFFIXES 21,544
+
+fmk/cfg.h,2809
+#define CFG_H42,807
+namespace QPF 64,1488
+typedef LibComm::Router2RouterPeer::Peer           Peer;66,1505
+typedef LibComm::Router2RouterPeer::Frame          Frame;67,1562
+struct Rule 69,1621
+    std::string              name;70,1635
+    std::vector<std::string> inputs;71,1670
+    std::vector<std::string> outputs;72,1707
+    std::string              processingElement;73,1745
+    std::string              condition;74,1793
+typedef std::map<Rule Rule77,1837
+typedef std::map<Rule *, ProductList>  RuleInputs;77,1837
+struct Processor 79,1889
+    std::string name;80,1908
+    std::string exePath;81,1930
+    std::string inPath;82,1955
+    std::string outPath;83,1979
+    std::string version;84,2004
+    int         counter;85,2029
+struct OrchestrationParameters 88,2058
+    std::vector<std::string>            productTypes;89,2091
+    std::vector<Rule *>                 rules;90,2145
+    std::map<std::map91,2192
+    std::map<std::string, Processor *>  processors;91,2192
+struct OrchestrationMaps 94,2248
+    std::multimap<std::multimap95,2275
+    std::multimap<std::string, Rule *>  prodAsInput;95,2275
+    std::map<std::map96,2328
+    std::map<Rule *, std::string>       ruleDesc;96,2328
+enum LocalArchiveMethod 99,2382
+    LINK,100,2408
+    MOVE,101,2418
+    COPY,102,2428
+    COPY_TO_REMOTE,103,2438
+    COPY_TO_MASTER,104,2458
+    SYMLINK105,2478
+struct StorageExternal 108,2494
+    std::string protocol;109,2519
+    std::string address;110,2545
+    std::string port;111,2570
+    std::string user;112,2592
+    std::string passwd;113,2614
+    std::string path;114,2638
+struct StorageLocal 117,2664
+    std::string path;118,2686
+struct StorageConfig 121,2712
+    std::string     base;122,2735
+    std::string     run;123,2761
+    std::string     tasks;124,2786
+    StorageExternal inbox;125,2813
+    StorageLocal    local_archive;126,2840
+    StorageExternal archive;127,2875
+    StorageLocal    gateway;128,2904
+    StorageExternal outbox;129,2933
+struct UserDefTool 132,2965
+    std::string name;133,2986
+    std::string desc;134,3008
+    std::string exe;135,3030
+    std::string args;136,3051
+    std::vector<std::string> prod_types;137,3073
+struct FlagsConfig 140,3118
+    struct MonitoringFlags 141,3139
+        std::map<std::map142,3168
+        std::map<std::string, bool> msgsToDisk;142,3168
+        std::map<std::map143,3216
+        std::map<std::string, bool> msgsToDB;143,3216
+        bool notifyMsgArrival;144,3262
+        bool groupTaskAgentLogs;145,3293
+    } monit;146,3326
+    struct ProcessingFlags 147,3339
+        bool allowReprocessing;148,3368
+        bool intermedProducts;149,3400
+    } proc;150,3431
+    struct ArchivingFlags 151,3443
+        bool sendOutputsToMainArchive;152,3471
+    } arch;153,3510
+
+fmk/cfginfo.cpp,340
+namespace QPF 51,1091
+ConfigurationInfo::ConfigurationInfo(ConfigurationInfo53,1108
+void ConfigurationInfo::clear(clear57,1152
+ConfigurationInfo & ConfigurationInfo::data(data72,1481
+std::string ConfigurationInfo::toJSONString(toJSONString78,1609
+#define C(84,1737
+#define Cc(85,1769
+void ConfigurationInfo::dump(dump358,12053
+
+fmk/cfginfo.h,2477
+#define CFGINFO_H42,826
+namespace QPF 70,1737
+class ConfigurationInfo 77,1954
+    std::string                         cfgFileName;83,2060
+    std::string                         currentMachine;84,2113
+    std::string                         currentUser;85,2169
+    bool                                isActualFile;86,2222
+    std::string                         masterMachine;88,2277
+    bool                                isMaster;89,2332
+    std::string                         appName;92,2398
+    std::string                         appVersion;93,2447
+    std::string                         lastAccess;94,2499
+    std::string                         session;95,2551
+    OrchestrationParameters             orcParams;98,2622
+    std::string                         parsing_regex;101,2693
+    std::string                         parsing_assign;102,2748
+    std::string                         product_id_tpl;103,2804
+    std::string                         data_ext;104,2860
+    std::string                         meta_ext;105,2910
+    std::string                         log_ext;106,2960
+    std::vector<std::string>            peerNames;109,3023
+    std::vector<Peer>                   peersCfg;110,3074
+    std::map<std::map111,3124
+    std::map<std::string, Peer*>        peersCfgByName;111,3124
+    std::map<std::map112,3180
+             std::vector<std::string> > connections;113,3206
+    Peer                                qpfhmiCfg;114,3259
+    Peer                                evtMngCfg;115,3310
+    std::vector<Component *>            peerNodes;118,3395
+    std::vector<Component *>            peerAgents;119,3446
+    std::vector<std::string>            machines;122,3522
+    std::map<std::map123,3572
+             std::vector<std::string> > machineNodes;124,3598
+    bool                                hmiPresent;125,3652
+    StorageConfig                       storage;128,3732
+    std::map<std::map131,3819
+    std::map<std::string, UserDefTool>  userDefTools;131,3819
+    std::string                         DBHost;134,3896
+    std::string                         DBPort;135,3944
+    std::string                         DBName;136,3992
+    std::string                         DBUser;137,4040
+    std::string                         DBPwd;138,4088
+    FlagsConfig                         flags;140,4136
+    std::vector<ConfigurationInfo *> pushedData;150,4288
+const std::set<std::string> URLSpaces162,4660
+
+fmk/channels.h,265
+#define CHANNELS_H4,35
+#undef T8,76
+#define TLISTOF_CHANNELS 10,86
+#define T(18,405
+enum ChannelId 19,429
+enum ChannelId { TLISTOF_CHANNELS 19,429
+#undef T20,466
+#define T(22,476
+const ChannelDescriptor ChannelAcronym[ChannelAcronym23,507
+#undef T24,572
+
+fmk/component.cpp,949
+Component::Component(Component68,1462
+Component::Component(Component76,1756
+void Component::init(init85,2051
+void Component::addConnection(addConnection122,3195
+void Component::periodicMsgInChannel(periodicMsgInChannel132,3558
+void Component::fromInitialisedToRunning(fromInitialisedToRunning140,3875
+void Component::fromRunningToOperational(fromRunningToOperational149,4184
+void Component::fromOperationalToRunning(fromOperationalToRunning158,4497
+void Component::fromRunningToOff(fromRunningToOff167,4798
+void Component::updateConnections(updateConnections177,5118
+void Component::sendPeriodicMsgs(sendPeriodicMsgs185,5391
+void Component::runEachIteration(runEachIteration207,6194
+void Component::step(step214,6396
+void Component::run(run230,7001
+void Component::setStep(setStep273,8103
+void Component::defineValidTransitions(defineValidTransitions283,8440
+void Component::afterTransition(afterTransition309,9428
+
+fmk/component.h,1238
+#define COMPONENT_H42,823
+using std::chrono::system_clock;59,1267
+#    undef LogMsg81,1798
+#    undef TraceMsg82,1816
+#    undef DbgMsg83,1836
+#    undef InfoMsg84,1854
+#    undef WarnMsg85,1873
+#    undef ErrMsg86,1892
+#    undef FatalMsg87,1910
+#    define LogMsg(100,2482
+#    define TraceMsg(101,2532
+#    define DbgMsg(102,2593
+#    define InfoMsg(103,2654
+#    define WarnMsg(104,2715
+#    define ErrMsg(105,2776
+#    define FatalMsg(106,2837
+class Component 118,3159
+    static const int ERROR 122,3256
+    static const int OFF 123,3296
+    static const int INITIALISED 124,3336
+    static const int RUNNING 125,3376
+    static const int OPERATIONAL 126,3416
+    virtual std::string getName(163,5150
+    virtual std::string getAddress(168,5386
+    std::map<std::map229,8103
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;229,8103
+    std::map<std::map230,8174
+    std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;230,8174
+    std::string compName;232,8251
+    std::string compAddress;233,8277
+    std::mutex mtxStepSize;235,8307
+    std::thread thrId;237,8336
+    Synchronizer * synchro;239,8360
+    int iteration;240,8388
+    int stepSize;241,8407
+
+fmk/config.cpp,1206
+#define WRITE_MESSAGE_FILES69,1235
+Config::Config(Config84,1727
+Config::Config(Config92,1944
+Config::Config(100,2175
+void Config::init(init118,2559
+void Config::setLastAccess(setLastAccess156,4036
+void Config::setConfigFile(setConfigFile165,4325
+void Config::readConfigFromFile(readConfigFromFile179,4780
+void Config::readConfigFromDB(readConfigFromDB198,5300
+void Config::saveConfigToDB(saveConfigToDB283,8091
+std::string Config::getRegExFromCfg(getRegExFromCfg334,9741
+void Config::processConfig(processConfig368,10992
+std::string Config::getEnvVar(getEnvVar596,19444
+std::string Config::DBHost;602,19616
+std::string Config::DBPort;603,19644
+std::string Config::DBName;604,19672
+std::string Config::DBUser;605,19700
+std::string Config::DBPwd;606,19728
+std::string Config::PATHBase;608,19756
+std::string Config::PATHRun;609,19786
+std::string Config::PATHBin;610,19815
+std::string Config::PATHSession;611,19844
+std::string Config::PATHLog;612,19877
+std::string Config::PATHRlog;613,19906
+std::string Config::PATHTmp;614,19936
+std::string Config::PATHTsk;615,19965
+std::string Config::PATHMsg;616,19994
+mode_t Config::PATHMode 618,20024
+bool Config::isLive 620,20057
+
+fmk/config.h,1945
+#define CONFIG_H42,797
+class CfgGrpGeneral 65,1574
+    CfgGrpGeneral(67,1621
+    CfgGrpGeneral(68,1644
+    virtual void dump(69,1686
+class CfgGrpNetwork 84,2098
+    CfgGrpNetwork(86,2145
+    CfgGrpNetwork(87,2168
+    virtual void dump(88,2210
+class CfgGrpDB 99,2545
+    CfgGrpDB(101,2587
+    CfgGrpDB(102,2605
+    virtual void dump(103,2642
+class CfgGrpProducts 120,3055
+    CfgGrpProducts(122,3103
+    CfgGrpProducts(123,3127
+    virtual void dump(124,3170
+class CfgGrpRulesList 141,3682
+    CfgGrpRulesList(143,3731
+    CfgGrpRulesList(144,3756
+    virtual void dump(149,3892
+class CfgGrpOrchestration 162,4291
+    CfgGrpOrchestration(164,4344
+    CfgGrpOrchestration(165,4373
+    virtual void dump(168,4464
+class CfgGrpUserDefToolsList 179,4803
+    CfgGrpUserDefToolsList(181,4859
+    CfgGrpUserDefToolsList(182,4891
+    virtual void dump(183,4942
+class CfgGrpFlags 202,5497
+    CfgGrpFlags(204,5542
+    CfgGrpFlags(205,5563
+    virtual void dump(206,5603
+class Config 227,6282
+    void init(245,6867
+    virtual void dump(265,7655
+    std::string           cfgFileName;326,10087
+    std::string           cfgFilePath;327,10126
+    std::string           sessionId;328,10165
+    bool hmiPresent;329,10202
+    bool isActualFile;330,10223
+    static std::string DBHost;333,10255
+    static std::string DBPort;334,10286
+    static std::string DBName;335,10317
+    static std::string DBUser;336,10348
+    static std::string DBPwd;337,10379
+    static std::string PATHBase;339,10410
+    static std::string PATHRun;340,10443
+    static std::string PATHBin;341,10475
+    static std::string PATHSession;342,10507
+    static std::string PATHLog;343,10543
+    static std::string PATHRlog;344,10575
+    static std::string PATHTmp;345,10608
+    static std::string PATHTsk;346,10640
+    static std::string PATHMsg;347,10672
+    static mode_t      PATHMode;349,10705
+    static bool isLive;351,10739
+
+fmk/datamng.cpp,47
+DataMng::DataMng(5,45
+DataMng::DataMng(9,150
+
+fmk/datamng.h,43
+#define DATAMNG_H4,34
+class DataMng 8,77
+
+fmk/datatypes.h,5531
+#define DATATYPES_H42,816
+const std::set<std::string> URLSpaces95,2487
+typedef Json::Value  json;109,2852
+#define JSTR(111,2880
+#define JINT(112,2949
+#define JDLB(113,3015
+#define JBOOL(114,3084
+#define JSTRIDX(116,3152
+#define JINTIDX(117,3231
+#define JDLBIDX(118,3307
+#define JSTRVEC(120,3387
+#define JSTRINTMAP(126,3777
+#define JSTRSTRMAP(133,4241
+#define JOBJ(141,4701
+#define JRECORD(143,4753
+#define SET_CFGGRP(145,4819
+#define CFGGRP(146,4872
+#define DUMPJSTR(148,4908
+#define DUMPJINT(149,4993
+#define DUMPJDLB(150,5075
+#define DUMPJBOOL(151,5160
+#define FOREACH(153,5262
+#define DUMPJSTRIDX(155,5321
+#define DUMPJINTIDX(156,5413
+#define DUMPJDLBIDX(157,5502
+#define DUMPJSTRVEC(159,5595
+#define DUMPJSTRINTMAP(164,5944
+#define DUMPJSTRSTRMAP(173,6586
+class JValue 183,7229
+    JValue(185,7252
+    JValue(186,7268
+    JValue(187,7306
+    JValue operator()(operator()188,7348
+    std::string str(190,7480
+    void fromStr(198,7673
+    json & val(202,7802
+    int size(203,7837
+    json value;205,7888
+class JRecord 208,7908
+    JRecord(210,7948
+    JRecord(211,7965
+    JRecord(212,8000
+    virtual void dump(213,8042
+typedef std::string   ProductType;224,8380
+typedef std::string   DateTime;225,8415
+typedef std::string   DateRange;226,8447
+typedef std::string   URL;227,8480
+typedef std::string   URLSpace;228,8507
+typedef unsigned int  ObsId;229,8539
+typedef std::string   Instrument;230,8568
+typedef std::string   ObsMode;231,8602
+typedef unsigned int  Exposure;232,8633
+typedef std::string   Creator;233,8665
+typedef std::string   Mission;234,8696
+typedef std::string   Origin;235,8727
+typedef std::string   ProcFunction;236,8757
+typedef std::string   FileType;237,8793
+typedef std::string   ProductParams;238,8825
+typedef std::string   ProductId;239,8862
+typedef std::string   ProductVersion;240,8895
+typedef std::string   ProductStatus;241,8933
+typedef unsigned int  ProductSize;242,8970
+typedef std::string   Signature;243,9005
+typedef std::string   FileNamePart;244,9038
+struct ProductMetadata 250,9223
+struct ProductCollection 280,9924
+struct ProductList 285,10019
+    std::vector<ProductMetadata> productList;286,10057
+struct StringList 289,10107
+    std::vector<std::string> items;290,10147
+struct ProductShortList 296,10244
+typedef std::map<std::string,std::string298,10293
+typedef std::map<std::string, std::string> PList;298,10293
+struct ParameterList 300,10344
+    PList paramList;301,10387
+typedef std::string                            TaskName;307,10469
+typedef std::string                            TaskPath;308,10526
+typedef int                                    TaskExitCode;309,10583
+typedef Json::Value                            TaskData;310,10644
+#define TLIST_TASK_STATUS 312,10702
+#define T(322,11288
+enum TaskStatus 323,11318
+enum TaskStatus { TLIST_TASK_STATUS 323,11318
+#undef T324,11357
+struct TaskInfo 329,11483
+    TaskName           taskName;331,11537
+    TaskPath           taskPath;332,11570
+    DateTime           taskStart;333,11603
+    DateTime           taskEnd;334,11637
+    TaskExitCode       taskExitCode;335,11669
+    TaskStatus         taskStatus;336,11706
+    ProductCollection  inputs;337,11741
+    ProductCollection  outputs;338,11772
+    ParameterList      params;339,11804
+    TaskData           taskData;340,11835
+struct TaskAgentInfo 346,11929
+    int         total;347,11972
+    int         maxnum;348,11995
+    int         running;349,12019
+    int         waiting;350,12044
+    int         paused;351,12069
+    int         stopped;352,12093
+    int         failed;353,12118
+    int         finished;354,12142
+    int         load1min;355,12168
+    int         load5min;356,12194
+    int         load15min;357,12220
+    int         uptimesecs;358,12247
+    std::string name;359,12275
+    std::string client;360,12297
+    std::string server;361,12321
+typedef int                   MessageId;373,12576
+typedef int                   MessageVersion;374,12617
+typedef std::string           NodeName;375,12663
+struct NodeList 377,12704
+typedef int                   CRC;379,12745
+struct MessageHeader 381,12781
+    MessageId      msgId;382,12824
+    MessageVersion msgVersion;383,12850
+    NodeName       source;384,12881
+    NodeName       destination;385,12908
+    NodeList       path;386,12940
+    DateTime       dateCreation;387,12965
+    DateTime       dateTransmission;388,12998
+    DateTime       dateReception;389,13035
+    CRC            crc;390,13069
+struct Message 396,13154
+    MessageHeader header;397,13191
+struct Message_INDATA 402,13277
+    ProductCollection    productsMetadata;403,13318
+struct Message_DATA_Exchange 409,13422
+    ParameterList    variables;410,13470
+typedef Message_DATA_Exchange Message_DATA_RQST;416,13563
+typedef Message_DATA_Exchange Message_DATA_INFO;417,13612
+typedef Message_DATA_Exchange Message_MONIT_RQST;419,13662
+typedef Message_DATA_Exchange Message_MONIT_INFO;420,13712
+typedef Message_DATA_Exchange Message_CMD;422,13763
+struct Message_TASK_Processing 424,13807
+    TaskInfo    task;425,13857
+    std::string rule;426,13879
+class Message_TASK_PROC 434,14067
+class Message_TASK_RES 435,14128
+#define TLIST_MESSAGE_TYPES 437,14190
+#define T(450,14877
+enum MessageTypeIdx 451,14908
+enum MessageTypeIdx { TLIST_MESSAGE_TYPES 451,14908
+#undef T452,14953
+#define T(454,14963
+#undef T456,15032
+struct MessageData 462,15121
+    Message * msg;468,15266
+#define UNUSED(473,15297
+
+fmk/dbhdl.h,185
+#define DBHDL_H42,810
+class DBHandler 85,2099
+    DBHandler(92,2317
+    virtual ~DBHandler(97,2566
+    virtual std::pair<std::pair175,6371
+    bool connectionParamsSet;277,11357
+
+fmk/dbhdlpostgre.cpp,1829
+namespace QPF 59,1239
+DBHdlPostgreSQL::DBHdlPostgreSQL(64,1434
+bool DBHdlPostgreSQL::openConnection(openConnection72,1693
+bool DBHdlPostgreSQL::closeConnection(closeConnection115,3327
+int  DBHdlPostgreSQL::storeProducts(storeProducts127,3669
+int  DBHdlPostgreSQL::retrieveProducts(retrieveProducts172,5185
+bool DBHdlPostgreSQL::storeTask(storeTask224,7477
+bool DBHdlPostgreSQL::checkTask(checkTask261,8624
+bool DBHdlPostgreSQL::updateTable<updateTable280,9197
+bool DBHdlPostgreSQL::updateTable<updateTable291,9652
+bool DBHdlPostgreSQL::updateTable<updateTable302,10124
+bool DBHdlPostgreSQL::updateTable<updateTable313,10603
+bool DBHdlPostgreSQL::updateTask(updateTask324,11111
+bool DBHdlPostgreSQL::retrieveTask(retrieveTask371,13062
+bool DBHdlPostgreSQL::storeState(storeState382,13392
+std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(getCurrentState404,14218
+std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState(getLatestState427,14985
+void DBHdlPostgreSQL::addICommand(addICommand453,15772
+bool DBHdlPostgreSQL::getICommand(getICommand480,16716
+bool DBHdlPostgreSQL::markICommandAsDone(markICommandAsDone514,17899
+bool DBHdlPostgreSQL::removeICommand(removeICommand530,18430
+bool DBHdlPostgreSQL::storeMsg(storeMsg545,18917
+bool DBHdlPostgreSQL::retrieveMsgs(retrieveMsgs572,20104
+bool DBHdlPostgreSQL::getTable(getTable605,21324
+bool DBHdlPostgreSQL::getQuery(getQuery615,21764
+int DBHdlPostgreSQL::getNumRowsInTable(getNumRowsInTable625,22180
+bool DBHdlPostgreSQL::runCmd(runCmd639,22600
+bool DBHdlPostgreSQL::fillWithResult(fillWithResult659,23334
+bool DBHdlPostgreSQL::updTable(updTable681,24030
+int DBHdlPostgreSQL::getVersionCounter(getVersionCounter695,24570
+bool DBHdlPostgreSQL::checkSignature(checkSignature715,25223
+
+fmk/dbhdlpostgre.h,221
+#define DBHDLPOSTGRE_H42,831
+namespace QPF 71,1781
+class DBHdlPostgreSQL 76,1978
+    ~DBHdlPostgreSQL(88,2445
+    virtual std::pair<std::pair156,5854
+    PGconn     * conn;266,11156
+    PGresult   * res;267,11179
+
+fmk/euclid.h,1202
+#define EUCLID_H42,813
+namespace Euclid 68,1696
+#define TLIST_PREDEF_MISSIONS 78,2060
+#undef T86,2328
+#define T(88,2338
+enum Mission 89,2368
+enum Mission { TLIST_PREDEF_MISSIONS 89,2368
+#undef T90,2408
+#define T(92,2418
+static std::map<std::map93,2454
+                    { TLIST_PREDEF_MISSIONS 95,2523
+#undef T96,2570
+#define T(98,2580
+static std::map<std::map99,2615
+                    { TLIST_PREDEF_MISSIONS 101,2681
+#undef T102,2728
+#define T(104,2738
+static std::map<std::map105,2762
+                    { TLIST_PREDEF_MISSIONS 107,2840
+#undef T108,2887
+#define TLIST_PREDEF_PROCESSING_FUNCTIONS 114,3055
+#undef T132,4090
+#define T(134,4100
+enum ProcFunction 135,4135
+enum ProcFunction { TLIST_PREDEF_PROCESSING_FUNCTIONS 135,4135
+#undef T136,4192
+#define T(138,4202
+static std::map<std::map139,4243
+                    { TLIST_PREDEF_PROCESSING_FUNCTIONS 141,4322
+#undef T142,4381
+#define T(144,4391
+static std::map<std::map145,4431
+                    { TLIST_PREDEF_PROCESSING_FUNCTIONS 147,4507
+#undef T148,4566
+#define T(150,4576
+static std::map<std::map151,4600
+                    { TLIST_PREDEF_PROCESSING_FUNCTIONS 153,4683
+#undef T154,4742
+
+fmk/evtmng.cpp,305
+EvtMng::EvtMng(56,1255
+EvtMng::EvtMng(63,1519
+void EvtMng::fromRunningToOperational(fromRunningToOperational70,1803
+void EvtMng::fromOperationalToRunning(fromOperationalToRunning83,2291
+void EvtMng::fromRunningToOff(fromRunningToOff96,2637
+void EvtMng::runEachIteration(runEachIteration107,2957
+
+fmk/evtmng.h,76
+#define EVTMNG_H42,820
+class EvtMng 71,1762
+    DirWatcher * dw;109,3445
+
+fmk/filenamespec.cpp,1250
+FileNameSpec::FileNameSpec(FileNameSpec69,1464
+FileNameSpec::FileNameSpec(FileNameSpec74,1564
+void FileNameSpec::setFileNameSpec(setFileNameSpec79,1673
+void FileNameSpec::setRegEx(setRegEx86,1828
+void FileNameSpec::setAssignations(setAssignations98,2017
+void FileNameSpec::setProductIdTpl(setProductIdTpl140,3353
+bool FileNameSpec::parseFileName(parseFileName145,3434
+std::string FileNameSpec::placeIn(placeIn282,7959
+void FileNameSpec::decodeSignature(decodeSignature291,8258
+std::string FileNameSpec::buildProductId(buildProductId344,10268
+std::string FileNameSpec::buildVersion(buildVersion372,11062
+std::string FileNameSpec::incrMinorVersion(incrMinorVersion379,11213
+std::regex                        FileNameSpec::re;391,11487
+PCRegEx *                         FileNameSpec::re 393,11545
+std::string                       FileNameSpec::reStr 396,11609
+std::string                       FileNameSpec::assignationsStr 397,11737
+std::map< char, std::set<int> >   FileNameSpec::assignations;398,11838
+std::map< char, std::string >     FileNameSpec::assignationsTpl;399,11900
+std::string                       FileNameSpec::productIdTpl 400,11965
+bool                              FileNameSpec::initialized 402,12047
+
+fmk/filenamespec.h,689
+#define FILENAMESPEC_H42,826
+#define USE_CX11_REGEX58,1260
+class FileNameSpec 87,2129
+    static std::regex                        re;117,2987
+    static PCRegEx *                         re;119,3042
+    static std::string                       reStr;122,3099
+    static std::string                       assignationsStr;123,3151
+    static std::map<std::map124,3213
+    static std::map< char, std::set<int> >   assignations;124,3213
+    static std::map<std::map125,3272
+    static std::map< char, std::string >     assignationsTpl;125,3272
+    static std::string                       productIdTpl;126,3334
+    static bool                              initialized;128,3394
+
+fmk/logmng.cpp,43
+LogMng::LogMng(5,44
+LogMng::LogMng(9,147
+
+fmk/logmng.h,41
+#define LOGMNG_H4,33
+class LogMng 8,75
+
+fmk/message.h,1410
+#define MESSAGE_H4,34
+class MsgHeader 11,251
+    MsgHeader(13,294
+    MsgHeader(14,313
+    virtual void dump(15,351
+class MessageBase 42,1073
+    MessageBase(44,1118
+    MessageBase(45,1139
+    MessageBase(46,1195
+    virtual void init(47,1244
+    virtual void dump(50,1321
+    MsgHeader   header;53,1376
+class MsgBodyCMD 59,1579
+    MsgBodyCMD(61,1623
+    MsgBodyCMD(62,1643
+    MsgBodyCMD(63,1689
+    virtual void dump(64,1728
+class MsgBodyINDATA 73,1980
+    MsgBodyINDATA(75,2027
+    MsgBodyINDATA(76,2050
+    MsgBodyINDATA(77,2099
+    virtual void dump(78,2141
+class MsgBodyMONIT 87,2414
+    MsgBodyMONIT(89,2460
+    MsgBodyMONIT(90,2482
+    MsgBodyMONIT(91,2530
+    virtual void dump(92,2571
+class MsgBodyTSKSCHED 101,2827
+    MsgBodyTSKSCHED(103,2876
+    MsgBodyTSKSCHED(104,2901
+    MsgBodyTSKSCHED(105,2952
+    virtual void dump(106,2996
+class MsgBodyTSKMONIT 115,3252
+    MsgBodyTSKMONIT(117,3301
+    MsgBodyTSKMONIT(118,3326
+    MsgBodyTSKMONIT(119,3377
+    virtual void dump(120,3421
+class MsgBodyTSKREP 129,3675
+    MsgBodyTSKREP(131,3722
+    MsgBodyTSKREP(132,3745
+    MsgBodyTSKREP(133,3794
+    virtual void dump(134,3836
+class Message 144,4111
+    Message(146,4156
+    Message(147,4173
+    Message(148,4229
+    virtual void init(149,4278
+    virtual void dump(153,4390
+    void buildHdr(157,4466
+    void buildBody(175,5214
+    T body;179,5305
+
+fmk/sync.h,182
+#define SYNC_H4,31
+class Synchronizer 9,95
+    Synchronizer(11,124
+    void wait(13,147
+    void notify(17,242
+    std::mutex lck;22,350
+    std::condition_variable cv;23,370
+
+fmk/tskage.cpp,98
+TskAge::TskAge(5,44
+TskAge::TskAge(9,147
+void TskAge::runEachIteration(runEachIteration13,249
+
+fmk/tskage.h,41
+#define TSKAGE_H4,33
+class TskAge 8,75
+
+fmk/tskmng.cpp,43
+TskMng::TskMng(5,44
+TskMng::TskMng(9,147
+
+fmk/tskmng.h,41
+#define TSKMNG_H4,33
+class TskMng 8,75
+
+fmk/tskorc.cpp,98
+TskOrc::TskOrc(5,44
+TskOrc::TskOrc(9,147
+void TskOrc::runEachIteration(runEachIteration13,249
+
+fmk/tskorc.h,41
+#define TSKORC_H4,33
+class TskOrc 8,75
+
+fmk/urlhdl.cpp,995
+URLHandler::URLHandler(66,1405
+ProductMetadata & URLHandler::fromExternal2Inbox(fromExternal2Inbox73,1641
+ProductMetadata & URLHandler::fromOutbox2External(fromOutbox2External102,2642
+ProductMetadata & URLHandler::fromFolder2Inbox(fromFolder2Inbox113,2995
+ProductMetadata & URLHandler::fromInbox2LocalArch(fromInbox2LocalArch146,4078
+ProductMetadata & URLHandler::fromLocalArch2Gateway(fromLocalArch2Gateway198,5853
+ProductMetadata & URLHandler::fromGateway2Processing(fromGateway2Processing233,7033
+ProductMetadata & URLHandler::fromProcessing2Gateway(fromProcessing2Gateway272,8225
+ProductMetadata & URLHandler::fromGateway2LocalArch(fromGateway2LocalArch315,9576
+int URLHandler::relocate(relocate350,10692
+int URLHandler::copyfile(copyfile404,12586
+int URLHandler::rcopyfile(rcopyfile424,13165
+int URLHandler::runlink(runlink444,13774
+void URLHandler::setRemoteCopyParams(setRemoteCopyParams458,14158
+void URLHandler::setProcElemRunDir(setProcElemRunDir469,14555
+
+fmk/urlhdl.h,274
+#define URLHANDLER_H42,814
+class URLHandler 76,1961
+    std::string workDir;157,5515
+    std::string intTaskDir;158,5540
+    std::string taskExchgDir;159,5568
+    std::string master_address;160,5598
+    std::string remote_address;161,5630
+    bool isRemote;162,5662
+
+infix/infixeval.h,1651
+#define INFIXEVAL_H42,837
+using std::istream;61,1206
+using std::istringstream;62,1226
+using std::map;63,1252
+using std::stack;64,1268
+using std::vector;65,1286
+using std::string;66,1305
+namespace InFix 79,1718
+    TLIST_OF_ERRORS 82,1811
+#define T(91,2399
+enum InfixEvError 92,2416
+enum InfixEvError { TLIST_OF_ERRORS 92,2416
+#undef T93,2455
+#define T(95,2465
+extern char const * InfixEvErrorNames[InfixEvErrorNames96,2483
+#undef T97,2524
+#define T(99,2534
+extern char const * InfixEvErrorMsgs[InfixEvErrorMsgs100,2551
+#undef T101,2591
+#define ALLOW_SYMBOLIC103,2601
+#define DEFINED_AS_TOKEN 106,2647
+#define DEFINED_AS_TOKEN108,2693
+#define TOKENS 111,2726
+#define T(132,3669
+enum TokenType 133,3684
+enum TokenType { TOKENS 133,3684
+#undef T134,3711
+struct Symbols 137,3753
+    static map<map138,3770
+    static map<string, NumericType> symbolMap;138,3770
+class Token 142,3853
+    Token(144,3875
+    inline TokenType getType(147,4012
+    inline const NumericType & getValue(148,4069
+    inline string getSymbol(149,4138
+    TokenType   theType;152,4206
+    NumericType theValue;153,4231
+    string      theSymbol;154,4257
+class TokensList 158,4320
+    TokensList(160,4347
+    istream & in;164,4446
+typedef Token<int> tokenType;167,4468
+class Evaluator 170,4531
+    Evaluator(172,4557
+    inline int getStatus(176,4676
+    inline void set(177,4722
+    inline void clear(178,4773
+    stack<TokenType>   opStack;181,4852
+    stack<NumericType> postFixStack;182,4922
+    stack<string>      symbolStack;183,4988
+    string expressions;185,5059
+    istringstream str;186,5127
+    int status;187,5181
+
+infix/infixeval.tcc,1005
+#define DEBUG_INFIX44,856
+#  define DBG(47,896
+#  define DBG(49,986
+namespace InFix 58,1236
+#define T(60,1255
+char const * InfixEvErrorNames[InfixEvErrorNames61,1273
+#undef T62,1329
+#define T(64,1339
+char const * InfixEvErrorMsgs[InfixEvErrorMsgs65,1356
+#undef T66,1411
+#define T(68,1421
+const char * TokenName 69,1437
+#undef T70,1477
+vector<string> split(77,1751
+Token<NumericType> TokensList<NumericType>::getToken(getToken94,2271
+struct Precedence 198,5299
+    int inputSymbol;199,5319
+    int topOfStack;200,5340
+} PREC_TABLE 201,5360
+NumericType Evaluator<NumericType>::getValue(getValue223,6288
+NumericType Evaluator<NumericType>::eval(eval257,7379
+void Evaluator<NumericType>::processToken(processToken289,8304
+NumericType Evaluator<NumericType>::getTop(getTop334,9640
+string Evaluator<NumericType>::getTopSymbol(getTopSymbol352,10195
+void Evaluator<NumericType>::binaryOp(binaryOp371,10813
+template<> map<string, int> Symbols<int>::symbolMap symbolMap431,12579
+
+json/jsoncpp.cpp,20348
+#define LIB_JSONCPP_JSON_TOOL_H_INCLUDED88,3746
+namespace Json 96,3966
+static inline std::string codePointToUTF8(99,4028
+static inline bool isControlCharacter(128,5042
+  uintToStringBufferSize 133,5224
+typedef char UIntToStringBuffer[UIntToStringBuffer137,5337
+static inline void uintToString(144,5608
+static inline void fixNumericLocale(157,6005
+#define snprintf 204,7262
+static int const stackLimit_g 212,7441
+static int       stackDepth_g 213,7479
+namespace Json 215,7535
+typedef std::unique_ptr<CharReader> CharReaderPtr;218,7580
+typedef std::auto_ptr<CharReader>   CharReaderPtr;220,7637
+Features::Features(226,7769
+Features Features::all(all230,7911
+Features Features::strictMode(strictMode232,7960
+static bool containsNewLine(244,8262
+Reader::Reader(254,8536
+Reader::Reader(259,8726
+Reader::parse(parse265,8933
+bool Reader::parse(parse272,9180
+bool Reader::parse(parse285,9630
+bool Reader::readValue(readValue327,10786
+void Reader::skipCommentTokens(skipCommentTokens411,13205
+bool Reader::readToken(readToken421,13402
+void Reader::skipSpaces(skipSpaces492,14665
+bool Reader::match(match502,14850
+bool Reader::readComment(readComment513,15122
+static std::string normalizeEOL(536,15733
+Reader::addComment(addComment556,16203
+bool Reader::readCStyleComment(readCStyleComment567,16548
+bool Reader::readCppStyleComment(readCppStyleComment576,16729
+void Reader::readNumber(readNumber592,17084
+bool Reader::readString(readString614,17704
+bool Reader::readObject(readObject626,17900
+bool Reader::readArray(readArray682,19804
+bool Reader::decodeNumber(decodeNumber720,20821
+bool Reader::decodeNumber(decodeNumber730,21102
+bool Reader::decodeDouble(decodeDouble772,22718
+bool Reader::decodeDouble(decodeDouble782,22999
+bool Reader::decodeString(decodeString794,23357
+bool Reader::decodeString(decodeString805,23691
+bool Reader::decodeUnicodeCodePoint(decodeUnicodeCodePoint858,24988
+bool Reader::decodeUnicodeEscapeSequence(decodeUnicodeEscapeSequence887,26033
+Reader::addError(addError916,26887
+bool Reader::recoverFromError(recoverFromError925,27101
+bool Reader::addErrorAndRecover(addErrorAndRecover938,27461
+Value& Reader::currentValue(currentValue945,27701
+Reader::Char Reader::getNextChar(getNextChar947,27760
+void Reader::getLocationLineAndColumn(getLocationLineAndColumn953,27860
+std::string Reader::getLocationLineAndColumn(getLocationLineAndColumn976,28462
+std::string Reader::getFormatedErrorMessages(getFormatedErrorMessages993,29028
+std::string Reader::getFormattedErrorMessages(getFormattedErrorMessages997,29124
+std::vector<Reader::StructuredError> Reader::getStructuredErrors(getStructuredErrors1013,29668
+bool Reader::pushError(pushError1028,30205
+bool Reader::pushError(pushError1045,30677
+bool Reader::good(good1063,31240
+class OurFeatures 1068,31323
+  bool allowComments_;1072,31396
+  bool strictRoot_;1073,31419
+  bool allowDroppedNullPlaceholders_;1074,31439
+  bool allowNumericKeys_;1075,31477
+  bool allowSingleQuotes_;1076,31503
+  bool failIfExtra_;1077,31530
+  bool rejectDupKeys_;1078,31551
+  int stackLimit_;1079,31574
+OurFeatures::OurFeatures(1085,31700
+OurFeatures OurFeatures::all(all1093,31906
+class OurReader 1099,32081
+  typedef char Char;1101,32107
+  typedef const Char* Location;1102,32128
+  struct StructuredError 1103,32160
+    size_t offset_start;1104,32187
+    size_t offset_limit;1105,32212
+    std::string message;1106,32237
+  enum TokenType 1124,32831
+    tokenEndOfStream 1125,32850
+    tokenObjectBegin,1126,32876
+    tokenObjectEnd,1127,32898
+    tokenArrayBegin,1128,32918
+    tokenArrayEnd,1129,32939
+    tokenString,1130,32958
+    tokenNumber,1131,32975
+    tokenTrue,1132,32992
+    tokenFalse,1133,33007
+    tokenNull,1134,33023
+    tokenArraySeparator,1135,33038
+    tokenMemberSeparator,1136,33063
+    tokenComment,1137,33089
+    tokenError1138,33107
+  class Token 1141,33128
+    TokenType type_;1143,33154
+    Location start_;1144,33175
+    Location end_;1145,33196
+  class ErrorInfo 1148,33221
+    Token token_;1150,33251
+    std::string message_;1151,33269
+    Location extra_;1152,33295
+  typedef std::deque<ErrorInfo> Errors;1155,33322
+  typedef std::stack<Value*> Nodes;1197,34988
+  Nodes nodes_;1198,35024
+  Errors errors_;1199,35040
+  std::string document_;1200,35058
+  Location begin_;1201,35083
+  Location end_;1202,35102
+  Location current_;1203,35119
+  Location lastValueEnd_;1204,35140
+  Value* lastValue_;1205,35166
+  std::string commentsBefore_;1206,35187
+  int stackDepth_;1207,35218
+  OurFeatures const features_;1209,35238
+  bool collectComments_;1210,35269
+OurReader::OurReader(1215,35358
+bool OurReader::parse(parse1220,35569
+bool OurReader::readValue(readValue1268,36872
+void OurReader::skipCommentTokens(skipCommentTokens1347,39064
+bool OurReader::readToken(readToken1357,39264
+void OurReader::skipSpaces(skipSpaces1434,40682
+bool OurReader::match(match1444,40870
+bool OurReader::readComment(readComment1455,41145
+OurReader::addComment(addComment1479,41764
+bool OurReader::readCStyleComment(readCStyleComment1490,42112
+bool OurReader::readCppStyleComment(readCppStyleComment1499,42296
+void OurReader::readNumber(readNumber1515,42654
+bool OurReader::readString(readString1536,43276
+bool OurReader::readStringSingleQuote(readStringSingleQuote1549,43476
+bool OurReader::readObject(readObject1561,43688
+bool OurReader::readArray(readArray1623,45878
+bool OurReader::decodeNumber(decodeNumber1661,46898
+bool OurReader::decodeNumber(decodeNumber1671,47182
+bool OurReader::decodeDouble(decodeDouble1711,48711
+bool OurReader::decodeDouble(decodeDouble1721,48995
+bool OurReader::decodeString(decodeString1757,50101
+bool OurReader::decodeString(decodeString1768,50438
+bool OurReader::decodeUnicodeCodePoint(decodeUnicodeCodePoint1821,51738
+bool OurReader::decodeUnicodeEscapeSequence(decodeUnicodeEscapeSequence1850,52786
+OurReader::addError(addError1879,53643
+bool OurReader::recoverFromError(recoverFromError1888,53860
+bool OurReader::addErrorAndRecover(addErrorAndRecover1901,54223
+Value& OurReader::currentValue(currentValue1908,54466
+OurReader::Char OurReader::getNextChar(getNextChar1910,54528
+void OurReader::getLocationLineAndColumn(getLocationLineAndColumn1916,54634
+std::string OurReader::getLocationLineAndColumn(getLocationLineAndColumn1939,55239
+std::string OurReader::getFormattedErrorMessages(getFormattedErrorMessages1955,55756
+std::vector<OurReader::StructuredError> OurReader::getStructuredErrors(getStructuredErrors1971,56303
+bool OurReader::pushError(pushError1986,56852
+bool OurReader::pushError(pushError2003,57327
+bool OurReader::good(good2021,57893
+class OurCharReader 2026,57954
+  bool const collectComments_;2027,57996
+  OurReader reader_;2028,58027
+  OurCharReader(2030,58056
+  virtual bool parse(2036,58197
+CharReaderBuilder::CharReaderBuilder(CharReaderBuilder2047,58475
+CharReaderBuilder::~CharReaderBuilder(~CharReaderBuilder2051,58545
+CharReader* CharReaderBuilder::newCharReader(newCharReader2053,58588
+static void getValidReaderKeys(2067,59356
+bool CharReaderBuilder::validate(validate2080,59816
+void CharReaderBuilder::strictMode(strictMode2102,60453
+void CharReaderBuilder::setDefaults(setDefaults2115,60887
+bool parseFromStream(2133,61444
+std::istream& operator>>(2147,61877
+namespace Json 2183,62894
+ValueIteratorBase::ValueIteratorBase(2193,63360
+ValueIteratorBase::ValueIteratorBase(2197,63436
+Value& ValueIteratorBase::deref(deref2201,63568
+void ValueIteratorBase::increment(increment2205,63640
+void ValueIteratorBase::decrement(decrement2209,63695
+ValueIteratorBase::computeDistance(computeDistance2214,63785
+bool ValueIteratorBase::isEqual(isEqual2241,64754
+void ValueIteratorBase::copy(copy2248,64904
+Value ValueIteratorBase::key(key2253,65017
+UInt ValueIteratorBase::index(index2263,65334
+std::string ValueIteratorBase::name(name2270,65510
+char const* ValueIteratorBase::memberName(memberName2278,65693
+char const* ValueIteratorBase::memberName(memberName2283,65825
+ValueConstIterator::ValueConstIterator(ValueConstIterator2301,66508
+ValueConstIterator::ValueConstIterator(2303,66553
+operator=(operator=2308,66721
+ValueIterator::ValueIterator(ValueIterator2321,67243
+ValueIterator::ValueIterator(2323,67278
+ValueIterator::ValueIterator(2326,67390
+ValueIterator::ValueIterator(2329,67487
+ValueIterator& ValueIterator::operator=(operator=2332,67579
+#define JSON_ASSERT_UNREACHABLE 2373,68718
+namespace Json 2375,68765
+#define ALIGNAS(2381,69010
+#define ALIGNAS(2383,69089
+const unsigned char& kNullRef 2386,69196
+const Value& Value::null 2387,69238
+const Value& Value::nullRef 2388,69307
+const Int Value::minInt 2390,69344
+const Int Value::maxInt 2391,69392
+const UInt Value::maxUInt 2392,69437
+const Int64 Value::minInt64 2394,69503
+const Int64 Value::maxInt64 2395,69559
+const UInt64 Value::maxUInt64 2396,69612
+static const double maxUInt64AsDouble 2400,69830
+const LargestInt Value::minLargestInt 2402,69928
+const LargestInt Value::maxLargestInt 2403,70004
+const LargestUInt Value::maxLargestUInt 2404,70077
+template <typename T,2407,70184
+static inline bool InRange(2408,70218
+static inline double integerToDouble(2412,70360
+template <typename T> static inline double integerToDouble(2416,70495
+template <typename T,2420,70605
+static inline bool InRange(2421,70639
+static inline char* duplicateStringValue(2433,71158
+static inline char* duplicateAndPrefixStringValue(2453,71786
+inline static void decodePrefixedString(2485,73149
+static inline void releaseStringValue(2499,73589
+namespace Json 2515,74235
+Exception::Exception(2517,74253
+Exception::~Exception(~Exception2520,74315
+char const* Exception::what(what2522,74350
+RuntimeError::RuntimeError(2526,74421
+LogicError::LogicError(2529,74494
+void throwRuntimeError(2532,74563
+void throwLogicError(2536,74641
+Value::CommentInfo::CommentInfo(2549,75165
+Value::CommentInfo::~CommentInfo(~CommentInfo2551,75217
+void Value::CommentInfo::setComment(setComment2556,75307
+Value::CZString::CZString(2580,76249
+Value::CZString::CZString(2582,76325
+Value::CZString::CZString(2590,76543
+Value::CZString::~CZString(~CZString2602,77073
+void Value::CZString::swap(swap2607,77203
+Value::CZString& Value::CZString::operator=(operator=2612,77320
+bool Value::CZString::operator<(operator<2617,77416
+bool Value::CZString::operator==(operator==2630,77892
+ArrayIndex Value::CZString::index(index2641,78291
+const char* Value::CZString::data(data2644,78416
+unsigned Value::CZString::length(length2645,78476
+bool Value::CZString::isStaticString(isStaticString2646,78546
+Value::Value(Value2660,79258
+Value::Value(Value2687,79726
+Value::Value(Value2692,79801
+Value::Value(Value2697,79906
+Value::Value(Value2701,79982
+Value::Value(Value2707,80096
+Value::Value(Value2712,80176
+Value::Value(Value2717,80340
+Value::Value(Value2723,80550
+Value::Value(Value2729,80735
+Value::Value(Value2735,80881
+Value::Value(Value2741,81067
+Value::Value(2746,81148
+Value::~Value(~Value2790,82369
+Value& Value::operator=(operator=2814,82765
+void Value::swapPayload(swapPayload2819,82838
+void Value::swap(swap2829,83080
+ValueType Value::type(type2836,83249
+int Value::compare(compare2838,83298
+bool Value::operator<(operator<2846,83431
+bool Value::operator<=(operator<=2892,84822
+bool Value::operator>=(operator>=2894,84901
+bool Value::operator>(operator>2896,84980
+bool Value::operator==(operator==2898,85055
+bool Value::operator!=(operator!=2942,86449
+const char* Value::asCString(asCString2944,86529
+bool Value::getString(getString2954,86878
+std::string Value::asString(asString2963,87168
+CppTL::ConstString Value::asConstString(asConstString2989,87844
+Value::Int Value::asInt(asInt2998,88048
+Value::UInt Value::asUInt(asUInt3020,88661
+Value::Int64 Value::asInt64(asInt643044,89310
+Value::UInt64 Value::asUInt64(asUInt643065,89880
+LargestInt Value::asLargestInt(asLargestInt3087,90489
+LargestUInt Value::asLargestUInt(asLargestUInt3095,90611
+double Value::asDouble(asDouble3103,90737
+float Value::asFloat(asFloat3125,91340
+bool Value::asBool(asBool3147,91960
+bool Value::isConvertibleTo(isConvertibleTo3166,92407
+ArrayIndex Value::size(size3200,93711
+bool Value::empty(empty3223,94251
+bool Value::operator!(operator!3230,94375
+void Value::clear(clear3232,94427
+void Value::resize(resize3248,94790
+void Value::initBasic(initBasic3320,97051
+Value& Value::resolveReference(resolveReference3331,97354
+Value& Value::resolveReference(resolveReference3350,98054
+Value Value::get(get3381,99191
+bool Value::isValidIndex(isValidIndex3386,99358
+Value const* Value::find(find3388,99435
+Value& Value::append(append3436,100897
+Value Value::get(get3438,100975
+Value Value::get(get3443,101145
+Value Value::get(get3447,101268
+bool Value::removeMember(removeMember3453,101415
+bool Value::removeMember(removeMember3466,101808
+bool Value::removeMember(removeMember3470,101926
+Value Value::removeMember(removeMember3474,102066
+Value Value::removeMember(removeMember3485,102443
+bool Value::removeIndex(removeIndex3490,102534
+Value Value::get(get3514,103223
+bool Value::isMember(isMember3520,103391
+bool Value::isMember(isMember3525,103521
+bool Value::isMember(isMember3529,103612
+bool Value::isMember(isMember3535,103748
+Value::Members Value::getMemberNames(getMemberNames3540,103867
+static bool IsIntegral(3582,105080
+bool Value::isNull(isNull3587,105183
+bool Value::isBool(isBool3589,105242
+bool Value::isInt(isInt3591,105304
+bool Value::isUInt(isUInt3606,105649
+bool Value::isInt64(isInt643621,106008
+bool Value::isUInt64(isUInt643641,106599
+bool Value::isIntegral(isIntegral3661,107163
+bool Value::isDouble(isDouble3669,107304
+bool Value::isNumeric(isNumeric3671,107381
+bool Value::isString(isString3673,107451
+bool Value::isArray(isArray3675,107514
+bool Value::isObject(isObject3677,107575
+void Value::setComment(setComment3679,107638
+void Value::setComment(setComment3689,107978
+void Value::setComment(setComment3693,108106
+bool Value::hasComment(hasComment3697,108250
+std::string Value::getComment(getComment3701,108375
+void Value::setOffsetStart(setOffsetStart3707,108528
+void Value::setOffsetLimit(setOffsetLimit3709,108590
+size_t Value::getOffsetStart(getOffsetStart3711,108652
+size_t Value::getOffsetLimit(getOffsetLimit3713,108709
+std::string Value::toStyledString(toStyledString3715,108766
+Value::const_iterator Value::begin(begin3720,108866
+Value::const_iterator Value::end(end3733,109108
+Value::iterator Value::begin(begin3746,109346
+Value::iterator Value::end(end3759,109564
+PathArgument::PathArgument(3775,109871
+PathArgument::PathArgument(3777,109940
+PathArgument::PathArgument(3780,110035
+PathArgument::PathArgument(3783,110125
+Path::Path(Path3789,110315
+void Path::makePath(makePath3804,110671
+void Path::addPathInArg(addPathInArg3835,111715
+void Path::invalidPath(invalidPath3848,112105
+const Value& Path::resolve(resolve3852,112206
+Value Path::resolve(resolve3875,113015
+Value& Path::make(make3894,113644
+#define isfinite 3948,115255
+#define isfinite 3951,115350
+#define isfinite 3954,115397
+#define snprintf 3958,115499
+#define snprintf 3960,115553
+#define snprintf 3962,115608
+#define isfinite 3967,115692
+#define snprintf 3968,115717
+namespace Json 3976,115896
+typedef std::unique_ptr<StreamWriter> StreamWriterPtr;3979,115941
+typedef std::auto_ptr<StreamWriter>   StreamWriterPtr;3981,116002
+static bool containsControlCharacter(3984,116065
+static bool containsControlCharacter0(3992,116218
+std::string valueToString(4002,116441
+std::string valueToString(4018,116894
+std::string valueToString(4028,117124
+std::string valueToString(4032,117209
+std::string valueToString(4038,117336
+std::string valueToString(4075,118671
+std::string valueToQuotedString(4077,118747
+static char const* strnpbrk(4140,120654
+static std::string valueToQuotedStringN(4154,120986
+Writer::~Writer(~Writer4219,122982
+FastWriter::FastWriter(4224,123095
+void FastWriter::enableYAMLCompatibility(enableYAMLCompatibility4228,123226
+void FastWriter::dropNullPlaceholders(dropNullPlaceholders4230,123307
+void FastWriter::omitEndingLineFeed(omitEndingLineFeed4232,123382
+std::string FastWriter::write(write4234,123453
+void FastWriter::writeValue(writeValue4242,123616
+StyledWriter::StyledWriter(4299,125201
+std::string StyledWriter::write(write4302,125292
+void StyledWriter::writeValue(writeValue4313,125551
+void StyledWriter::writeArrayValue(writeArrayValue4372,127105
+bool StyledWriter::isMultineArray(isMultineArray4415,128265
+void StyledWriter::pushValue(pushValue4443,129205
+void StyledWriter::writeIndent(writeIndent4450,129354
+void StyledWriter::writeWithIndent(writeWithIndent4461,129636
+void StyledWriter::indent(indent4466,129741
+void StyledWriter::unindent(unindent4468,129822
+void StyledWriter::writeCommentBeforeValue(writeCommentBeforeValue4473,129969
+void StyledWriter::writeCommentAfterValueOnSameLine(writeCommentAfterValueOnSameLine4493,130504
+bool StyledWriter::hasCommentForValue(hasCommentForValue4504,130829
+StyledStreamWriter::StyledStreamWriter(4513,131129
+void StyledStreamWriter::write(write4517,131289
+void StyledStreamWriter::writeValue(writeValue4531,131676
+void StyledStreamWriter::writeArrayValue(writeArrayValue4590,133238
+bool StyledStreamWriter::isMultineArray(isMultineArray4635,134482
+void StyledStreamWriter::pushValue(pushValue4663,135428
+void StyledStreamWriter::writeIndent(writeIndent4670,135584
+void StyledStreamWriter::writeWithIndent(writeWithIndent4678,135887
+void StyledStreamWriter::indent(indent4684,136036
+void StyledStreamWriter::unindent(unindent4686,136106
+void StyledStreamWriter::writeCommentBeforeValue(writeCommentBeforeValue4691,136270
+void StyledStreamWriter::writeCommentAfterValueOnSameLine(writeCommentAfterValueOnSameLine4709,136805
+bool StyledStreamWriter::hasCommentForValue(hasCommentForValue4720,137133
+struct CommentStyle 4730,137443
+  enum Enum 4732,137505
+    None,4733,137519
+    Most,4734,137554
+    All 4735,137635
+struct BuiltStyledStreamWriter 4739,137677
+  typedef std::vector<std::string> ChildValues;4761,138462
+  ChildValues childValues_;4763,138511
+  std::string indentString_;4764,138539
+  int rightMargin_;4765,138568
+  std::string indentation_;4766,138588
+  CommentStyle::Enum cs_;4767,138616
+  std::string colonSymbol_;4768,138642
+  std::string nullSymbol_;4769,138670
+  std::string endingLineFeedSymbol_;4770,138697
+  bool addChildValues_ 4771,138734
+  bool indented_ 4772,138762
+BuiltStyledStreamWriter::BuiltStyledStreamWriter(4774,138787
+int BuiltStyledStreamWriter::write(write4790,139247
+void BuiltStyledStreamWriter::writeValue(writeValue4805,139621
+void BuiltStyledStreamWriter::writeArrayValue(writeArrayValue4864,141233
+bool BuiltStyledStreamWriter::isMultineArray(isMultineArray4911,142576
+void BuiltStyledStreamWriter::pushValue(pushValue4939,143527
+void BuiltStyledStreamWriter::writeIndent(writeIndent4946,143684
+void BuiltStyledStreamWriter::writeWithIndent(writeWithIndent4958,144066
+void BuiltStyledStreamWriter::indent(indent4964,144216
+void BuiltStyledStreamWriter::unindent(unindent4966,144291
+void BuiltStyledStreamWriter::writeCommentBeforeValue(writeCommentBeforeValue4971,144460
+void BuiltStyledStreamWriter::writeCommentAfterValueOnSameLine(writeCommentAfterValueOnSameLine4990,145037
+bool BuiltStyledStreamWriter::hasCommentForValue(hasCommentForValue5002,145391
+StreamWriter::StreamWriter(5011,145636
+StreamWriter::~StreamWriter(~StreamWriter5015,145687
+StreamWriter::Factory::~Factory(~Factory5018,145721
+StreamWriterBuilder::StreamWriterBuilder(StreamWriterBuilder5020,145758
+StreamWriterBuilder::~StreamWriterBuilder(~StreamWriterBuilder5024,145832
+StreamWriter* StreamWriterBuilder::newStreamWriter(newStreamWriter5026,145879
+static void getValidWriterKeys(5055,146787
+bool StreamWriterBuilder::validate(validate5063,147050
+void StreamWriterBuilder::setDefaults(setDefaults5085,147691
+std::string writeString(5095,148002
+std::ostream& operator<<(5102,148225
+
+log/log.cpp,1477
+std::map<std::string, std::fstream *>            Log::logStream;63,1265
+std::map<std::string, std::string>               Log::logFileName;64,1330
+std::map<std::string, int >                      Log::sizeOfLogBuffer;65,1397
+std::map<std::string, std::vector<std::string> > Log::logBuffer;66,1468
+std::map<std::string, bool> Log::dateChangeShown 67,1533
+std::string Log::logBaseDir 70,1622
+const std::string Log::System 72,1678
+static const Log::LogLevel DefaultMinimumLogLevel 74,1734
+Log::LogLevel Log::minimumLogLevel 76,1798
+bool Log::consoleOutput 78,1860
+bool Log::quietExit 79,1893
+bool Log::isInitialised 80,1926
+Log::Log(Log88,2218
+Log::~Log(~Log96,2422
+void Log::ensureSystemLogIsInitialized(ensureSystemLogIsInitialized104,2703
+void Log::log(log119,3216
+void Log::getLastLogMsgs(getLastLogMsgs181,5235
+std::string Log::getTimeTag(getTimeTag194,5715
+void Log::setQuietExit(setQuietExit237,7130
+void Log::defineLogSystem(defineLogSystem246,7416
+std::string Log::getLogFileName(getLogFileName267,8173
+void Log::defineSizeOfLogBuffer(defineSizeOfLogBuffer276,8488
+void Log::closeLogStreams(closeLogStreams286,8869
+void Log::setConsoleOutput(setConsoleOutput304,9540
+void Log::setLogBaseDir(setLogBaseDir313,9819
+std::string Log::getLogBaseDir(getLogBaseDir323,10145
+void Log::setMinLogLevel(setMinLogLevel335,10490
+Log::LogLevel Log::getMinLogLevel(getMinLogLevel347,10847
+#define SIZE 359,11032
+void showBacktrace(361,11050
+
+log/log.h,1465
+#define LOG_H42,804
+#define LogMsg(83,2258
+#define TraceMsg(84,2307
+#define DbgMsg(85,2367
+#define InfoMsg(86,2427
+#define WarnMsg(87,2487
+#define ErrMsg(88,2547
+#define FatalMsg(89,2607
+class Log 102,3086
+    enum LogLevel 115,3671
+        TRACE 116,3691
+        DEBUG 117,3710
+        INFO 118,3729
+        WARNING 119,3747
+        ERROR 120,3768
+        FATAL 121,3787
+        T 122,3806
+        D 123,3825
+        I 124,3844
+        W 125,3862
+        E 126,3883
+        F 127,3902
+    static const std::string System;130,3929
+    Log(253,9082
+    void operator=(operator=258,9288
+    static std::map<std::map282,10234
+    static std::map<std::string, std::fstream *>            logStream;282,10234
+    static std::map<std::map286,10391
+    static std::map<std::string, std::string>               logFileName;286,10391
+    static std::map<std::map290,10570
+    static std::map<std::string, int >                      sizeOfLogBuffer;290,10570
+    static std::map<std::map294,10731
+    static std::map<std::string, std::vector<std::string> > logBuffer;294,10731
+    static std::string logBaseDir;298,10873
+    static bool consoleOutput;302,11004
+    static bool quietExit;306,11113
+    static std::string dateString;310,11243
+    static std::map<std::map314,11369
+    static std::map<std::string, bool> dateChangeShown;314,11369
+    static LogLevel minimumLogLevel;318,11516
+    static bool isInitialised;322,11654
+
+nncomm/bus.cpp,205
+Bus::Bus(Bus6,185
+Bus::Bus(Bus10,263
+void Bus::connectTo(connectTo14,334
+void Bus::connectTo(connectTo18,406
+void Bus::init(init22,474
+void Bus::processMessageString(processMessageString32,761
+
+nncomm/bus.h,37
+#define BUS_H4,30
+class Bus 12,264
+
+nncomm/commnode.h,97
+#define COMMNODE_H4,35
+class CommNode 9,104
+    CommNode(11,129
+    virtual ~CommNode(12,147
+
+nncomm/dbg.h,270
+#define DBG_H4,30
+#define TRACE_LEVEL 8,66
+#define DEBUG_LEVEL 9,92
+#define INFO_LEVEL 10,118
+#define VERBOSITY_LEVEL 12,145
+#    define DBG(16,255
+#    define TRC(19,379
+#    define DBG(23,560
+#    define TRC(26,731
+#  define DBG(29,765
+#  define TRC(30,782
+
+nncomm/err.cpp,234
+void nn_backtrace_print 33,1321
+void nn_backtrace_print 47,1663
+void nn_err_abort 54,1727
+int nn_err_errno 59,1771
+const char *nn_err_strerror nn_err_strerror64,1818
+int nn_err_wsa_to_posix 141,3840
+void nn_win_error 203,5308
+
+nncomm/err.h,593
+#define NN_ERR_INCLUDED25,1231
+#define NN_NORETURN 37,1447
+#define NN_NORETURN 39,1511
+#define NN_NORETURN41,1564
+#define nn_assert(46,1696
+#define nn_assert_state(57,1992
+#define alloc_assert(71,2451
+#define errno_assert(83,2795
+#define errnum_assert(95,3171
+#define win_assert(107,3571
+#define wsa_assert(122,4081
+#define nn_fsm_error(137,4566
+#define nn_fsm_bad_action(146,4861
+#define nn_fsm_bad_state(148,4963
+#define nn_fsm_bad_source(150,5063
+#define CT_ASSERT_HELPER2(154,5194
+#define CT_ASSERT_HELPER1(155,5247
+#define CT_ASSERT(157,5343
+#define CT_ASSERT(160,5445
+
+nncomm/fast.h,133
+#define NN_FAST_INCLUDED24,1175
+#define nn_fast(27,1242
+#define nn_slow(28,1287
+#define nn_fast(30,1338
+#define nn_slow(31,1361
+
+nncomm/nncomm.h,22
+#define NNCOMM_H4,33
+
+nncomm/nncommon.h,79
+#define NNCOMMON_H4,35
+typedef std::string            ChannelDescriptor;8,74
+
+nncomm/nn.hpp,911
+#define NN_HPP_INCLUDED24,1152
+#define nn_slow(34,1304
+#define nn_slow(36,1355
+namespace nn39,1386
+    class exception 42,1402
+        exception 46,1465
+        virtual const char *what what48,1510
+        int num 53,1620
+        int err;60,1704
+    inline const char *symbol symbol63,1729
+    inline void *allocmsg allocmsg68,1829
+    inline int freemsg 76,2022
+    class socket84,2191
+        inline socket 88,2227
+        inline ~socket 95,2416
+        inline void setsockopt 101,2528
+        inline void getsockopt 109,2803
+        inline int bind 117,3073
+        inline int connect 125,3274
+        inline void shutdown 133,3481
+        inline int send 140,3659
+        inline int recv 151,3993
+        inline int sendmsg 162,4321
+        inline int recvmsg 173,4662
+        inline int fd(184,4997
+        int s;188,5050
+    inline void term 195,5211
+#undef nn_slow202,5271
+
+nncomm/pipeline.cpp,289
+Pipeline::Pipeline(Pipeline6,195
+Pipeline::Pipeline(Pipeline11,283
+void Pipeline::setMsgOut(setMsgOut16,364
+void Pipeline::init(init23,496
+void Pipeline::getIncommingMessageStrings(getIncommingMessageStrings36,798
+void Pipeline::processMessageString(processMessageString44,977
+
+nncomm/pipeline.h,47
+#define PIPELINE_H4,35
+class Pipeline 12,284
+
+nncomm/protlayer.cpp,330
+ProtocolLayer::ProtocolLayer(11,142
+ProtocolLayer::ProtocolLayerClass ProtocolLayer::getClass(getClass15,206
+void ProtocolLayer::createPipeline(createPipeline20,298
+void ProtocolLayer::createPubSub(createPubSub48,1317
+void ProtocolLayer::createSurvey(createSurvey78,2304
+void ProtocolLayer::createBus(createBus105,3227
+
+nncomm/protlayer.h,509
+#define PROTLAYER_H4,36
+class ProtocolLayer 10,99
+    enum ProtocolLayerClass 12,129
+    enum ProtocolLayerClass { UNDEFINED,12,129
+    enum ProtocolLayerClass { UNDEFINED, PIPELINE,12,129
+    enum ProtocolLayerClass { UNDEFINED, PIPELINE, PUBSUB,12,129
+    enum ProtocolLayerClass { UNDEFINED, PIPELINE, PUBSUB, SURVEY,12,129
+    enum ProtocolLayerClass { UNDEFINED, PIPELINE, PUBSUB, SURVEY, BUS}BUS12,129
+    std::vector<CommNode*> components;33,930
+    ProtocolLayerClass protLayerClass;34,969
+
+nncomm/pubsub.cpp,270
+PubSub::PubSub(PubSub6,191
+PubSub::PubSub(PubSub11,275
+void PubSub::setMsgOut(setMsgOut16,352
+void PubSub::init(init23,481
+void PubSub::getIncommingMessageStrings(getIncommingMessageStrings37,838
+void PubSub::processMessageString(processMessageString45,1014
+
+nncomm/pubsub.h,43
+#define PUBSUB_H4,33
+class PubSub 12,276
+
+nncomm/scalprotrole.cpp,701
+ScalabilityProtocolRole::ScalabilityProtocolRole(3,27
+ScalabilityProtocolRole::~ScalabilityProtocolRole(~ScalabilityProtocolRole8,143
+void ScalabilityProtocolRole::createSocket(createSocket13,243
+void ScalabilityProtocolRole::update(update20,414
+void ScalabilityProtocolRole::setMsgOut(setMsgOut35,737
+int ScalabilityProtocolRole::getClass(getClass43,916
+std::string ScalabilityProtocolRole::getName(getName48,983
+void ScalabilityProtocolRole::setName(setName53,1056
+std::string ScalabilityProtocolRole::getAddress(getAddress58,1140
+void ScalabilityProtocolRole::getIncommingMessageStrings(getIncommingMessageStrings63,1215
+int ScalabilityProtocolRole::getevents(getevents74,1556
+
+nncomm/scalprotrole.h,733
+#define SCALPROTROLE_H4,39
+#define NN_IN 19,265
+#define NN_OUT 20,282
+#define NN_BUS_MASTER 22,300
+#define MAX_MESSAGE_SIZE 24,340
+#define WAIT_BINDING 26,371
+typedef std::string                  MessageString;28,400
+typedef nn::socket                   Socket;29,452
+typedef std::queue<MessageString>    MsgList;30,497
+class ScalabilityProtocolRole 32,544
+    Socket *    sck;50,1188
+    MsgList     iMsgList;51,1209
+    MsgList     oMsgList;52,1235
+    bool        readyToGo;53,1261
+    int         elemClass;54,1288
+    std::string elemName;55,1315
+    std::string address;56,1341
+    char        buf[buf57,1366
+    int         rc;58,1405
+    int         endPoint;59,1425
+    int         incMsgsMask;60,1451
+
+nncomm/survey.cpp,333
+Survey::Survey(Survey6,191
+Survey::Survey(Survey11,275
+void Survey::setMsgOut(setMsgOut16,352
+void Survey::setNumOfRespondents(setNumOfRespondents36,984
+void Survey::init(init41,1053
+void Survey::getIncommingMessageStrings(getIncommingMessageStrings56,1480
+void Survey::processMessageString(processMessageString63,1634
+
+nncomm/survey.h,74
+#define SURVEY_H4,33
+class Survey 14,299
+    int maxRespondents;25,704
+
+str/str.cpp,509
+#define showBacktrace(50,942
+namespace str 64,1424
+std::vector<std::string> &split(split71,1705
+std::vector<std::string> split(87,2255
+std::string join(99,2677
+std::string replaceAll(122,3322
+std::string mid(136,3754
+std::string mid(152,4236
+std::string quoted(168,4680
+void toUpper(177,4949
+std::string getExtension(188,5339
+std::string getBaseName(200,5769
+std::string getBaseName(209,6068
+std::string getDirName(218,6379
+std::string getDirName(227,6675
+std::string tagToTimestamp(236,6989
+
+str/str.h,103
+#define STR_H42,823
+namespace str 79,2014
+inline std::string toStr(92,2419
+inline T strTo(111,2911
+
+tests/main.cpp,339
+struct MasterNodeElements 18,269
+    EvtMng  * evtMng;19,297
+    DataMng * datMng;20,319
+    LogMng  * logMng;21,341
+    TskOrc  * tskOrc;22,363
+    TskMng  * tskMng;23,385
+typedef MasterNodeElements * MasterNodeElementsPtr;25,410
+Synchronizer synchro;27,463
+std::vector<CommNode*> createElementsNetwork(32,657
+int main(125,4507
+
+tools/dwatcher.cpp,249
+DirWatcher::DirWatcher(DirWatcher64,1388
+DirWatcher::~DirWatcher(~DirWatcher85,1950
+void DirWatcher::watch(watch92,2149
+void DirWatcher::start(start107,2654
+void DirWatcher::stop(stop202,5746
+bool DirWatcher::nextEvent(nextEvent210,5968
+
+tools/dwatcher.h,519
+#define DIRWATCHER_H42,816
+class DirWatcher 79,1987
+    struct DirWatchEvent 85,2084
+        std::string      name;86,2111
+        std::string      path;87,2142
+        std::uint32_t    mask;88,2173
+        std::int64_t     size;89,2204
+        bool             isDir;90,2235
+    int                         fd;101,2406
+    std::map<std::map102,2442
+    std::map<int, std::string>  watchedDirs;102,2442
+    std::queue<DirWatchEvent>   events;103,2487
+    bool                        keepWatching;104,2527
+
+tools/propdef.h,191
+#define PROPDEF_H42,852
+#define SET_NAMED_PROPERTIES55,1337
+# define Property(66,1773
+# define PropertyRef(72,2023
+# define with(78,2278
+# define Property(80,2305
+#  undef with87,2543
+
+tools/sm.cpp,348
+bool StateMachine::transitTo(transitTo54,1241
+void StateMachine::afterTransition(afterTransition91,2402
+std::string StateMachine::getStateName(getStateName100,2684
+int StateMachine::getStateIdx(getStateIdx108,2938
+void StateMachine::defineState(defineState117,3228
+void StateMachine::defineValidTransition(defineValidTransition127,3573
+
+tools/sm.h,378
+#define STATEMACHINE_H42,826
+class StateMachine 78,2002
+StateMachine(88,2345
+    virtual ~StateMachine(94,2622
+    std::multimap<std::multimap171,5435
+    std::multimap<int, int> validTransitions;171,5435
+    std::map<std::map172,5481
+    std::map<int, std::string> stateNames;172,5481
+    std::map<std::map173,5524
+    std::map<std::string, int> stateIdx;173,5524
+
+tools/tools.cpp,603
+inline T max(68,1209
+inline T min(71,1279
+static std::string specificSessionTag 73,1331
+void waitForHeartBeat(79,1612
+void getYMD(94,2213
+std::string timeTag(105,2606
+std::string sessionTag(122,3081
+void setSessionTag(133,3439
+std::string preciseTimeTag(144,3817
+std::string tagToTimestamp(167,4474
+void waitUntilNextSecond(182,5068
+std::vector<double> getLoadAvgs(197,5486
+int getUptime(208,5722
+bool scanMemoryInfo(220,5942
+double scanCPUTime(263,7427
+bool SysInfo::update(update349,11359
+#define SYSINFOMETER_MAXNUMITEMS 397,12498
+void SysInfo::computeStats(computeStats399,12535
+
+tools/tools.h,2443
+#define TOOLS_H42,813
+struct CPUData 151,4881
+   unsigned long long int totalTime;152,4898
+   unsigned long long int userTime;153,4935
+   unsigned long long int systemTime;154,4971
+   unsigned long long int systemAllTime;155,5009
+   unsigned long long int idleAllTime;156,5050
+   unsigned long long int idleTime;157,5089
+   unsigned long long int niceTime;158,5125
+   unsigned long long int ioWaitTime;159,5161
+   unsigned long long int irqTime;160,5199
+   unsigned long long int softIrqTime;161,5234
+   unsigned long long int stealTime;162,5273
+   unsigned long long int guestTime;163,5310
+   unsigned long long int totalPeriod;165,5348
+   unsigned long long int userPeriod;166,5387
+   unsigned long long int systemPeriod;167,5425
+   unsigned long long int systemAllPeriod;168,5465
+   unsigned long long int idleAllPeriod;169,5508
+   unsigned long long int idlePeriod;170,5549
+   unsigned long long int nicePeriod;171,5587
+   unsigned long long int ioWaitPeriod;172,5625
+   unsigned long long int irqPeriod;173,5665
+   unsigned long long int softIrqPeriod;174,5702
+   unsigned long long int stealPeriod;175,5743
+   unsigned long long int guestPeriod;176,5782
+struct MemData 179,5825
+    unsigned long long int totalMem;180,5842
+    unsigned long long int usedMem;181,5879
+    unsigned long long int freeMem;182,5915
+    unsigned long long int sharedMem;183,5951
+    unsigned long long int buffersMem;184,5989
+    unsigned long long int cachedMem;185,6028
+    unsigned long long int totalSwap;186,6066
+    unsigned long long int usedSwap;187,6104
+    unsigned long long int freeSwap;188,6141
+struct SysInfoMeter 191,6182
+    double               total;192,6204
+    std::vector<double>  values;193,6236
+struct SysInfo 196,6273
+    SysInfo(197,6290
+    int                  cpuCount;201,6379
+    std::vector<CPUData> cpuData;202,6414
+    MemData              memData;203,6448
+    std::vector<double>  loadAvgs;204,6482
+    int                  upTime;205,6517
+    std::vector<SysInfoMeter> cpuStat;207,6551
+    std::vector<double>  cpuPercent;208,6590
+    SysInfoMeter         memStat;209,6627
+    SysInfoMeter         swapStat;210,6661
+    bool                 detailedCPUinfo;212,6697
+    bool                 accoutGuestInCPUstats;213,6739
+#define PROCDIR 220,6852
+#define PROCSTATFILE 224,6905
+#define PROCMEMINFOFILE 228,6974
+#define PROCUPTIME 232,7044
+#define PROCLOADAVG 236,7109
+
+uuid/uuid.cpp,872
+namespace QPF 49,1054
+UUID::UUID(UUID51,1071
+void UUID::clear(clear57,1116
+bool UUID::compare(compare64,1183
+void UUID::copy(copy71,1287
+void UUID::generate(generate78,1371
+void UUID::generate_random(generate_random83,1427
+void UUID::generate_time(generate_time88,1497
+bool UUID::generate_time_safe(generate_time_safe93,1563
+bool UUID::is_null(is_null100,1667
+bool UUID::parse(parse107,1748
+bool UUID::parse(parse112,1828
+void UUID::unparse(unparse119,1935
+void UUID::unparse_lower(unparse_lower124,2003
+void UUID::unparse_upper(unparse_upper129,2083
+std::string UUID::asString(asString134,2163
+std::string UUID::asLowerString(asLowerString141,2292
+std::string UUID::asUpperString(asUpperString148,2432
+time_t UUID::time(time157,2591
+int UUID::type(type162,2678
+int UUID::variant(variant167,2732
+uuid_t & UUID::uuid(uuid172,2792
+
+uuid/uuid.h,89
+#define UUID_H42,828
+namespace QPF 71,1756
+class UUID 77,1978
+    uuid_t uu;104,2586
+
+version.h,370
+#define VERSION_H44,811
+#define APP_SYS_NAME 47,858
+#define APP_NAME 50,911
+#define APP_RELEASE 53,974
+#define APP_DATE 56,1035
+#define APP_COMPANY 59,1106
+#define APP_DOMAIN 62,1184
+#define APP_DIVISION 65,1251
+#define APP_LONG_NAME 68,1306
+#define APP_PURPOSE 71,1401
+#define APP_TITLE 74,1503
+#define APP_CREATED_BY 77,1557
+#define APP_COPYRIGHT 80,1616
+
+uuid/CMakeLists.txt,0
+
+tools/CMakeLists.txt,0
+
+tests/CMakeLists.txt,0
+
+str/CMakeLists.txt,0
+
+nncomm/commnode.cpp,0
+
+nncomm/CMakeLists.txt,0
+
+log/CMakeLists.txt,0
+
+json/json.pro,0
+
+json/json,0
+
+json/CMakeLists.txt,0
+
+infix/infix.pro,0
+
+infix/CMakeLists.txt,0
+
+fmk/sync.cpp,0
+
+fmk/fmk,0
+
+fmk/CMakeLists.txt,0
+
+build/uuid,0
+
+build/tools,0
+
+build/tests,0
+
+build/str,0
+
+build/nncomm,0
+
+build/log,0
+
+build/json,0
+
+build/infix,0
+
+build/fmk,0
+
+build/CPackSourceConfig.cmake,0
+
+build/CPackConfig.cmake,0
+
+build/cmake_install.cmake,0
+
+build/CMakeFiles,0
