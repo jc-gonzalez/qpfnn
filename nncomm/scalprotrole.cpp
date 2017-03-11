@@ -25,11 +25,22 @@ void ScalabilityProtocolRole::update()
     getIncommingMessageStrings();
 
     // Process incoming messages
+    /*
     while (! iMsgList.empty()) {
         MessageString m = iMsgList.front();
         processMessageString(m);
         iMsgList.pop();
+    }*/
+}
+
+bool ScalabilityProtocolRole::next(MessageString & m)
+{
+    bool thereAreMessages = ! iMsgList.empty();
+    if (thereAreMessages) {
+        m = iMsgList.front();
+        iMsgList.pop();
     }
+    return thereAreMessages;
 }
 
 void ScalabilityProtocolRole::setMsgOut(MessageString m)

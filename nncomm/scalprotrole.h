@@ -35,6 +35,7 @@ public:
     ~ScalabilityProtocolRole();
     virtual void createSocket(int protocol, int domain = AF_SP);
     virtual void update();
+    virtual bool next(MessageString & m);
     virtual void setMsgOut(MessageString m);
     virtual int getClass();
     virtual std::string getName();

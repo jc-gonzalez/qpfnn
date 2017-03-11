@@ -199,6 +199,11 @@ protected:
     virtual void updateConnections();
 
     //----------------------------------------------------------------------
+    // Method: processIncommingMessages
+    //----------------------------------------------------------------------
+    virtual void processIncommingMessages();
+
+    //----------------------------------------------------------------------
     // Method: fromInitialisedToRunning
     //----------------------------------------------------------------------
     virtual void sendPeriodicMsgs();
@@ -225,9 +230,22 @@ private:
     //----------------------------------------------------------------------
     virtual void step();
 
+private:
+    virtual void processCmdMsg(MessageString & m) {}
+    virtual void processIndataMsg(MessageString & m) {}
+    virtual void processTskSchedMsg(MessageString & m) {}
+    virtual void processTskProcMsg(MessageString & m) {}
+    virtual void processTskMonitMsg(MessageString & m) {}
+    virtual void processTskRepMsg(MessageString & m) {}
+    virtual void processMonitMsg(MessageString & m) {}
+
+
 protected:
+    typedef void (Component::*MessageProcessingMethod)(MessageString &);
+
     std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;
     std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;
+    std::map<ChannelDescriptor, MessageProcessingMethod> msgProcMethods;
 
     std::string compName;
     std::string compAddress;

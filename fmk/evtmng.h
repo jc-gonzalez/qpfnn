@@ -81,11 +81,6 @@ public:
     EvtMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
-    // Method: start
-    //----------------------------------------------------------------------
-    void start();
-
-    //----------------------------------------------------------------------
     // Method: fromRunningToOperational
     //----------------------------------------------------------------------
     virtual void fromRunningToOperational();
@@ -101,9 +96,19 @@ public:
     virtual void fromRunningToOff();
 
     //----------------------------------------------------------------------
+    // Method: processIncommingMessages
+    //----------------------------------------------------------------------
+    virtual void processIncommingMessages();
+
+    //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
     virtual void runEachIteration();
+
+private:
+    virtual void processCmdMsg(MessageString & m);
+    virtual void processTskRepMsg(MessageString & m);
+    virtual void processMonitMsg(MessageString & m);
 
 private:
     DirWatcher * dw;

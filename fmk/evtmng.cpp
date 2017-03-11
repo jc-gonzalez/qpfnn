@@ -102,6 +102,24 @@ void EvtMng::fromRunningToOff()
 }
 
 //----------------------------------------------------------------------
+// Method: processIncommingMessages
+//----------------------------------------------------------------------
+void EvtMng::processIncommingMessages()
+{
+    MessageString m;
+    DBG("processIncommingmessages()");
+    for (auto & kv: connections) {
+        const ChannelDescriptor & chnl = kv.first;
+        ScalabilityProtocolRole * conn = kv.second;
+        DBG(". Checking channel " << chnl);
+        while (conn->next(m)) {
+            DBG("%%%%%%%%% " << compName << " received the message [" << m << "]");
+            (*this.*msgProcMethods[chnl])(m);
+        }
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: runEachIteration
 //----------------------------------------------------------------------
 void EvtMng::runEachIteration()
@@ -225,5 +243,23 @@ void EvtMng::runEachIteration()
 
     if (iteration > 1000) { transitTo(RUNNING); }
 }
+
+void EvtMng::processCmdMsg(MessageString & m)
+{
+    DBG("############# Processing CMD message!");
+}
+
+void EvtMng::processMonitMsg(MessageString & m)
+{
+    DBG("############# Processing MONIT message!");
+
+}
+
+void EvtMng::processTskRepMsg(MessageString & m)
+{
+    DBG("############# Processing TSKREP message!");
+
+}
+
 
 //}

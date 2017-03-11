@@ -199,11 +199,11 @@ int main(int argc, char * argv[])
     masterNodeElems.evtMng->periodicMsgInChannel(ChnlInData, 13, msgStr);
 
     // START!
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     synchro.notify();
 
     // FOREVER
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     synchro.wait();
 
     return 0;

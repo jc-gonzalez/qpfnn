@@ -107,6 +107,12 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     // Define valid state transitions
     defineValidTransitions();
 
+    // Define msg. processing methods
+    msgProcMethods.clear();
+    msgProcMethods[ChnlCmd] = &Component::processCmdMsg;
+    msgProcMethods[ChnlMonit] = &Component::processMonitMsg;
+    msgProcMethods[ChnlTskRep] = &Component::processTskRepMsg;
+
     // Transit to INITIALISED
     transitTo(INITIALISED);
     InfoMsg("New state: " + getStateName(getState()));
@@ -180,6 +186,26 @@ void Component::updateConnections()
 }
 
 //----------------------------------------------------------------------
+// Method: processIncommingMessages
+//----------------------------------------------------------------------
+void Component::processIncommingMessages()
+{
+    MessageString m;
+
+    for (auto & kv: connections) {
+        const ChannelDescriptor & chnl = kv.first;
+        ScalabilityProtocolRole * conn = kv.second;
+        while (conn->next(m)) {
+            DBG(compName << "received the message [" << m << "]");
+            if (chnl == ChnlCmd) {
+                MessageString msg = "My name is " + compName;
+                conn->setMsgOut(msg);
+            }
+        }
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: sendPeriodicMsgs
 //----------------------------------------------------------------------
 void Component::sendPeriodicMsgs()
@@ -213,15 +239,21 @@ void Component::runEachIteration()
 //----------------------------------------------------------------------
 void Component::step()
 {
-    /*
     // Sleep until next second
+    /*
     std::time_t tt = system_clock::to_time_t(system_clock::now());
     struct std::tm * ptm = std::localtime(&tt);
     ptm->tm_sec++;
-    std::this_thread::sleep_until(system_clock::from_time_t(mktime(ptm))); */
-    // Sleep for 200 milliseconds
+    std::this_thread::sleep_until(system_clock::from_time_t(mktime(ptm)));
+    */
+    // Sleep for 'stepSize' milliseconds
     //auto start = std::chrono::high_resolution_clock::now();
-    std::this_thread::sleep_for(std::chrono::milliseconds(stepSize));
+    long int msnow =
+        static_cast<long int>(std::chrono::duration_cast<
+                              std::chrono::milliseconds>(
+                                  std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+    long int ms2wait = stepSize - ((msnow + stepSize) % stepSize);
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms2wait));
 }
 
 //----------------------------------------------------------------------
@@ -251,8 +283,8 @@ void Component::run()
 
     do {
         ++iteration;
-
         updateConnections();
+        processIncommingMessages();
         sendPeriodicMsgs();
         runEachIteration();
         step();
