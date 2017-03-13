@@ -191,12 +191,12 @@ void Component::updateConnections()
 void Component::processIncommingMessages()
 {
     MessageString m;
-
+    DBG("Component::processIncommingmessages()");
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
         while (conn->next(m)) {
-            DBG(compName << "received the message [" << m << "]");
+            DBG(compName << " received the message [" << m << "]");
             if (chnl == ChnlCmd) {
                 MessageString msg = "My name is " + compName;
                 conn->setMsgOut(msg);

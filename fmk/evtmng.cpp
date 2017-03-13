@@ -107,7 +107,7 @@ void EvtMng::fromRunningToOff()
 void EvtMng::processIncommingMessages()
 {
     MessageString m;
-    DBG("processIncommingmessages()");
+    DBG("EvtMng::processIncommingmessages()");
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
