@@ -91,24 +91,13 @@ public:
     virtual void fromOperationalToRunning();
 
     //----------------------------------------------------------------------
-    // Method: fromRunningToOff
-    //----------------------------------------------------------------------
-    virtual void fromRunningToOff();
-
-    //----------------------------------------------------------------------
-    // Method: processIncommingMessages
-    //----------------------------------------------------------------------
-    virtual void processIncommingMessages();
-
-    //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
     virtual void runEachIteration();
 
-private:
+protected:
     virtual void processCmdMsg(MessageString & m);
     virtual void processTskRepMsg(MessageString & m);
-    virtual void processMonitMsg(MessageString & m);
 
 private:
     DirWatcher * dw;

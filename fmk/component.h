@@ -169,11 +169,6 @@ public:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: init
-    //----------------------------------------------------------------------
-    virtual void init(std::string name, std::string addr, Synchronizer * s);
-
-    //----------------------------------------------------------------------
     // Method: fromInitialisedToRunning
     //----------------------------------------------------------------------
     virtual void fromInitialisedToRunning();
@@ -224,28 +219,28 @@ protected:
     //----------------------------------------------------------------------
     virtual void afterTransition(int fromState, int toState);
 
+protected:
+    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+    virtual void processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+    virtual void processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+    virtual void processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+    virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+    virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)=0;
+
 private:
+    //----------------------------------------------------------------------
+    // Method: init
+    //----------------------------------------------------------------------
+    virtual void init(std::string name, std::string addr, Synchronizer * s);
+
     //----------------------------------------------------------------------
     // Method: step
     //----------------------------------------------------------------------
     virtual void step();
 
-private:
-    virtual void processCmdMsg(MessageString & m) {}
-    virtual void processIndataMsg(MessageString & m) {}
-    virtual void processTskSchedMsg(MessageString & m) {}
-    virtual void processTskProcMsg(MessageString & m) {}
-    virtual void processTskMonitMsg(MessageString & m) {}
-    virtual void processTskRepMsg(MessageString & m) {}
-    virtual void processMonitMsg(MessageString & m) {}
-
-
 protected:
-    typedef void (Component::*MessageProcessingMethod)(MessageString &);
-
     std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;
     std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;
-    std::map<ChannelDescriptor, MessageProcessingMethod> msgProcMethods;
 
     std::string compName;
     std::string compAddress;

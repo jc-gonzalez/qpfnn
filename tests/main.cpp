@@ -54,15 +54,15 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
     auto concat = [](std::vector<CommNode*> a, std::vector<CommNode*> b)
         -> std::vector<CommNode*> { a.insert(a.end(), b.begin(), b.end()); return a;};
 
-    std::vector<CommNode*> allCommNodes =
-        concat(std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}, ag);
+    std::vector<CommNode*> allMainNodes =
+        std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng};
 
     //-----------------------------------------------------------------
     // Channel CMD - SURVEY
     // - Surveyor: EvtMng
-    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng
     ProtocolLayer p1;
-    p1.createSurvey(ChnlCmd, m.evtMng, allCommNodes);
+    p1.createSurvey(ChnlCmd, m.evtMng, allMainNodes);
 
     //-----------------------------------------------------------------
     // Channel INDATA -  PUBSUB
@@ -74,35 +74,38 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
                    std::vector<CommNode*> {m.datMng, m.tskOrc});
 
     //-----------------------------------------------------------------
-    // Channel MONITORING - BUS
-    // - Connected: EvtMng QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    ProtocolLayer p3;
-    p3.createBus(ChnlMonit,
-                 std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng});
-
-    //-----------------------------------------------------------------
     // Channel TASK-SCHEDULING - PUBSUB
     // - Publisher: TskOrc
     // - Subscriber: DataMng TskMng
-    ProtocolLayer p4;
-    p4.createPubSub(ChnlTskSched,
+    ProtocolLayer p3;
+    p3.createPubSub(ChnlTskSched,
                     std::vector<CommNode*> {m.tskOrc},
                     std::vector<CommNode*> {m.datMng, m.tskMng});
 
     //-----------------------------------------------------------------
-    // Channel TASK-PROCESSING - PIPELINE
-    // - Out/In: TskMng/TskAge*
-    ProtocolLayer p5;
+    // Channel TASK-REQUEST - PIPELINEs
+    // - Out/In: TskAge*/TskMng
+    ProtocolLayer p4;
     for (auto & c: ag) {
-        p5.createPipeline(ChnlTskProc + "_" + dynamic_cast<Component*>(c)->getName(), m.tskMng, c);
+        p4.createPipeline(ChnlTskRqst + "_" + dynamic_cast<Component*>(c)->getName(), m.tskMng, c);
     }
 
     //-----------------------------------------------------------------
-    // Channel TASK-MONITORING - SURVEY
-    // - Surveyor: TskMng
-    // - Respondent: TskAge*
+    // Channel TASK-PROCESSING - PIPELINEs
+    // - Out/In: TskMng/TskAge*
+    ProtocolLayer p5;
+    for (auto & c: ag) {
+        p5.createPipeline(ChnlTskProc + "_" + dynamic_cast<Component*>(c)->getName(), c, m.tskMng);
+    }
+
+    //-----------------------------------------------------------------
+    // Channel TASK-REPORTING - PUBSUB
+    // - Publisher: TskAge*
+    // - Subscriber: TskMng
     ProtocolLayer p6;
-    p6.createSurvey(ChnlTskMonit, m.tskMng, ag, 5555);
+    p6.createPubSub(ChnlTskRep,
+                    ag,
+                    std::vector<CommNode*> {m.tskMng}, 5555);
 
     //-----------------------------------------------------------------
     // Channel TASK-REPORTING - PUBSUB
@@ -113,10 +116,9 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
                     std::vector<CommNode*> {m.tskMng},
                     std::vector<CommNode*> {m.datMng, m.evtMng});
 
-    allCommNodes.push_back(m.evtMng);
+    allMainNodes.push_back(m.evtMng);
 
-    return allCommNodes;
-//    return std::vector<ProtocolLayer> {p1, p2, p3, p4, p5, p6, p7};
+    return concat(allMainNodes, ag);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

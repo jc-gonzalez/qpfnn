@@ -107,12 +107,6 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     // Define valid state transitions
     defineValidTransitions();
 
-    // Define msg. processing methods
-    msgProcMethods.clear();
-    msgProcMethods[ChnlCmd] = &Component::processCmdMsg;
-    msgProcMethods[ChnlMonit] = &Component::processMonitMsg;
-    msgProcMethods[ChnlTskRep] = &Component::processTskRepMsg;
-
     // Transit to INITIALISED
     transitTo(INITIALISED);
     InfoMsg("New state: " + getStateName(getState()));
@@ -163,8 +157,8 @@ void Component::fromRunningToOperational()
 //----------------------------------------------------------------------
 void Component::fromOperationalToRunning()
 {
-    transitTo(RUNNING);
     InfoMsg("New state: " + getStateName(getState()));
+    transitTo(OFF);
 }
 
 //----------------------------------------------------------------------
@@ -172,9 +166,9 @@ void Component::fromOperationalToRunning()
 //----------------------------------------------------------------------
 void Component::fromRunningToOff()
 {
-    transitTo(OFF);
     InfoMsg("New state: " + getStateName(getState()));
     InfoMsg("Ending . . . ");
+    synchro->notify();
 }
 
 //----------------------------------------------------------------------
@@ -197,10 +191,13 @@ void Component::processIncommingMessages()
         ScalabilityProtocolRole * conn = kv.second;
         while (conn->next(m)) {
             DBG(compName << " received the message [" << m << "]");
-            if (chnl == ChnlCmd) {
-                MessageString msg = "My name is " + compName;
-                conn->setMsgOut(msg);
-            }
+            if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
+            else if (chnl == ChnlInData)   { processInDataMsg(conn, m); }
+            else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
+            else if (chnl == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
+            else if (chnl == ChnlTskProc)  { processTskProcMsg(conn, m); }
+            else if (chnl == ChnlTskRep)   { processTskRepMsg(conn, m); }
+            else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
 }

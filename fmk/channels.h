@@ -9,10 +9,9 @@
 
 #define TLISTOF_CHANNELS  T(CMD),               \
         T(INDATA),                              \
-        T(MONIT),                               \
         T(TSKSCHED),                            \
+        T(TSKRQST),                             \
         T(TSKPROC),                             \
-        T(TSKMONIT),                            \
         T(TSKREP)
 
 #define T(x) CHNL_ ## x
@@ -25,10 +24,9 @@ const ChannelDescriptor ChannelAcronym[] = { TLISTOF_CHANNELS };
 
 const ChannelDescriptor ChnlCmd      (ChannelAcronym[CHNL_CMD]);
 const ChannelDescriptor ChnlInData   (ChannelAcronym[CHNL_INDATA]);
-const ChannelDescriptor ChnlMonit    (ChannelAcronym[CHNL_MONIT]);
 const ChannelDescriptor ChnlTskSched (ChannelAcronym[CHNL_TSKSCHED]);
+const ChannelDescriptor ChnlTskRqst  (ChannelAcronym[CHNL_TSKRQST]);
 const ChannelDescriptor ChnlTskProc  (ChannelAcronym[CHNL_TSKPROC]);
-const ChannelDescriptor ChnlTskMonit (ChannelAcronym[CHNL_TSKMONIT]);
 const ChannelDescriptor ChnlTskRep   (ChannelAcronym[CHNL_TSKREP]);
 
 #endif
