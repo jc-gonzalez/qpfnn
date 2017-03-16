@@ -185,7 +185,7 @@ void Component::updateConnections()
 void Component::processIncommingMessages()
 {
     MessageString m;
-    DBG("Component::processIncommingmessages()");
+    TRC("Component::processIncommingmessages()");
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;

@@ -223,7 +223,6 @@ void EvtMng::runEachIteration()
 //----------------------------------------------------------------------
 void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    DBG("############# Processing CMD message!");
 }
 
 //----------------------------------------------------------------------
@@ -231,8 +230,6 @@ void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    DBG("############# Processing TSKREP message!");
-
 }
 
 //}

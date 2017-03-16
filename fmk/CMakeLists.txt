@@ -16,6 +16,7 @@ set (libfmk_hdr
   datatypes.h
   message.h
   config.h
+  infixeval.h
   filenamespec.h
   component.h
   dbhdl.h
@@ -52,6 +53,7 @@ target_include_directories (fmk PUBLIC .
   ${PSQLINCDIR}
   ${NNMSG_ROOT_DIR}/include
   ${JSON_ROOT_DIR}
+  ${INFIX_ROOT_DIR}
   ${NNCOMM_ROOT_DIR}
   ${TOOLS_ROOT_DIR}
   ${STR_ROOT_DIR}
@@ -60,7 +62,7 @@ target_include_directories (fmk PUBLIC .
   ${FMK_ROOT_DIR}
   ${PSQLLIBDIR})
 target_link_libraries (fmk
-  json str log tools uuid nncomm
+  json infix str log tools uuid nncomm
   nanomsg ${PSQLLIB} pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmk

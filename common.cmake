@@ -33,6 +33,7 @@ set (PSQLLIB pq)
 
 set (JSON_ROOT_DIR    ../json)
 set (NNCOMM_ROOT_DIR  ../nncomm)
+set (INFIX_ROOT_DIR    ../infix)
 set (TOOLS_ROOT_DIR   ../tools)
 set (LOG_ROOT_DIR     ../log)
 set (STR_ROOT_DIR     ../str)
@@ -48,6 +49,7 @@ link_directories (
   ${TOOLS_ROOT_DIR}
   ${JSON_ROOT_DIR}
   ${LOG_ROOT_DIR}
+  ${INFIX_ROOT_DIR}
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
   ${PSQLLIBDIR})

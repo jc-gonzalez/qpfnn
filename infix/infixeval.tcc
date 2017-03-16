@@ -44,9 +44,9 @@ using namespace std;
 #define DEBUG_INFIX
 
 #ifdef DEBUG_INFIX
-#  define DBG(s) std::cerr << s << std::endl << std::flush; std::cout << std::flush
+#  define DBGI(s) std::cerr << s << std::endl << std::flush; std::cout << std::flush
 #else
-#  define DBG(s)
+#  define DBGI(s)
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
@@ -162,11 +162,11 @@ Token<NumericType> TokensList<NumericType>::getToken(int & status)
             in.putback(ch);
             istringstream symbol(name);
             if (!(symbol >> theValue)) {
-                DBG("Name: " << name);
+                DBGI("Name: " << name);
                 typename map<string, NumericType>::iterator it = vars.find(name);
                 if (it != vars.end()) {
                     theValue = vars[name];
-                    DBG("with value: " << theValue);
+                    DBGI("with value: " << theValue);
                     return Token<NumericType>(VALUE, theValue);
                 } else {
                     return Token<NumericType>(SYMBOL, 0, name);
@@ -174,7 +174,7 @@ Token<NumericType> TokensList<NumericType>::getToken(int & status)
                     //return EOL;
                 }
             } else {
-                DBG("Constant: " << name);
+                DBGI("Constant: " << name);
                 return Token<NumericType>(VALUE, theValue);
             }
             // if ((name.at(0) < '0') || (name.at(0) > '9')) {
@@ -230,7 +230,7 @@ NumericType Evaluator<NumericType>::getValue()
         string & s = singleExpr.at(i);
         str.clear();
         str.str(s);
-        DBG("Evaluating expression: " << s);
+        DBGI("Evaluating expression: " << s);
 
         theResult = eval();
 
@@ -239,7 +239,7 @@ NumericType Evaluator<NumericType>::getValue()
 
     typename map<string, NumericType>::iterator it = Symbols<NumericType>::symbolMap.begin();
     while (it !=Symbols<NumericType>::symbolMap.end()) {
-        DBG(it->first << " : " << it->second);
+        DBGI(it->first << " : " << it->second);
         ++it;
     }
 
@@ -256,7 +256,7 @@ NumericType Evaluator<NumericType>::getValue()
 template <class NumericType>
 NumericType Evaluator<NumericType>::eval()
 {
-    DBG(str.str());
+    DBGI(str.str());
     TokensList<NumericType> tok(str);
     Token<NumericType> lastToken;
 
@@ -291,7 +291,7 @@ void Evaluator<NumericType>::processToken(const Token<NumericType> & lastToken)
     TokenType topOp;
     TokenType lastType = lastToken.getType();
 
-    DBG("Processing token " << TokenName[lastType]);
+    DBGI("Processing token " << TokenName[lastType]);
 
     switch(lastType) {
     case VALUE:
