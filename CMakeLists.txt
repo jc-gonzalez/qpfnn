@@ -6,7 +6,10 @@
 # Author: J C Gonzalez - 2015-2017
 # Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 2.8)
+cmake_policy (SET CMP0015 OLD)
+
+include (common.cmake)
 
 project (QPF)
 
@@ -20,20 +23,19 @@ set (QPF_VERSION ${QPF_MAJOR}.${QPF_MINOR}.${QPF_PATCH})
 
 message (STATUS "Building QPF version ${QPF_VERSION}")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-
 set (BUILD_ID $ENV{BUILD_ID})
 add_definitions(-DBUILD_ID="${BUILD_ID}")
 
 add_subdirectory (json)
 add_subdirectory (nncomm)
 add_subdirectory (infix)
-add_subdirectory (fmk)
 add_subdirectory (log)
 add_subdirectory (str)
 add_subdirectory (tools)
 add_subdirectory (uuid)
+add_subdirectory (fmk)
 #add_subdirectory (qpf)
+#add_subdirectory (qpfhmi)
 
 if (HMI)
   message ("HMI component will be generated as well")

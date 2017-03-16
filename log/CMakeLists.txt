@@ -4,6 +4,7 @@
 # Library project file
 # Author: J C Gonzalez - 2015-2017
 #======================================================================
+include (../common.cmake)
 
 project (log)
 

@@ -6,7 +6,7 @@
 # Author: J C Gonzalez - 2015-2017
 # Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
-cmake_minimum_required(VERSION 3.5)
+include (../common.cmake)
 
 #===== Projec dir. =======
 project (nncomm)

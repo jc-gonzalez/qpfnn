@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    component.h
+ * File:    evtmng.h
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.Component
@@ -55,6 +55,7 @@
 
 //------------------------------------------------------------
 // Topic: Project headers
+//   . component.h
 //   - dwatcher.h
 //------------------------------------------------------------
 #include "component.h"
@@ -69,6 +70,7 @@
 //namespace QPF {
 
 class EvtMng : public Component {
+
 public:
     //----------------------------------------------------------------------
     // Constructor
@@ -91,24 +93,20 @@ public:
     virtual void fromOperationalToRunning();
 
     //----------------------------------------------------------------------
-    // Method: fromRunningToOff
-    //----------------------------------------------------------------------
-    virtual void fromRunningToOff();
-
-    //----------------------------------------------------------------------
-    // Method: processIncommingMessages
-    //----------------------------------------------------------------------
-    virtual void processIncommingMessages();
-
-    //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
     virtual void runEachIteration();
 
-private:
-    virtual void processCmdMsg(MessageString & m);
-    virtual void processTskRepMsg(MessageString & m);
-    virtual void processMonitMsg(MessageString & m);
+protected:
+    //----------------------------------------------------------------------
+    // Method: processCmdMsg
+    //----------------------------------------------------------------------
+    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+    //----------------------------------------------------------------------
+    // Method: processTskRepMsg
+    //----------------------------------------------------------------------
+    virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 private:
     DirWatcher * dw;

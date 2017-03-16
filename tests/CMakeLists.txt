@@ -6,36 +6,13 @@
 # Author: J C Gonzalez - 2015-2017
 # Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
-cmake_minimum_required(VERSION 3.5)
+include (../common.cmake)
 
 #===== Projec dir. =======
 project (fmktest)
 
 set (fmktest_src
   main.cpp
-)
-
-#===== Project sections/libraries =======
-
-set (NNMSG_ROOT_DIR /usr/local)
-
-set (JSON_ROOT_DIR    ../json)
-set (NNCOMM_ROOT_DIR  ../nncomm)
-set (FMK_ROOT_DIR     ../fmk)
-set (INFIX_ROOT_DIR   ../infix)
-set (LOG_ROOT_DIR     ../log)
-set (STR_ROOT_DIR     ../str)
-set (UUID_ROOT_DIR    ../uuid)
-
-link_directories (
-  ${NNMSG_ROOT_DIR}/lib
-  ${NNCOMM_ROOT_DIR}
-  ${FMK_ROOT_DIR}
-  ${JSON_ROOT_DIR}
-  ${LOG_ROOT_DIR}
-  ${STR_ROOT_DIR}
-  ${UUID_ROOT_DIR}
-  ${INFIX_ROOT_DIR}
 )
 
 add_executable(fmktest ${fmktest_src})
@@ -47,10 +24,13 @@ target_include_directories (fmktest PUBLIC .
   ${LOG_ROOT_DIR}
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
-  ${INFIX_ROOT_DIR})
+  ${INFIX_ROOT_DIR}
+  ${PSQLLIBDIR})
 target_link_libraries (fmktest
-  fmk json nncomm infix str uuid log
-  nanomsg pthread)
+  fmk json nncomm infix str log uuidxx
+  nanomsg
+  ${UUIDLIB} ${PSQLLIB}
+  pthread)
 set_target_properties (fmktest PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmktest
          RUNTIME DESTINATION bin

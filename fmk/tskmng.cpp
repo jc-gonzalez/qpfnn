@@ -12,15 +12,6 @@ TskMng::TskMng(std::string name, std::string addr, Synchronizer * s) : Component
 
 
 void TskMng::runEachIteration() {
-    if (((iteration + 1) % 21) == 0) {
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlMonit);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            char msg[128] = "=====================>> Pues si...";
-            conn->setMsgOut(msg);
-        }
-    }
     if (((iteration + 1) % 11) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlTskRep);

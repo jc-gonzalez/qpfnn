@@ -80,6 +80,15 @@ public:
 
     PropertyRef(URLHandler, ProductMetadata, product, Product);
 
+    enum LocalArchiveMethod {
+        LINK,
+        MOVE,
+        COPY,
+        COPY_TO_REMOTE,
+        COPY_TO_MASTER,
+        SYMLINK
+    };
+
 public:
 
     //----------------------------------------------------------------------
@@ -159,6 +168,10 @@ private:
     std::string taskExchgDir;
     std::string master_address;
     std::string remote_address;
+
+    std::string productUrl;
+    std::string productUrlSpace;
+
     bool isRemote;
 };
 

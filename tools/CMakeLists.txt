@@ -6,7 +6,7 @@
 # Author: J C Gonzalez - 2015-2017
 # Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
-cmake_minimum_required(VERSION 3.5)
+include (../common.cmake)
 
 #===== Projec dir. =======
 project (tools)
@@ -23,13 +23,6 @@ set (libtools_src
   sm.cpp
   tools.cpp
 )
-
-#===== Project sections/libraries =======
-
-set (JSON_ROOT_DIR ../json)
-set (TOOLS_ROOT_DIR ../tools)
-
-link_directories ( ${TOOLS_ROOT_DIR} ${JSON_ROOT_DIR} )
 
 add_library(tools SHARED ${libtools_src})
 target_include_directories (tools PUBLIC .

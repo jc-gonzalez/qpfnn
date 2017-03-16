@@ -68,7 +68,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //==========================================================================
 // Class: DBHdlPostgreSQL
@@ -103,7 +103,7 @@ public:
     // Method: storeProducts
     // Saves a set of products' metadata to the database
     //----------------------------------------------------------------------
-    virtual int storeProducts(ProductCollection & prodList);
+    virtual int storeProducts(ProductList & prodList);
 
     //----------------------------------------------------------------------
     // Method: retrieveProducts
@@ -189,7 +189,7 @@ public:
     // Stores a message into the database
     //----------------------------------------------------------------------
     virtual bool storeMsg(std::string from,
-                          Router2RouterPeer::PeerMessage & inPeerMsg,
+                          MessageString & inPeerMsg,
                           bool isBroadcast);
 
     //----------------------------------------------------------------------
@@ -198,7 +198,7 @@ public:
     // pre-defined criteria
     //----------------------------------------------------------------------
     virtual bool retrieveMsgs(std::vector<std::pair<std::string,
-                              Router2RouterPeer::PeerMessage> > & msgList,
+                              MessageString> > & msgList,
                               std::string criteria = std::string());
 
     //----------------------------------------------------------------------
@@ -267,6 +267,6 @@ private:
     PGresult   * res;
 };
 
-}
+//}
 
 #endif  /* DBHDLPOSTGRE_H */

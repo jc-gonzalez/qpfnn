@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "evtmng.h"
+
 #include "filenamespec.h"
 #include "message.h"
 
@@ -53,14 +54,16 @@
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-EvtMng::EvtMng(const char * name, const char * addr, Synchronizer * s) : Component(name, addr, s)
+EvtMng::EvtMng(const char * name, const char * addr, Synchronizer * s)
+    : Component(name, addr, s)
 {
 }
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)  : Component(name, addr, s)
+EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)
+    : Component(name, addr, s)
 {
 }
 
@@ -88,35 +91,6 @@ void EvtMng::fromOperationalToRunning()
     dw->stop();
 
     transitTo(OFF);
-}
-
-//----------------------------------------------------------------------
-// Method: fromRunningToOff
-//----------------------------------------------------------------------
-void EvtMng::fromRunningToOff()
-{
-    InfoMsg("New state: " + getStateName(getState()));
-    InfoMsg("Ending . . . ");
-
-    synchro->notify();
-}
-
-//----------------------------------------------------------------------
-// Method: processIncommingMessages
-//----------------------------------------------------------------------
-void EvtMng::processIncommingMessages()
-{
-    MessageString m;
-    DBG("EvtMng::processIncommingmessages()");
-    for (auto & kv: connections) {
-        const ChannelDescriptor & chnl = kv.first;
-        ScalabilityProtocolRole * conn = kv.second;
-        DBG(". Checking channel " << chnl);
-        while (conn->next(m)) {
-            DBG("%%%%%%%%% " << compName << " received the message [" << m << "]");
-            (*this.*msgProcMethods[chnl])(m);
-        }
-    }
 }
 
 //----------------------------------------------------------------------
@@ -244,22 +218,21 @@ void EvtMng::runEachIteration()
     if (iteration > 1000) { transitTo(RUNNING); }
 }
 
-void EvtMng::processCmdMsg(MessageString & m)
+//----------------------------------------------------------------------
+// Method: processCmdMsg
+//----------------------------------------------------------------------
+void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     DBG("############# Processing CMD message!");
 }
 
-void EvtMng::processMonitMsg(MessageString & m)
-{
-    DBG("############# Processing MONIT message!");
-
-}
-
-void EvtMng::processTskRepMsg(MessageString & m)
+//----------------------------------------------------------------------
+// Method: processTskRepMsg
+//----------------------------------------------------------------------
+void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     DBG("############# Processing TSKREP message!");
 
 }
-
 
 //}

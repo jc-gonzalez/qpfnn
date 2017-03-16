@@ -36,6 +36,7 @@ void ProtocolLayer::createPipeline(ChannelDescriptor chnl,
         bindAddr = "tcp://" + pusherHost + ":" + ssPort.str();
         connAddr = "tcp://" + pullerHost + ";" + pusherHost + ":" + ssPort.str();
     }
+    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
     pusher->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
     puller->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
 
@@ -63,6 +64,10 @@ void ProtocolLayer::createPubSub(ChannelDescriptor chnl,
         bindAddr = "tcp://*:" + ssPort.str();
         connAddr = "tcp://" + pubHost + ":" + ssPort.str();
     }
+    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
+    //if ((publishers.size() > 1) && (subscribers.size() == 1)) {
+    //    bindAddr.swap(connAddr);
+    //}
     components.clear();
     for (auto & c: publishers) {
         c->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
@@ -92,6 +97,7 @@ void ProtocolLayer::createSurvey(ChannelDescriptor chnl,
         bindAddr = "tcp://*:" + ssPort.str();
         connAddr = "tcp://" + surveyorHost + ":" + ssPort.str();
     }
+    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
     components.clear();
     surveyor->addConnection(chnl, new Survey(NN_SURVEYOR,   bindAddr));
     components.push_back(surveyor);
@@ -123,6 +129,7 @@ void ProtocolLayer::createBus(ChannelDescriptor chnl,
             ssPort << port;
             addr = "tcp://" + host + ":" + ssPort.str();
         }
+        DBG("Binding: " << addr << ", Connect from anywhere");
         Bus * conn = new Bus(NN_BUS,   addr);
         for (auto & adr: addresses) { conn->connectTo(adr); }
         addresses.push_back(addr);

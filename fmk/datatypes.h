@@ -145,6 +145,9 @@ typedef Json::Value  json;
 #define SET_CFGGRP(c,e) e = CfgGrp ## c ( v[ #e ] );
 #define CFGGRP(c,e) CfgGrp ## c e;
 
+#define SET_GRP(c,e) e = c ( v[ #e ] );
+#define GRP(c,e) c e;
+
 #define DUMPJSTR(e)  std::cerr << #e << ": " << value[ #e ].asString() << std::endl;
 #define DUMPJINT(e)  std::cerr << #e << ": " << value[ #e ].asInt() << std::endl;
 #define DUMPJDLB(e)  std::cerr << #e << ": " << value[ #e ].asDouble() << std::endl;
@@ -248,6 +251,37 @@ typedef std::string   FileNamePart;
 //------------------------------------------------------------
 
 struct ProductMetadata : public JRecord {
+    ProductMetadata() {}
+    ProductMetadata(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTR(mission);        // %M
+        DUMPJSTR(startTime);      // %f
+        DUMPJSTR(endTime);        // %t
+        DUMPJSTR(regTime);
+        DUMPJSTR(timeInterval);   // %D
+        DUMPJINT(obsId);
+        DUMPJSTR(instrument);     // %I
+        DUMPJSTR(obsMode);
+        DUMPJINT(expos);
+        DUMPJSTR(creator);
+        DUMPJSTR(origin);
+        DUMPJSTR(procFunc);       // %F
+        DUMPJSTR(fileType);
+        DUMPJSTR(params);         // %P
+        DUMPJSTR(productId);
+        DUMPJSTR(productType);    // %T
+        DUMPJSTR(productVersion); // %V
+        DUMPJSTR(productStatus);
+        DUMPJSTR(productSize);
+        DUMPJSTR(signature);      // %S
+        DUMPJSTR(dirName);
+        DUMPJSTR(baseName);
+        DUMPJSTR(suffix);
+        DUMPJSTR(extension);
+        DUMPJSTR(url);
+        DUMPJSTR(urlSpace);
+        DUMPJBOOL(hadNoVersion);
+    }
     JSTR(mission);        // %M
     JSTR(startTime);      // %f
     JSTR(endTime);        // %t
@@ -274,11 +308,93 @@ struct ProductMetadata : public JRecord {
     JSTR(extension);
     JSTR(url);
     JSTR(urlSpace);
-    JSTR(hadNoVersion);
+    JBOOL(hadNoVersion);
+};
+
+//typedef std::vector<ProductMetadata>           ProductList;
+//typedef std::map<ProductType, ProductMetadata> ProductCollection;
+
+
+struct ProductList : public JRecord {
+    ProductList() {}
+    ProductList(json v) : JRecord(v) {
+        products.clear();
+        for (int i = 0; i < value.size(); ++i) {
+            products.push_back(ProductMetadata(value[i]));
+        }
+    }
+    virtual void dump() {
+        for (auto & v: products) { v.dump(); }
+    }
+    std::vector<ProductMetadata> products;
 };
 
 struct ProductCollection : public JRecord {
-    JSTRSTRMAP(products);
+    ProductCollection() {}
+    ProductCollection(json v) : JRecord(v) {
+        products.clear();
+        Json::Value::iterator it = value.begin();
+        while (it != value.end()) {
+            products[it.key().asString()] = ProductMetadata(*it);
+            ++it;
+        }
+    }
+    virtual void dump() {
+        for (auto & kv: products) { kv.second.dump(); }
+    }
+    std::map<ProductType, ProductMetadata> products;
+};
+
+typedef std::string                            TaskName;
+typedef std::string                            TaskPath;
+typedef int                                    TaskExitCode;
+typedef json                                   TaskData;
+
+#define TLIST_TASK_STATUS                                       \
+    T(SCHEDULED, -2),                                           \
+        T(FAILED,    -1),                                       \
+        T(FINISHED,   0),                                       \
+        T(RUNNING,    1),                                       \
+        T(PAUSED,     2),                                       \
+        T(STOPPED,    3),                                       \
+        T(ARCHIVED,   4),                                       \
+        T(UNKNOWN_STATE, 5)
+
+#define T(a,b) TASK_ ## a = b
+enum TaskStatus { TLIST_TASK_STATUS };
+#undef T
+
+extern std::map<TaskStatus, std::string> TaskStatusName;
+extern std::map<std::string, TaskStatus> TaskStatusValue;
+
+struct TaskInfo : public JRecord {
+    TaskInfo() {}
+    TaskInfo(json v) : JRecord(v) {
+        SET_GRP(ProductList,inputs);
+        SET_GRP(ProductList,outputs);
+    }
+    virtual void dump() {
+        DUMPJSTR(taskName);
+        DUMPJSTR(taskPath);
+        DUMPJSTR(taskStart);
+        DUMPJSTR(taskEnd);
+        DUMPJINT(taskExitCode);
+        DUMPJINT(taskStatus);
+        inputs.dump();
+        outputs.dump();
+        DUMPJSTRSTRMAP(params);
+        DUMPJSTR(taskData);
+    }
+    JSTR(taskName);
+    JSTR(taskPath);
+    JSTR(taskStart);
+    JSTR(taskEnd);
+    JINT(taskExitCode);
+    JINT(taskStatus);
+    GRP(ProductList,inputs);
+    GRP(ProductList,outputs);
+    JSTRSTRMAP(params);
+    JSTR(taskData);
 };
 
 #ifdef COMMENTED_OUT
@@ -304,44 +420,6 @@ struct ParameterList : public JsonStruct {
     virtual void toData();
 };
 
-typedef std::string                            TaskName;
-typedef std::string                            TaskPath;
-typedef int                                    TaskExitCode;
-typedef Json::Value                            TaskData;
-
-#define TLIST_TASK_STATUS                                       \
-    T(SCHEDULED, -2),                                           \
-                                     T(FAILED,    -1),          \
-                                     T(FINISHED,   0),          \
-                                     T(RUNNING,    1),          \
-                                     T(PAUSED,     2),          \
-                                     T(STOPPED,    3),          \
-                                     T(ARCHIVED,   4),          \
-                                     T(UNKNOWN_STATE, 5)
-
-#define T(a,b) TASK_ ## a = b
-enum TaskStatus { TLIST_TASK_STATUS };
-#undef T
-
-extern std::map<TaskStatus, std::string> TaskStatusName;
-extern std::map<std::string, TaskStatus> TaskStatusValue;
-
-struct TaskInfo : public JsonStruct {
-    TaskInfo();
-    TaskName           taskName;
-    TaskPath           taskPath;
-    DateTime           taskStart;
-    DateTime           taskEnd;
-    TaskExitCode       taskExitCode;
-    TaskStatus         taskStatus;
-    ProductCollection  inputs;
-    ProductCollection  outputs;
-    ParameterList      params;
-    TaskData           taskData;
-
-    virtual void toFields();
-    virtual void toData();
-};
 
 struct TaskAgentInfo : public JsonStruct {
     int         total;

@@ -79,6 +79,9 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+typedef std::string MessageString;
+
+
 //==========================================================================
 // Class: DBHandler
 //==========================================================================
@@ -121,7 +124,7 @@ public:
     // Method: storeProducts
     // Saves a set of products' metadata to the database
     //----------------------------------------------------------------------
-    virtual int storeProducts(ProductCollection & prodList)=0;
+    virtual int storeProducts(ProductList & prodList)=0;
 
     //----------------------------------------------------------------------
     // Method: retrieveProducts
@@ -208,7 +211,7 @@ public:
     // Stores a message into the database
     //----------------------------------------------------------------------
     virtual bool storeMsg(std::string from,
-                          Router2RouterPeer::PeerMessage & inPeerMsg,
+                          MessageString & inPeerMsg,
                           bool isBroadcast)=0;
 
     //----------------------------------------------------------------------
@@ -217,7 +220,7 @@ public:
     // pre-defined criteria
     //----------------------------------------------------------------------
     virtual bool retrieveMsgs(std::vector<std::pair<std::string,
-                              Router2RouterPeer::PeerMessage> > & msgList,
+                              MessageString> > & msgList,
                               std::string criteria = std::string())=0;
 
     //----------------------------------------------------------------------

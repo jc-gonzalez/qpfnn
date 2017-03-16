@@ -1,0 +1,71 @@
+#!/bin/bash
+##############################################################################
+# QLA_VIS
+# Driver script for EUCLID QLA VIS Processor (python)
+#-----------------------------------------------------------------------------
+# Usage:  QLA_VIS {cfgFile}
+##############################################################################
+
+# Set I/O directories and files
+baseScriptName=${BASH_SOURCE##*/}
+
+usage() {
+    echo "Usage: $baseScriptName {cfgFile}"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+cfgFile=$1
+workDir=$(dirname $cfgFile)
+
+cd ${workDir}
+
+binPath=/qlabin
+inPath=${workDir}/in
+outPath=${workDir}/out
+
+in=$(find ${inPath} -name "*.fits" -print)
+id=$(basename $in .fits)
+
+idres=$(echo $id|sed -e 's#VIS_RAW#VIS_LE1#g')
+idrep=$(echo $id|sed -e 's#VIS_RAW#VIS_REP#g')
+idlog=$(echo $id|sed -e 's#VIS_RAW#VIS_LOG#g')
+idchk==$(echo $id|sed -e 's#VIS_RAW#VIS_CHK#g')
+
+exe=driver.py
+results=${outPath}/${idres}.json
+report=${outPath}/${idrep}.json
+log=${outPath}/${idlog}.log
+chk=${outPath}/${idlog}.chk
+
+bpm="${binPath}/config/bpm.fits"
+satmap="${binPath}/config/vis_sat_map.fits"
+
+visbpm="--vis_bpm ${bpm}"
+vissatmap="--vis_sat_map_fits ${satmap}"
+chks="--checks_file ${chks}"
+interm="--intermediate_products"
+
+#addopts="${visbpm} ${vissatmap} ${interm} ${chks}"
+addopts="${visbpm} ${vissatmap}"
+#addopts=""
+
+# Run the processor
+
+cd ${workDir}
+python ${binPath}/${exe} \
+       -i ${inPath} \
+       -r ${results} \
+       ${addopts} \
+       -v 1>${log} 2>&1
+
+# Compress results (can be large)
+
+#if [ -n "${results}" ]; then
+#    gzip ${results}
+#fi
+
+chown -hR --reference=${cfgFile} ${workDir}

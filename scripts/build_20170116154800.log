@@ -1,0 +1,11 @@
+===============================================================================
+ Euclid QLA Processing Framework
+ Version 1.1
+ Compilation and Installation process
+ Build time-stamp: 20170116154800
+===============================================================================
+
+## STEP 0 - Checking required applications and libraries are installed
+  - Program 'qmake' found!
+  - Program 'make' found!
+  - Program 'psql' found!

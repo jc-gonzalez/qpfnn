@@ -1,0 +1,22 @@
+===============================================================================
+ Euclid QLA Processing Framework
+ Version 1.1
+ Compilation and Installation process
+ Build time-stamp: 20170113151211
+===============================================================================
+
+## STEP 0 - Checking required applications and libraries are installed
+  - Program 'qmake' found!
+  - Program 'make' found!
+  - Program 'psql' found!
+  - Library 'Qt' found!
+  - Library 'zmq' found!
+  - Library 'pcre2' found!
+  - Library 'sodium' found!
+  - Library 'sodium' found!
+  - Library 'curl' found!
+  - Library 'pq' found!
+## STEP 1 - Ensuring contributions to COTS are properly installed
+  - Installing file cppzmq-master/zmq.hpp
+  - Installing file pcre2/PCRegEx.h
+## STEP 2 - Creating build folder

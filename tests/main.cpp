@@ -22,6 +22,7 @@ struct MasterNodeElements {
     TskOrc  * tskOrc;
     TskMng  * tskMng;
 };
+
 typedef MasterNodeElements * MasterNodeElementsPtr;
 
 Synchronizer synchro;
@@ -57,66 +58,79 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
     std::vector<CommNode*> allCommNodes =
         concat(std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}, ag);
 
+    ProtocolLayer * p;
+    std::vector<ProtocolLayer *> protocolLayers;
+
     //-----------------------------------------------------------------
     // Channel CMD - SURVEY
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    ProtocolLayer p1;
-    p1.createSurvey(ChnlCmd, m.evtMng, allCommNodes);
+    p = new ProtocolLayer;
+    p->createSurvey(ChnlCmd, m.evtMng, allCommNodes);
+    protocolLayers.push_back(p);
 
     //-----------------------------------------------------------------
     // Channel INDATA -  PUBSUB
     // - Publisher: EvtMng
     // - Subscriber: DataMng TskOrc
-    ProtocolLayer p2;
-    p2.createPubSub(ChnlInData,
+    p = new ProtocolLayer;
+    p->createPubSub(ChnlInData,
                    std::vector<CommNode*> {m.evtMng},
                    std::vector<CommNode*> {m.datMng, m.tskOrc});
-
-    //-----------------------------------------------------------------
-    // Channel MONITORING - BUS
-    // - Connected: EvtMng QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    ProtocolLayer p3;
-    p3.createBus(ChnlMonit,
-                 std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng});
+    protocolLayers.push_back(p);
 
     //-----------------------------------------------------------------
     // Channel TASK-SCHEDULING - PUBSUB
     // - Publisher: TskOrc
     // - Subscriber: DataMng TskMng
-    ProtocolLayer p4;
-    p4.createPubSub(ChnlTskSched,
+    p = new ProtocolLayer;
+    p->createPubSub(ChnlTskSched,
                     std::vector<CommNode*> {m.tskOrc},
                     std::vector<CommNode*> {m.datMng, m.tskMng});
+    protocolLayers.push_back(p);
+
+    //-----------------------------------------------------------------
+    // Channel TASK-REQUEST - PIPELINE
+    // - Out/In: TskAge*/TskMng
+    for (auto & c: ag) {
+        p = new ProtocolLayer;
+        p->createPipeline(ChnlTskRqst + "_" + dynamic_cast<Component*>(c)->getName(), c, m.tskMng);
+        protocolLayers.push_back(p);
+    }
 
     //-----------------------------------------------------------------
     // Channel TASK-PROCESSING - PIPELINE
     // - Out/In: TskMng/TskAge*
-    ProtocolLayer p5;
     for (auto & c: ag) {
-        p5.createPipeline(ChnlTskProc + "_" + dynamic_cast<Component*>(c)->getName(), m.tskMng, c);
+        p = new ProtocolLayer;
+        p->createPipeline(ChnlTskProc + "_" + dynamic_cast<Component*>(c)->getName(), m.tskMng, c);
+        protocolLayers.push_back(p);
     }
 
     //-----------------------------------------------------------------
-    // Channel TASK-MONITORING - SURVEY
-    // - Surveyor: TskMng
-    // - Respondent: TskAge*
-    ProtocolLayer p6;
-    p6.createSurvey(ChnlTskMonit, m.tskMng, ag, 5555);
+    // Channel TASK-REQUEST - PIPELINE
+    // - Out/In: TskAge*/TskMng
+    int port = 55000;
+    for (auto & c: ag) {
+        p = new ProtocolLayer;
+        p->createPipeline(ChnlTskRep + "_" + dynamic_cast<Component*>(c)->getName(), c, m.tskMng, port);
+        protocolLayers.push_back(p);
+        ++port;
+    }
 
     //-----------------------------------------------------------------
     // Channel TASK-REPORTING - PUBSUB
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
-    ProtocolLayer p7;
-    p7.createPubSub(ChnlTskRep,
+    p = new ProtocolLayer;
+    p->createPubSub(ChnlTskRepDist,
                     std::vector<CommNode*> {m.tskMng},
                     std::vector<CommNode*> {m.datMng, m.evtMng});
+    protocolLayers.push_back(p);
 
     allCommNodes.push_back(m.evtMng);
 
     return allCommNodes;
-//    return std::vector<ProtocolLayer> {p1, p2, p3, p4, p5, p6, p7};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,14 +181,17 @@ int main(int argc, char * argv[])
 
     //------------------------------------------------------------
 
-    std::ifstream cfgFile("/home/jcgonzalez/file.cfg");
+    std::ifstream cfgFile(getenv("HOME") + std::string("/file.cfg"));
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
 
     JValue v;
     v.fromStr(buffer.str());
 
-    Config cfg(v.val());
+    //Config & cfg = Config::_();
+    using Configuration::cfg;
+    cfg.init(v.val());
+
     std::cerr << cfg.str() << std::endl;
     std::cerr << cfg.general.appName() << std::endl;
     std::cerr << cfg.network.masterNode() << std::endl;
@@ -183,6 +200,7 @@ int main(int argc, char * argv[])
     }
 
     //cfg.dump();
+    DBG("Config::PATHBase: " << Config::PATHBase);
 
     //------------------------------------------------------------
 

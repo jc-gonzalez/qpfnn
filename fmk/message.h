@@ -76,61 +76,19 @@ public:
     MsgBodyINDATA(std::string s) : JRecord(s) {}
     MsgBodyINDATA(json v) : JRecord(v) {}
     virtual void dump() {
-        DUMPJSTRSTRMAP(products);
+        DUMPJSTRVEC(products);
     }
-    JSTRSTRMAP(products);
+    JSTRVEC(products);
 };
 
 //==========================================================================
-// Class: MsgBodyMONIT
+// Class: MsgBodyTSK
 //==========================================================================
-class MsgBodyMONIT : public JRecord {
+class MsgBodyTSK : public JRecord {
 public:
-    MsgBodyMONIT() {}
-    MsgBodyMONIT(std::string s) : JRecord(s) {}
-    MsgBodyMONIT(json v) : JRecord(v) {}
-    virtual void dump() {
-        DUMPJSTR(info);
-    }
-    JSTR(info);
-};
-
-//==========================================================================
-// Class: MsgBodyTSKSCHED
-//==========================================================================
-class MsgBodyTSKSCHED : public JRecord {
-public:
-    MsgBodyTSKSCHED() {}
-    MsgBodyTSKSCHED(std::string s) : JRecord(s) {}
-    MsgBodyTSKSCHED(json v) : JRecord(v) {}
-    virtual void dump() {
-        DUMPJSTR(info);
-    }
-    JSTR(info);
-};
-
-//==========================================================================
-// Class: MsgBodyTSKMONIT
-//==========================================================================
-class MsgBodyTSKMONIT : public JRecord {
-public:
-    MsgBodyTSKMONIT() {}
-    MsgBodyTSKMONIT(std::string s) : JRecord(s) {}
-    MsgBodyTSKMONIT(json v) : JRecord(v) {}
-    virtual void dump() {
-        DUMPJSTR(info);
-    }
-    JSTR(info);
-};
-
-//==========================================================================
-// Class: MsgBodyTSKREP
-//==========================================================================
-class MsgBodyTSKREP : public JRecord {
-public:
-    MsgBodyTSKREP() {}
-    MsgBodyTSKREP(std::string s) : JRecord(s) {}
-    MsgBodyTSKREP(json v) : JRecord(v) {}
+    MsgBodyTSK() {}
+    MsgBodyTSK(std::string s) : JRecord(s) {}
+    MsgBodyTSK(json v) : JRecord(v) {}
     virtual void dump() {
         DUMPJSTR(info);
     }

@@ -40,9 +40,8 @@
 
 #include "urlhdl.h"
 
-#include "str.h"
-
 #include <unistd.h>
+#include <cassert>
 #include <ctime>
 #include <cstdio>
 #include <sys/types.h>
@@ -52,6 +51,13 @@
 
 #include <libgen.h>
 
+#include "str.h"
+#include "config.h"
+
+#include "dbg.h"
+
+#define showBacktrace()
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -59,6 +65,8 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
+
+using Configuration::cfg;
 
 //----------------------------------------------------------------------
 // Method: Constructor
@@ -72,26 +80,26 @@ URLHandler::URLHandler(bool remote) : isRemote(remote)
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromExternal2Inbox()
 {
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
-
     // NO DOWNLOAD IS STILL IMPLEMENTED
     // TODO: Implement download of external products into inbox
 
     // Get product basename
-    std::vector<std::string> tokens = str::split(product.url, '/');
+    std::vector<std::string> tokens;
+    productUrl = product.url();
+    str::split(productUrl, '/', tokens);
     std::string baseName = tokens.back();
 
     // Set new location and url
-    std::string newFile(cfgInfo.storage.inbox.path + "/" + baseName);
+    std::string newFile(cfg.storage.inbox + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // This method should only be called once the download has been done,
     // hence the only action left is setting the url
-    DBG("Changing URL from " << product.url << " to " << newUrl);
+    TRC("Changing URL from " << productUrl << " to " << newUrl);
 
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = InboxSpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = InboxSpace;
 
     return product;
 }
@@ -112,29 +120,32 @@ ProductMetadata & URLHandler::fromOutbox2External()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromFolder2Inbox()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert((product.urlSpace == UserSpace) ||
-           (product.urlSpace == ReprocessingSpace));
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert((productUrlSpace == UserSpace) ||
+           (productUrlSpace == ReprocessingSpace));
 
     // Get product basename
-    std::vector<std::string> tokens = str::split(product.url, '/');
+    std::vector<std::string> tokens;
+    str::split(productUrl, '/', tokens);
     std::string baseName = tokens.back();
 
     // Set new location and url
-    std::string file(str::mid(product.url,7));
-    std::string newFile(cfgInfo.storage.inbox.path + "/" + baseName);
+    std::string file(str::mid(productUrl,7));
+    std::string newFile(cfg.storage.inbox + "/" + baseName);
     std::string newUrl ("file://" + newFile);
 
     // Set (hard) link (should it be move?)
     (void)relocate(file, newFile, LINK);
 
     // Change url in processing task
-    product.url = newUrl;
-    if (product.urlSpace != ReprocessingSpace) {
-        product.urlSpace = InboxSpace;
+    product["url"] = newUrl;
+    if (productUrlSpace != ReprocessingSpace) {
+        product["urlSpace"] = InboxSpace;
     }
 
     return product;
@@ -145,39 +156,41 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromInbox2LocalArch()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert((product.urlSpace == InboxSpace) ||
-           (product.urlSpace == ReprocessingSpace));
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert((productUrlSpace == InboxSpace) ||
+           (productUrlSpace == ReprocessingSpace));
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
+    std::string file(str::mid(productUrl,7,1000));
     std::string newFile(file);
-    std::string newUrl(product.url);
+    std::string newUrl(productUrl);
 
     std::string section("/in");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.inbox.path,
-                    cfgInfo.storage.local_archive.path + section);
+                    cfg.storage.inbox,
+                    cfg.storage.archive + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.inbox.path,
-                    cfgInfo.storage.local_archive.path + section);
+                    cfg.storage.inbox,
+                    cfg.storage.archive + section);
 
-    if (product.hadNoVersion) {
-        std::string a("Z." + product.extension);
-        std::string b("Z_" + product.productVersion + "." + product.extension);
+    if (product.hadNoVersion()) {
+        std::string a("Z." + product.extension());
+        std::string b("Z_" + product.productVersion() + "." + product.extension());
 
-        str::replaceAll(product.url, a, b);
+        str::replaceAll(productUrl,  a, b);
         str::replaceAll(newFile,     a, b);
         str::replaceAll(newUrl,      a, b);
 
-        product.hadNoVersion = false;
+        product["hadNoVersion"] = false;
     }
 
-    if (product.urlSpace != ReprocessingSpace) {
+    if (productUrlSpace != ReprocessingSpace) {
         // Set (hard) link (should it be move?)
         (void)relocate(file, newFile, MOVE);
     } else {
@@ -186,8 +199,8 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
         (void)unlink(file.c_str());
     }
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = LocalArchSpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = LocalArchSpace;
 
     return product;
 }
@@ -197,32 +210,34 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromLocalArch2Gateway()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == LocalArchSpace);
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == LocalArchSpace);
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
+    std::string file(str::mid(productUrl,7,1000));
     std::string newFile(file);
-    std::string newUrl(product.url);
+    std::string newUrl(productUrl);
 
     std::string section((newUrl.find("/out/") != std::string::npos) ? "/out" : "/in");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.local_archive.path + section,
-                    cfgInfo.storage.gateway.path + "/in");
+                    cfg.storage.archive + section,
+                    cfg.storage.gateway + "/in");
     str::replaceAll(newUrl,
-                    cfgInfo.storage.local_archive.path + section,
-                    cfgInfo.storage.gateway.path + "/in");
+                    cfg.storage.archive + section,
+                    cfg.storage.gateway + "/in");
 
     // Set (hard) link
     (void)relocate(file, newFile, LINK);
 
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = GatewaySpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = GatewaySpace;
 
     return product;
 }
@@ -232,24 +247,26 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromGateway2Processing()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == GatewaySpace);
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == GatewaySpace);
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
+    std::string file(str::mid(productUrl,7,1000));
     std::string newFile(file);
-    std::string newUrl(product.url);
+    std::string newUrl(productUrl);
 
     std::string section("/in");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.gateway.path + section,
+                    cfg.storage.gateway + section,
                     taskExchgDir + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.gateway.path + section,
+                    cfg.storage.gateway + section,
                     taskExchgDir + section);
 
     if (isRemote) {
@@ -260,8 +277,8 @@ ProductMetadata & URLHandler::fromGateway2Processing()
     }
 
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = ProcessingSpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = ProcessingSpace;
 
     return product;
 }
@@ -271,16 +288,18 @@ ProductMetadata & URLHandler::fromGateway2Processing()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromProcessing2Gateway()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == ProcessingSpace);
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == ProcessingSpace);
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
+    std::string file(str::mid(productUrl,7,1000));
     std::string newFile(file);
-    std::string newUrl(product.url);
+    std::string newUrl(productUrl);
 
     // Get extension
     std::string extension = str::mid(file,file.find_last_of('.') + 1);
@@ -290,10 +309,10 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 
     str::replaceAll(newFile,
                     taskExchgDir + subdir,
-                    cfgInfo.storage.gateway.path + section);
+                    cfg.storage.gateway + section);
     str::replaceAll(newUrl,
                     taskExchgDir + subdir,
-                    cfgInfo.storage.gateway.path + section);
+                    cfg.storage.gateway + section);
 
     if (isRemote) {
         (void)relocate(file, newFile, COPY_TO_MASTER);
@@ -303,8 +322,8 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
     }
 
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = GatewaySpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = GatewaySpace;
 
     return product;
 }
@@ -314,32 +333,34 @@ ProductMetadata & URLHandler::fromProcessing2Gateway()
 //----------------------------------------------------------------------
 ProductMetadata & URLHandler::fromGateway2LocalArch()
 {
-    DBG(__FUNCTION__ << ':' << __LINE__);
-    ConfigurationInfo & cfgInfo = ConfigurationInfo::data();
+    TRC(__FUNCTION__ << ':' << __LINE__);
 
-    assert(str::mid(product.url,0,8) == "file:///");
-    assert(product.urlSpace == GatewaySpace);
+    productUrl      = product.url();
+    productUrlSpace = product.urlSpace();
+
+    assert(str::mid(productUrl,0,8) == "file:///");
+    assert(productUrlSpace == GatewaySpace);
 
     // Set new location and url
-    std::string file(str::mid(product.url,7,1000));
+    std::string file(str::mid(productUrl,7,1000));
     std::string newFile(file);
-    std::string newUrl(product.url);
+    std::string newUrl(productUrl);
 
     std::string section("/out");
 
     str::replaceAll(newFile,
-                    cfgInfo.storage.gateway.path + section,
-                    cfgInfo.storage.local_archive.path + section);
+                    cfg.storage.gateway + section,
+                    cfg.storage.archive + section);
     str::replaceAll(newUrl,
-                    cfgInfo.storage.gateway.path + section,
-                    cfgInfo.storage.local_archive.path + section);
+                    cfg.storage.gateway + section,
+                    cfg.storage.archive + section);
 
     // Set (hard) link
     (void)relocate(file, newFile, MOVE);
 
     // Change url in processing task
-    product.url = newUrl;
-    product.urlSpace = LocalArchSpace;
+    product["url"]      = newUrl;
+    product["urlSpace"] = LocalArchSpace;
 
     return product;
 }
@@ -366,24 +387,24 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     switch(method) {
     case LINK:
         retVal = link(sFrom.c_str(), sTo.c_str());
-        DBG("LINK: Hard link of " << sFrom << " to " << sTo);
+        TRC("LINK: Hard link of " << sFrom << " to " << sTo);
         break;
     case SYMLINK:
         retVal = symlink(sFrom.c_str(), sTo.c_str());
-        DBG("SYMLINK: Soft link of " << sFrom << " to " << sTo);
+        TRC("SYMLINK: Soft link of " << sFrom << " to " << sTo);
         break;
     case MOVE:
         retVal = rename(sFrom.c_str(), sTo.c_str());
-        DBG("MOVE: Moving file from " << sFrom << " to " << sTo);
+        TRC("MOVE: Moving file from " << sFrom << " to " << sTo);
         break;
     case COPY:
         retVal = copyfile(sFrom, sTo);
-        DBG("COPY: Copying file from " << sFrom << " to " << sTo);
+        TRC("COPY: Copying file from " << sFrom << " to " << sTo);
         break;
     case COPY_TO_REMOTE:
     case COPY_TO_MASTER:
         retVal = rcopyfile(sFrom, sTo, method == COPY_TO_REMOTE);
-        DBG(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
+        TRC(((method == COPY_TO_REMOTE) ? "COPY_TO_REMOTE: " : "COPY_TO_MASTER: ")
             << "Transferring file from " << sFrom << " to " << sTo);
         break;
     default:
@@ -431,7 +452,7 @@ int URLHandler::rcopyfile(std::string & sFrom, std::string & sTo,
     } else {
         cmd = scp + " " + sFrom + " " + master_address + ":" + sTo;
     }
-    DBG("CMD: " << cmd);
+    TRC("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -445,7 +466,7 @@ int URLHandler::runlink(std::string & f)
 {
     std::string cmd;
     cmd = "ssh " + master_address + " rm " + f;
-    DBG("CMD: " << cmd);
+    TRC("CMD: " << cmd);
     int res = system(cmd.c_str());
     (void)(res);
 
@@ -460,7 +481,7 @@ void URLHandler::setRemoteCopyParams(std::string maddr, std::string raddr)
     master_address = maddr;
     remote_address = raddr;
     isRemote = true;
-    DBG("Master addr: " << maddr << "  Remote addr: " << raddr);
+    TRC("Master addr: " << maddr << "  Remote addr: " << raddr);
 }
 
 //----------------------------------------------------------------------
@@ -472,7 +493,7 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     intTaskDir = tskDir;
 
     taskExchgDir = workDir + "/" + intTaskDir;
-    DBG("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir << "  => TaskExchgDir: " << taskExchgDir);
+    TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir << "  => TaskExchgDir: " << taskExchgDir);
 }
 
 //}

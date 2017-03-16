@@ -1,0 +1,9 @@
+===============================================================================
+ Euclid QLA Processing Framework
+ Version 1.1
+ Compilation and Installation process
+ Build time-stamp: 20170112115157
+===============================================================================
+
+## STEP 0 - Checking required applications and libraries are installed
+ERROR: Program 'qmake' appear is either not installed or not available

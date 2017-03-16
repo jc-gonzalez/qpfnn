@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    uuid.h
+ * File:    uuidxx.h
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.UUID
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef UUID_H
-#define UUID_H
+#ifndef UUIDXX_H
+#define UUIDXX_H
 
 //============================================================
 // Group: External Dependencies
@@ -68,7 +68,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //==========================================================================
 // Class: UUID
@@ -104,6 +104,6 @@ private:
     uuid_t uu;
 };
 
-}
+//}
 
-#endif  /* UUID_H */
+#endif  /* UUIDXX_H */

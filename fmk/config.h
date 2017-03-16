@@ -58,7 +58,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
-
 //==========================================================================
 // Class: CfgGrpGeneral
 //==========================================================================
@@ -226,10 +225,12 @@ public:
 //==========================================================================
 class Config : public JRecord {
 public:
+    static Config & _();
+/*
     Config(std::string fName = std::string());
     Config(const char * fName = 0);
     Config(json v);
-
+*/
     CFGGRP(General, general);
     CFGGRP(Network, network);
     CFGGRP(DB, db);
@@ -242,15 +243,7 @@ public:
     // Method: init
     // Initializes the configuration data
     //----------------------------------------------------------------------
-    void init(json v) {
-        SET_CFGGRP(General, general);
-        SET_CFGGRP(Network, network);
-        SET_CFGGRP(DB, db);
-        SET_CFGGRP(Products, products);
-        SET_CFGGRP(Orchestration, orchestration);
-        SET_CFGGRP(UserDefToolsList, userDefTools);
-        SET_CFGGRP(Flags, flags);
-    }
+    void init(json v);
 
     //----------------------------------------------------------------------
     // Method: init
@@ -323,6 +316,8 @@ private:
     std::string getRegExFromCfg(std::string & regexStr);
 
 private:
+    Config() {}
+
     std::string           cfgFileName;
     std::string           cfgFilePath;
     std::string           sessionId;
@@ -330,6 +325,12 @@ private:
     bool isActualFile;
 
 public:
+    struct {
+        std::string      inbox;
+        std::string      archive;
+        std::string      gateway;
+    } storage;
+
     static std::string DBHost;
     static std::string DBPort;
     static std::string DBName;
@@ -337,6 +338,7 @@ public:
     static std::string DBPwd;
 
     static std::string PATHBase;
+    static std::string PATHData;
     static std::string PATHRun;
     static std::string PATHBin;
     static std::string PATHSession;
@@ -350,6 +352,10 @@ public:
 
     static bool isLive;
 };
+
+namespace Configuration {
+    static ::Config & cfg = ::Config::_();
+}
 
 //}
 

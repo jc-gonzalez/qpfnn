@@ -39,16 +39,17 @@
  ******************************************************************************/
 
 #include <iterator>
+#include <arpa/inet.h>
+
 #include "dbhdlpostgre.h"
+
 #include "except.h"
 #include "tools.h"
 #include "json/json.h"
 #include "config.h"
 #include "dbg.h"
 #include "str.h"
-#include <arpa/inet.h>
-
-using namespace LibComm;
+#include "message.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -56,7 +57,7 @@ using namespace LibComm;
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //----------------------------------------------------------------------
 // Constructor: DBHdlPostgreSQL
@@ -75,11 +76,11 @@ bool DBHdlPostgreSQL::openConnection(const char * data)
     const char * connStr = data;
     if (data == 0) {
         if (!connectionParamsSet) {
-            setDbHost(Configuration::DBHost);
-            setDbPort(Configuration::DBPort);
-            setDbName(Configuration::DBName);
-            setDbUser(Configuration::DBUser);
-            setDbPasswd(Configuration::DBPwd);
+            setDbHost(Config::DBHost);
+            setDbPort(Config::DBPort);
+            setDbName(Config::DBName);
+            setDbUser(Config::DBUser);
+            setDbPasswd(Config::DBPwd);
 
             setDbConnectionParams("host=" + getDbHost() +
                                   " port=" + getDbPort() +
@@ -124,42 +125,37 @@ bool DBHdlPostgreSQL::closeConnection(const char * data)
 // Method: storeProducts
 // Saves a set of products' metadata to the database
 //----------------------------------------------------------------------
-int  DBHdlPostgreSQL::storeProducts(ProductCollection & prodList)
+int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
 {
     bool result;
-
     int nInsProd = 0;
     std::stringstream ss;
 
-    for (auto & kv : prodList.productList) {
-        ProductMetadata & m = kv.second;
-
+    for (auto & m : prodList.products) {
         ss.str("");
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
            << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
            << "VALUES ("
-           << str::quoted(m.productId) << ", "
-           << str::quoted(m.productType) << ", "
+           << str::quoted(m.productId()) << ", "
+           << str::quoted(m.productType()) << ", "
            << 0 << ", "
-           << str::quoted(m.productVersion) << ", "
-           << m.productSize << ", "
+           << str::quoted(m.productVersion()) << ", "
+           << m.productSize() << ", "
            << 1 << ", "
            << 1 << ", "
            << 2 << ", "
-           << str::quoted(m.signature) << ", "
-           << str::quoted(str::tagToTimestamp(m.startTime)) << ", "
-           << str::quoted(str::tagToTimestamp(m.endTime)) << ", "
-           << str::quoted(str::tagToTimestamp(LibComm::timeTag())) << ", "
-           << str::quoted(m.url) << ")";
+           << str::quoted(m.signature()) << ", "
+           << str::quoted(str::tagToTimestamp(m.startTime())) << ", "
+           << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
+           << str::quoted(str::tagToTimestamp(timeTag())) << ", "
+           << str::quoted(m.url()) << ")";
 
         try { result = runCmd(ss.str()); } catch(...) { throw; }
 
         PQclear(res);
         nInsProd++;
     }
-
-    UNUSED(result);
 
     return nInsProd;
 }
@@ -192,27 +188,29 @@ int  DBHdlPostgreSQL::retrieveProducts(ProductList & prodList,
     try { result = runCmd(cmd); } catch(...) { throw; }
 
     // Transfer the data to the product list argument
-    prodList.productList.clear();
+    //prodList.products.clear();
+    json productArray;
     ProductMetadata m;
     int nRows = PQntuples(res);
     for (int i = 0; i < nRows; ++i) {
-        m.productId      = std::string(PQgetvalue(res, i, 0));
-        m.productType    = std::string(PQgetvalue(res, i, 1));
-        m.productStatus  = std::string(PQgetvalue(res, i, 2));
-        m.productVersion = std::string(PQgetvalue(res, i, 3));
-        m.productSize    =    *((int*)(PQgetvalue(res, i, 4)));
-        m.creator        = std::string(PQgetvalue(res, i, 5));
-        m.instrument     = std::string(PQgetvalue(res, i, 6));
-        m.signature      = std::string(PQgetvalue(res, i, 7));
-        m.startTime      = std::string(PQgetvalue(res, i, 8));
-        m.endTime        = std::string(PQgetvalue(res, i, 9));
-        m.regTime        = std::string(PQgetvalue(res, i, 10));
-        m.url            = std::string(PQgetvalue(res, i, 11));
-        prodList.productList.push_back(m);
+        m["productId"]      = std::string(PQgetvalue(res, i, 0));
+        std::string prodType = std::string(PQgetvalue(res, i, 1));
+        m["productType"]    = prodType;
+        m["productStatus"]  = std::string(PQgetvalue(res, i, 2));
+        m["productVersion"] = std::string(PQgetvalue(res, i, 3));
+        m["productSize"]    =    *((int*)(PQgetvalue(res, i, 4)));
+        m["creator"]        = std::string(PQgetvalue(res, i, 5));
+        m["instrument"]     = std::string(PQgetvalue(res, i, 6));
+        m["signature"]      = std::string(PQgetvalue(res, i, 7));
+        m["startTime"]      = std::string(PQgetvalue(res, i, 8));
+        m["endTime"]        = std::string(PQgetvalue(res, i, 9));
+        m["regTime"]        = std::string(PQgetvalue(res, i, 10));
+        m["url"]            = std::string(PQgetvalue(res, i, 11));
+        productArray[i] = m.val();
+        //prodList.products.push_back(m);
     }
+    prodList = ProductList(productArray);
     PQclear(res);
-
-    UNUSED(result);
 
     return nRows;
 }
@@ -227,11 +225,11 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
 
     std::string registrationTime(tagToTimestamp(preciseTimeTag()));
     std::stringstream ss;
-    std::string taskPath = task.taskPath;
+    std::string taskPath = task.taskPath();
     Json::StyledWriter writer;
     std::string taskData("{}");
-    if (!task.taskData.isNull()) {
-        taskData = writer.write(task.taskData);
+    if (!task.taskData().empty()) {
+        taskData = writer.write(task.taskData());
     }
 
     ss.str("");
@@ -239,9 +237,9 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << "(task_id, task_status_id, task_exitcode, task_path, "
        << "task_size, registration_time, task_data) "
        << "VALUES ("
-       << str::quoted(task.taskName) << ", "
-       << task.taskStatus << ", "
-       << task.taskExitCode << ", "
+       << str::quoted(task.taskName()) << ", "
+       << task.taskStatus() << ", "
+       << task.taskExitCode() << ", "
        << str::quoted(taskPath) << ", "
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
@@ -326,9 +324,9 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     bool result = true;
     bool mustUpdate = true;
 
-    if (!checkTask(task.taskName)) {
+    if (!checkTask(task.taskName())) {
         // Check if name provided by Orc is present
-        std::string initialName = task.taskData["NameOrc"].asString();
+        std::string initialName = task["taskData"]["NameOrc"].asString();
 
         if (!checkTask(initialName)) {
             // not present, must be first time this tast is requested to be
@@ -341,23 +339,23 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
             // that must change its name
             result = updateTable<std::string>("tasks_info",
                                               "task_id=" + str::quoted(initialName),
-                                              "task_id", task.taskName);
+                                              "task_id", task.taskName());
             // Once changed the task_id, the update must still be done
         }
     }
 
     if (mustUpdate) {
-        std::string filter("task_id=" + str::quoted(task.taskName));
+        std::string filter("task_id=" + str::quoted(task.taskName()));
         result &= updateTable<int>("tasks_info", filter,
-                                   "task_status_id", (int)(task.taskStatus));
+                                   "task_status_id", (int)(task.taskStatus()));
         result &= updateTable<std::string>("tasks_info", filter,
-                                           "start_time", task.taskStart);
-        if (!task.taskEnd.empty()) {
+                                           "start_time", task.taskStart());
+        if (!task.taskEnd().empty()) {
             result &= updateTable<std::string>("tasks_info", filter,
-                                               "end_time", task.taskEnd);
+                                               "end_time", task.taskEnd());
         }
         result &= updateTable<Json::Value>("tasks_info", filter,
-                                           "task_data", task.taskData);
+                                           "task_data", task.taskData());
         PQclear(res);
     }
 
@@ -543,21 +541,22 @@ bool DBHdlPostgreSQL::removeICommand(int id)
 // Stores a message into the database
 //----------------------------------------------------------------------
 bool DBHdlPostgreSQL::storeMsg(std::string from,
-                               Router2RouterPeer::PeerMessage & msg,
+                               MessageString & msg,
                                bool isBroadcast)
 {
     bool result = true;
     if (from.empty()) { from = "all"; }
 
+    MessageBase m(msg);
     std::string cmd("INSERT INTO transmissions "
                     "(msg_date, msg_from, msg_to, msg_type, msg_bcast, msg_content) "
                     "VALUES (" +
-                    str::quoted(str::tagToTimestamp(LibComm::timeTag())) + ", " +
+                    str::quoted(str::tagToTimestamp(timeTag())) + ", " +
                     str::quoted(from) + ", " +
-                    str::quoted(msg.at(Router2RouterPeer::FRAME_PEER_ID)) + ", " +
-                    str::quoted(msg.at(Router2RouterPeer::FRAME_MSG_TYPE)) + ", " +
+                    str::quoted(m.header.target()) + ", " +
+                    str::quoted(m.header.type()) + ", " +
                     str::quoted(isBroadcast ? "Y" : "N") + ", " +
-                    str::quoted(msg.at(Router2RouterPeer::FRAME_MSG_CONTENT)) + ")");
+                    str::quoted(msg) + ")");
 
     try { result = runCmd(cmd); } catch(...) { throw; }
 
@@ -570,12 +569,12 @@ bool DBHdlPostgreSQL::storeMsg(std::string from,
 // pre-defined criteria
 //----------------------------------------------------------------------
 bool DBHdlPostgreSQL::retrieveMsgs(std::vector<std::pair<std::string,
-                                   Router2RouterPeer::PeerMessage> > & msgList,
+                                   MessageString> > & msgList,
                                    std::string criteria)
 {
     bool result = true;
 
-    std::string cmd("SELECT m.msg_date, m.msg_to, m.msg_type, m.msg_content "
+    std::string cmd("SELECT m.msg_date, m.msg_content "
                     "FROM transmissions as m "
                     "ORDER BY m.msg_date ");
     cmd += criteria + ";";
@@ -587,10 +586,7 @@ bool DBHdlPostgreSQL::retrieveMsgs(std::vector<std::pair<std::string,
     int nRows = PQntuples(res);
     for (int i = 0; i < nRows; ++i) {
         std::string msg_date(PQgetvalue(res, i, 1));
-        Router2RouterPeer::PeerMessage m;
-        m.push_back(std::string(PQgetvalue(res, i, 2)));
-        m.push_back(std::string(PQgetvalue(res, i, 3)));
-        m.push_back(std::string(PQgetvalue(res, i, 4)));
+        MessageString m = std::string(PQgetvalue(res, i, 2));
         msgList.push_back(std::make_pair(msg_date, m));
     }
     PQclear(res);
@@ -737,4 +733,4 @@ bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)
 }
 
 
-}
+//}

@@ -77,7 +77,7 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
-
+/*
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -99,7 +99,42 @@ Config::Config(const char * fName)
 //----------------------------------------------------------------------
 Config::Config(json v) : JRecord(v)
 {
-    init(v);
+    //init(v);
+
+    DBHost = db.host();
+    DBPort = db.port();
+    DBName = db.name();
+    DBUser = db.user();
+    DBPwd  = db.pwd();
+
+    isActualFile = false;
+
+    processConfig();
+}
+*/
+
+Config & Config::_()
+{
+    static Config configInstance {};
+
+    return configInstance;
+}
+
+//----------------------------------------------------------------------
+// Constructor
+//----------------------------------------------------------------------
+void Config::init(json v)
+{
+    value = v;
+    {
+        SET_CFGGRP(General, general);
+        SET_CFGGRP(Network, network);
+        SET_CFGGRP(DB, db);
+        SET_CFGGRP(Products, products);
+        SET_CFGGRP(Orchestration, orchestration);
+        SET_CFGGRP(UserDefToolsList, userDefTools);
+        SET_CFGGRP(Flags, flags);
+    }
 
     DBHost = db.host();
     DBPort = db.port();
@@ -369,6 +404,8 @@ void Config::processConfig()
 {
     PATHBase    = general.workArea();
 
+    PATHData    = PATHBase + "/data";
+
     PATHRun     = PATHBase + "/run";
 
     PATHBin     = PATHRun + "/bin";
@@ -379,6 +416,10 @@ void Config::processConfig()
     PATHTmp     = PATHSession + "/tmp";
     PATHTsk     = PATHSession + "/tsk";
     PATHMsg     = PATHSession + "/msg";
+
+    storage.inbox   = PATHData + "/inbox";
+    storage.archive = PATHData + "/archive";
+    storage.gateway = PATHData + "/gateway";
 
 /*
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
@@ -606,6 +647,7 @@ std::string Config::DBUser;
 std::string Config::DBPwd;
 
 std::string Config::PATHBase;
+std::string Config::PATHData;
 std::string Config::PATHRun;
 std::string Config::PATHBin;
 std::string Config::PATHSession;
