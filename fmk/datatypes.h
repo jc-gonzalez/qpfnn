@@ -142,9 +142,6 @@ typedef Json::Value  json;
 
 #define JRECORD(e) JRecord e () { return JRecord(value[ #e ]); }
 
-#define SET_CFGGRP(c,e) e = CfgGrp ## c ( v[ #e ] );
-#define CFGGRP(c,e) CfgGrp ## c e;
-
 #define SET_GRP(c,e) e = c ( v[ #e ] );
 #define GRP(c,e) c e;
 

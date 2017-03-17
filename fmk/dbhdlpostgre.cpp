@@ -51,6 +51,8 @@
 #include "str.h"
 #include "message.h"
 
+using Configuration::cfg;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------

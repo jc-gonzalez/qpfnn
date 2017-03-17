@@ -104,6 +104,7 @@ void DataMng::processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m
     ProductList prodList(body["products"]);
 
     // Synthetic INDATA messages, that means reading products from folder
+    DBG("Transfer files to local archive");
     URLHandler urlh;
     for (auto & m : prodList.products) {
         urlh.setProduct(m);
@@ -111,7 +112,10 @@ void DataMng::processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m
     }
 
     // Save to DB
+    DBG("Store products in DB");
     saveProductsToDB(prodList);
+
+    DBG("Processing of DB done.");
 }
 
 //----------------------------------------------------------------------

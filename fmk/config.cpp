@@ -45,21 +45,7 @@
 
 #include "dbg.h"
 #include "str.h"
-/*
-#include "evtmng.h"
-#include "datamng.h"
-#include "logmng.h"
-#include "taskmng.h"
-#include "taskorc.h"
-#include "taskagent.h"
-#include "filenamespec.h"
-*/
 #include "tools.h"
-
-//#include "dbhdlpostgre.h"
-//#include "except.h"
-//#include "log.h"
-//using namespace LibComm;
 
 #include <sys/time.h>
 #include <fstream>
@@ -68,8 +54,6 @@
 
 #define WRITE_MESSAGE_FILES
 
-//static const std::string QPFExecutionsBase("/qpf/run/");
-
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -77,41 +61,6 @@
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
-/*
-//----------------------------------------------------------------------
-// Constructor
-//----------------------------------------------------------------------
-Config::Config(std::string fName)
-{
-    init(fName);
-}
-
-//----------------------------------------------------------------------
-// Constructor
-//----------------------------------------------------------------------
-Config::Config(const char * fName)
-{
-    init(std::string(fName));
-}
-
-//----------------------------------------------------------------------
-// Constructor
-//----------------------------------------------------------------------
-Config::Config(json v) : JRecord(v)
-{
-    //init(v);
-
-    DBHost = db.host();
-    DBPort = db.port();
-    DBName = db.name();
-    DBUser = db.user();
-    DBPwd  = db.pwd();
-
-    isActualFile = false;
-
-    processConfig();
-}
-*/
 
 Config & Config::_()
 {
@@ -127,13 +76,13 @@ void Config::init(json v)
 {
     value = v;
     {
-        SET_CFGGRP(General, general);
-        SET_CFGGRP(Network, network);
-        SET_CFGGRP(DB, db);
-        SET_CFGGRP(Products, products);
-        SET_CFGGRP(Orchestration, orchestration);
-        SET_CFGGRP(UserDefToolsList, userDefTools);
-        SET_CFGGRP(Flags, flags);
+        SET_GRP(CfgGrpGeneral,          general);
+        SET_GRP(CfgGrpNetwork,          network);
+        SET_GRP(CfgGrpDB,               db);
+        SET_GRP(CfgGrpProducts,         products);
+        SET_GRP(CfgGrpOrchestration,    orchestration);
+        SET_GRP(CfgGrpUserDefToolsList, userDefTools);
+        SET_GRP(CfgGrpFlags,            flags);
     }
 
     DBHost = db.host();
@@ -141,6 +90,8 @@ void Config::init(json v)
     DBName = db.name();
     DBUser = db.user();
     DBPwd  = db.pwd();
+
+    DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
     isActualFile = false;
 
@@ -153,9 +104,9 @@ void Config::init(json v)
 void Config::init(std::string fName)
 {
     isLive = false;
-    std::cerr << "Provided fName='" << fName << "'" << std::endl;
+    DBG("Provided fName='" << fName << "'");
     if (fName.compare(0,5,"db://") == 0) {
-        std::cerr << "A database URL!" << std::endl;
+        DBG("A database URL!");
 
         // fName in fact is a db url in the form:
         //   db://user:pwd@host:port/dbname
@@ -167,11 +118,8 @@ void Config::init(std::string fName)
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
 
-        std::cerr << DBUser << ", "
-                  << DBPwd  << ", "
-                  << DBHost << ", "
-                  << DBPort << ", "
-                  << DBName << std::endl;
+        DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+
         fName = ""; // clear filename, to read from DB
     }
     if (! fName.empty()) {

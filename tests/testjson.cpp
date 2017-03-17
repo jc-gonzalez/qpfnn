@@ -15,8 +15,6 @@
 #include "channels.h"
 #include "config.h"
 
-using Configuration::cfg;
-
 struct MasterNodeElements {
     EvtMng  * evtMng;
     DataMng * datMng;
@@ -38,39 +36,22 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
                                              std::string agentsAddress)
 {
     //========================================
-    // 0. Gather host information
-    //========================================
-    char hostname[100];
-    gethostname(hostname, 100);
-    std::string thisHost(hostname);
-
-    //========================================
     // 1. Create the elements
     //========================================
-    if (thisHost == cfg.network.masterNode()) {
-        // Create master node elements
-        m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
-        m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
-        m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
-        m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
-        m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
-    } else {
-        for (auto & kv : cfg.network.processingNodes()) {
-            if (thisHost == kv.first) {
-                int numOfTskAgents = kv.second;
-                char sAgName[20];
-                for (unsigned int i = 0; i < numOfTskAgents; ++i) {
-                    sprintf(sAgName, "TskAgent%02dd", i);
-                    ag.push_back(new TskAge(sAgName, thisHost, &synchro));
-                }
-            }
-        }
+    m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
+    m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
+    m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
+    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
+    m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
 
-    }
+    ag.push_back(new TskAge("TskAgent1", agentsAddress, &synchro));
+    ag.push_back(new TskAge("TskAgent2", agentsAddress, &synchro));
+    ag.push_back(new TskAge("TskAgent3", agentsAddress, &synchro));
 
     //========================================
     // 2. Create the connection channels
     //========================================
+
     auto concat = [](std::vector<CommNode*> a, std::vector<CommNode*> b)
         -> std::vector<CommNode*> { a.insert(a.end(), b.begin(), b.end()); return a;};
 
@@ -157,14 +138,56 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char * argv[])
 {
-    std::string cfgFileName(argv[1]);
-    std::ifstream cfgFile(cfgFileName);
+    /*
+    MessageString content("{\"header\": {\"source\": \"evtmng\", "
+                          "              \"target\": \"tskorc\", "
+                          "              \"type\": \"MSG_MONIT_RQST\"},"
+                          "\"data\": {\"rqst\": \"GIMMEALL\", "
+                          "           \"when\": \"NOW\" }}");
+    Message msg(content);
+
+    json hdr = msg["header"];
+    DBG(msg.str());
+    DBG(JValue(msg["header"]).str());
+    DBG(JValue(msg.hdr()).str());
+    DBG(msg.hdrStr());
+    DBG(JValue(msg["data"]).str());
+    DBG(JValue(msg.data()).str());
+
+    msg.setHeader("0001", "MSG_DATA", 1, "SRC", "TGT", "NOW", "TOMORROW", "IN-TWO-YEARS", 0,
+                  std::vector<std::string> {std::string("one"), std::string("two"), std::string("three")});
+
+    msg.set("data1", "hola");
+    msg.set("data2", 34.2);
+    msg.set("data1", 55);
+    msg.set("data3", "adios");
+    msg.data()["data4"] = json("adios");
+    msg["data"]["data4"] = json("adios");
+
+    DBG(msg.str());
+    msg.newTargetIs("four");
+
+    MessageBase msg(JValue(content).val());
+    Message<MsgBodyCMD> msgCmd("{\"header\": " + msg("header").str() + ", "
+                               "\"body\": " + MsgBodyCMD(std::string("{\"cmd\": \"time 50\"}")).str() + "}");
+
+    msg.dump();
+    msgCmd.dump();
+
+    DBG(msg.str());
+    DBG(msgCmd.str());
+    */
+    //------------------------------------------------------------
+
+    std::ifstream cfgFile(argv[1]);
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
 
     JValue v;
     v.fromStr(buffer.str());
 
+    //Config & cfg = Config::_();
+    using Configuration::cfg;
     cfg.init(v.val());
 
     std::cerr << cfg.str() << std::endl;

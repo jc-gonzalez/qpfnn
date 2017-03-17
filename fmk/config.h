@@ -101,13 +101,13 @@ public:
     CfgGrpDB(json v) : JRecord(v) {}
     virtual void dump() {
         DUMPJSTR(host);
-        DUMPJINT(port);
+        DUMPJSTR(port);
         DUMPJSTR(name);
         DUMPJSTR(user);
         DUMPJSTR(pwd);
     }
     JSTR(host);
-    JINT(port);
+    JSTR(port);
     JSTR(name);
     JSTR(user);
     JSTR(pwd);
@@ -162,13 +162,13 @@ class CfgGrpOrchestration : public JRecord {
 public:
     CfgGrpOrchestration() {}
     CfgGrpOrchestration(json v) : JRecord(v) {
-        SET_CFGGRP(RulesList, rules);
+        SET_GRP(CfgGrpRulesList, rules);
     }
     virtual void dump() {
         rules.dump();
         DUMPJSTRSTRMAP(processors);
     }
-    CFGGRP(RulesList, rules);
+    GRP(CfgGrpRulesList, rules);
     JSTRSTRMAP(processors);
 };
 
@@ -231,13 +231,13 @@ public:
     Config(const char * fName = 0);
     Config(json v);
 */
-    CFGGRP(General, general);
-    CFGGRP(Network, network);
-    CFGGRP(DB, db);
-    CFGGRP(Products, products);
-    CFGGRP(Orchestration, orchestration);
-    CFGGRP(UserDefToolsList, userDefTools);
-    CFGGRP(Flags, flags);
+    GRP(CfgGrpGeneral,          general);
+    GRP(CfgGrpNetwork,          network);
+    GRP(CfgGrpDB,               db);
+    GRP(CfgGrpProducts,         products);
+    GRP(CfgGrpOrchestration,    orchestration);
+    GRP(CfgGrpUserDefToolsList, userDefTools);
+    GRP(CfgGrpFlags,            flags);
 
     //----------------------------------------------------------------------
     // Method: init

@@ -48,7 +48,6 @@ public:
     MessageBase(json v) : JRecord(v) { init(); }
     virtual void init() {
         header = MsgHeader(value["header"]);
-        dump();
     }
     virtual void dump() {
         header.dump();
