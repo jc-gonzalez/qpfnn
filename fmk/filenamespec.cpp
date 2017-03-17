@@ -52,6 +52,7 @@
 
 #include "str.h"
 #include "tools.h"
+#include "dbg.h"
 
 #include "euclid.h"
 
@@ -149,6 +150,8 @@ bool FileNameSpec::parseFileName(std::string fileName,
 {
     if (! initialized) { setFileNameSpec(reStr, assignationsStr); }
 
+    DBG("Trying to parse '" << fileName << "' with the regex '" << reStr << "'");
+
     // First, get path name out of the name
     char *dirc, *basec, *bname, *dname;
 
@@ -166,7 +169,12 @@ bool FileNameSpec::parseFileName(std::string fileName,
     std::regex_match(baseName.c_str(), mre, re);
 #else
     std::vector<std::string> mre;
-    if (re->match(baseName)) { re->get(mre); }
+    if (re->match(baseName)) {
+        re->get(mre);
+    } else {
+        DBG("Filename does not match regex");
+        return false;
+    }
 #endif
 
     // Split name in dot '.' separated sections
@@ -198,6 +206,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     // substrings start at m[1]
     unsigned int count = mre.size() - 1;
 #endif
+    DBG("size: " << mre.size() << count);
 
     for (unsigned int i = 0; i < count; ++i) {
         // Extract the matches of the regex
@@ -216,6 +225,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
             if (idx <= count + 1) { fld = mre[k]; }
             if (kv.second.find(idx) != kv.second.end()) {
                 std::string tpl(assignationsTpl[kv.first]);
+                DBG(k << idx << fld << ' ' << kv.first);
                 switch (kv.first) {
                 case 'M':
                     m["mission"] = placeIn(m.mission(),      tpl, idx, fld);
@@ -275,6 +285,8 @@ bool FileNameSpec::parseFileName(std::string fileName,
     m["regTime"]        = timeTag();
     m["url"]            = "file://" + fileName;
     m["urlSpace"]       = space;
+
+    DBG("Signature: '" << m.signature() << "'");
 
     return (m.mission() == Euclid::MissionAcronym[Euclid::EUC_Mission]);
 }
@@ -393,7 +405,7 @@ std::regex                        FileNameSpec::re;
 PCRegEx *                         FileNameSpec::re = 0;
 #endif
 
-std::string                       FileNameSpec::reStr = "EUC_([A-Z]+)(_[A-Z0-9_]+)_([^_]+)_([0-9T]+[\\.0-9]*Z)[_]*([0-9\\.]*)";
+std::string                       FileNameSpec::reStr = "([A-Z]+)_([A-Z0-9]+)_([^_]+)_([0-9]+T[\\.0-9]+Z)[_]*([0-9]*\\.*[0-9]*)";
 std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
 std::map< char, std::set<int> >   FileNameSpec::assignations;
 std::map< char, std::string >     FileNameSpec::assignationsTpl;

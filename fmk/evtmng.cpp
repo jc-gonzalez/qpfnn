@@ -134,8 +134,7 @@ void EvtMng::runEachIteration()
                          "", "", "");
 
             MsgBodyINDATA body;
-            JValue record("{\"" + prodType + "\": " + m.str() + "}");
-            body["products"] = record.val();
+            body["products"][0] = m.val();
             msg.buildBody(body);
 
             std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
@@ -144,7 +143,6 @@ void EvtMng::runEachIteration()
                 ScalabilityProtocolRole * conn = it->second;
                 conn->setMsgOut(msg.str());
             }
-
 
             /*
             // Create message and send it to appropriate targets
@@ -204,6 +202,7 @@ void EvtMng::runEachIteration()
             conn->setMsgOut(msg);
         }
     }
+/*
     if (((iteration + 1) % 9) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlInData);
@@ -214,6 +213,7 @@ void EvtMng::runEachIteration()
             conn->setMsgOut(msg);
         }
     }
+    */
 
     if (iteration > 1000) { transitTo(RUNNING); }
 }

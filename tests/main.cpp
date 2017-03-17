@@ -181,7 +181,7 @@ int main(int argc, char * argv[])
 
     //------------------------------------------------------------
 
-    std::ifstream cfgFile(getenv("HOME") + std::string("/file.cfg"));
+    std::ifstream cfgFile(argv[1]);
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
 
@@ -214,7 +214,7 @@ int main(int argc, char * argv[])
 
     // Define periodic message in  a certain channel at component level
     MessageString msgStr = msg.str();
-    masterNodeElems.evtMng->periodicMsgInChannel(ChnlInData, 13, msgStr);
+    //masterNodeElems.evtMng->periodicMsgInChannel(ChnlInData, 13, msgStr);
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -223,6 +223,7 @@ int main(int argc, char * argv[])
     // FOREVER
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     synchro.wait();
+    std::cerr << "Exiting..." << std::endl;
 
     return 0;
 }

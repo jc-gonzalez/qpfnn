@@ -154,7 +154,7 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
 //----------------------------------------------------------------------
 // Method: fromInbox2Local
 //----------------------------------------------------------------------
-ProductMetadata & URLHandler::fromInbox2LocalArch()
+ProductMetadata & URLHandler::fromInbox2LocalArch(bool tx)
 {
     TRC(__FUNCTION__ << ':' << __LINE__);
 
@@ -190,13 +190,15 @@ ProductMetadata & URLHandler::fromInbox2LocalArch()
         product["hadNoVersion"] = false;
     }
 
-    if (productUrlSpace != ReprocessingSpace) {
-        // Set (hard) link (should it be move?)
-        (void)relocate(file, newFile, MOVE);
-    } else {
-        // From now on the addressed file will be the existing one in the
-        // local archive, so we remove the existing (hard) link in the inbox
-        (void)unlink(file.c_str());
+    if (tx) {
+        if (productUrlSpace != ReprocessingSpace) {
+            // Set (hard) link (should it be move?)
+            (void)relocate(file, newFile, MOVE);
+        } else {
+            // From now on the addressed file will be the existing one in the
+            // local archive, so we remove the existing (hard) link in the inbox
+            (void)unlink(file.c_str());
+        }
     }
     // Change url in processing task
     product["url"]      = newUrl;

@@ -109,7 +109,7 @@ public:
     //----------------------------------------------------------------------
     // Method: fromInbox2Local
     //----------------------------------------------------------------------
-    ProductMetadata & fromInbox2LocalArch();
+    ProductMetadata & fromInbox2LocalArch(bool tx = true);
 
     //----------------------------------------------------------------------
     // Method: fromLocal2Gateway

@@ -60,10 +60,11 @@ target_include_directories (fmk PUBLIC .
   ${LOG_ROOT_DIR}
   ${UUID_ROOT_DIR}
   ${FMK_ROOT_DIR}
+  ${PCRE2LIBDIR}
   ${PSQLLIBDIR})
 target_link_libraries (fmk
   json infix str log tools uuid nncomm
-  nanomsg ${PSQLLIB} pthread)
+  nanomsg ${PCRE2LIB} ${PSQLLIB} pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmk
          RUNTIME DESTINATION bin

@@ -5,6 +5,8 @@
 
 #include "datatypes.h"
 
+#include "dbg.h"
+
 //==========================================================================
 // Class: MsgHeader
 //==========================================================================
@@ -46,6 +48,7 @@ public:
     MessageBase(json v) : JRecord(v) { init(); }
     virtual void init() {
         header = MsgHeader(value["header"]);
+        dump();
     }
     virtual void dump() {
         header.dump();
@@ -74,11 +77,18 @@ class MsgBodyINDATA : public JRecord {
 public:
     MsgBodyINDATA() {}
     MsgBodyINDATA(std::string s) : JRecord(s) {}
-    MsgBodyINDATA(json v) : JRecord(v) {}
-    virtual void dump() {
-        DUMPJSTRVEC(products);
+    MsgBodyINDATA(json v) : JRecord(v) {
+        products.clear();
+        json & prds = value["products"];
+        for (int i = 0; i < prds.size(); ++i) {
+            products.push_back(ProductMetadata(prds[i]));
+        }
+        DBG("MsgBodyINDATA initialized");
     }
-    JSTRVEC(products);
+    virtual void dump() {
+        for (auto & v: products) { v.dump(); }
+    }
+    std::vector<ProductMetadata> products;
 };
 
 //==========================================================================

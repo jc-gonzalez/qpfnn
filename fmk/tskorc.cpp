@@ -169,12 +169,16 @@ void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyINDATA> msg(m);
-    ProductList prodList(msg.body["products"]);
+    MsgBodyINDATA & body = msg.body;
 
     // Synthetic INDATA messages, that means reading products from folder
-    for (auto & m : prodList.products) {
-        std::string prodType = m.productType();
+    URLHandler urlh;
+    for (auto & m : msg.body.products) {
+        urlh.setProduct(m);
+        m = urlh.fromInbox2LocalArch(false);
+
         // Append product to catalogue
+        std::string prodType = m.productType();
         catalogue.products[prodType] = m;
 
         // Check the product type as input for any rule

@@ -19,6 +19,10 @@ set (UUIDINCDIR /usr/include)
 set (UUIDLIBDIR /usr/lib64)
 set (UUIDLIB uuid)
 
+set (PCRE2INCDIR /usr/include)
+set (PCRE2LIBDIR /usr/lib64)
+set (PCRE2LIB pcre2-posix)
+
 if (EXISTS /usr/pgsql-9.6)
   set (PSQLDIR /usr/pgsql-9.6)
   set (PSQLLIBDIR ${PSQLDIR}/lib)
@@ -52,4 +56,5 @@ link_directories (
   ${INFIX_ROOT_DIR}
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
+  ${PCRE2LIBDIR}
   ${PSQLLIBDIR})

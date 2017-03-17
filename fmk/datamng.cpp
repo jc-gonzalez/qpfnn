@@ -100,7 +100,8 @@ void DataMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
 void DataMng::processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m)
 {
     Message<MsgBodyINDATA> msg(m);
-    ProductList prodList(msg.body["products"]);
+    MsgBodyINDATA & body = msg.body;
+    ProductList prodList(body["products"]);
 
     // Synthetic INDATA messages, that means reading products from folder
     URLHandler urlh;

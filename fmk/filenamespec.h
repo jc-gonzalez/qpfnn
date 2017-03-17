@@ -55,7 +55,7 @@
 #include <vector>
 #include <map>
 
-#define USE_CX11_REGEX
+//#define USE_CX11_REGEX
 #ifdef USE_CX11_REGEX
 #  include <regex>
 #else
