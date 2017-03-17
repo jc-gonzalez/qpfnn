@@ -170,15 +170,15 @@ fmk/channels.h,265
 #define CHANNELS_H4,35
 #undef T8,76
 #define TLISTOF_CHANNELS 10,86
-#define T(18,405
-enum ChannelId 19,429
-enum ChannelId { TLISTOF_CHANNELS 19,429
-#undef T20,466
-#define T(22,476
-const ChannelDescriptor ChannelAcronym[ChannelAcronym23,507
-#undef T24,572
+#define T(18,409
+enum ChannelId 19,433
+enum ChannelId { TLISTOF_CHANNELS 19,433
+#undef T20,470
+#define T(22,480
+const ChannelDescriptor ChannelAcronym[ChannelAcronym23,511
+#undef T24,576
 
-fmk/component.cpp,949
+fmk/component.cpp,1026
 Component::Component(Component68,1462
 Component::Component(Component76,1756
 void Component::init(init85,2051
@@ -187,17 +187,18 @@ void Component::periodicMsgInChannel(periodicMsgInChannel132,3558
 void Component::fromInitialisedToRunning(fromInitialisedToRunning140,3875
 void Component::fromRunningToOperational(fromRunningToOperational149,4184
 void Component::fromOperationalToRunning(fromOperationalToRunning158,4497
-void Component::fromRunningToOff(fromRunningToOff167,4798
-void Component::updateConnections(updateConnections177,5118
-void Component::sendPeriodicMsgs(sendPeriodicMsgs185,5391
-void Component::runEachIteration(runEachIteration207,6194
-void Component::step(step214,6396
-void Component::run(run230,7001
-void Component::setStep(setStep273,8103
-void Component::defineValidTransitions(defineValidTransitions283,8440
-void Component::afterTransition(afterTransition309,9428
+void Component::fromRunningToOff(fromRunningToOff167,4794
+void Component::updateConnections(updateConnections177,5117
+void Component::processIncommingMessages(processIncommingMessages185,5398
+void Component::sendPeriodicMsgs(sendPeriodicMsgs209,6560
+void Component::runEachIteration(runEachIteration231,7363
+void Component::step(step238,7565
+void Component::run(run260,8490
+void Component::setStep(setStep303,9627
+void Component::defineValidTransitions(defineValidTransitions313,9964
+void Component::afterTransition(afterTransition339,10952
 
-fmk/component.h,1238
+fmk/component.h,1551
 #define COMPONENT_H42,823
 using std::chrono::system_clock;59,1267
 #    undef LogMsg81,1798
@@ -222,117 +223,143 @@ class Component 118,3159
     static const int OPERATIONAL 126,3416
     virtual std::string getName(163,5150
     virtual std::string getAddress(168,5386
-    std::map<std::map229,8103
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;229,8103
-    std::map<std::map230,8174
-    std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;230,8174
-    std::string compName;232,8251
-    std::string compAddress;233,8277
-    std::mutex mtxStepSize;235,8307
-    std::thread thrId;237,8336
-    Synchronizer * synchro;239,8360
-    int iteration;240,8388
-    int stepSize;241,8407
+    virtual void processCmdMsg(223,7882
+    virtual void processInDataMsg(224,7963
+    virtual void processTskSchedMsg(225,8047
+    virtual void processTskRqstMsg(226,8133
+    virtual void processTskProcMsg(227,8218
+    virtual void processTskRepMsg(228,8303
+    virtual void processTskRepDistMsg(229,8387
+    std::map<std::map243,8948
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;243,8948
+    std::map<std::map244,9019
+    std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;244,9019
+    std::string compName;246,9096
+    std::string compAddress;247,9122
+    std::mutex mtxStepSize;249,9152
+    std::thread thrId;251,9181
+    Synchronizer * synchro;253,9205
+    int iteration;254,9233
+    int stepSize;255,9252
 
-fmk/config.cpp,1206
+fmk/config.cpp,1224
 #define WRITE_MESSAGE_FILES69,1235
-Config::Config(Config84,1727
-Config::Config(Config92,1944
-Config::Config(100,2175
-void Config::init(init118,2559
-void Config::setLastAccess(setLastAccess156,4036
-void Config::setConfigFile(setConfigFile165,4325
-void Config::readConfigFromFile(readConfigFromFile179,4780
-void Config::readConfigFromDB(readConfigFromDB198,5300
-void Config::saveConfigToDB(saveConfigToDB283,8091
-std::string Config::getRegExFromCfg(getRegExFromCfg334,9741
-void Config::processConfig(processConfig368,10992
-std::string Config::getEnvVar(getEnvVar596,19444
-std::string Config::DBHost;602,19616
-std::string Config::DBPort;603,19644
-std::string Config::DBName;604,19672
-std::string Config::DBUser;605,19700
-std::string Config::DBPwd;606,19728
-std::string Config::PATHBase;608,19756
-std::string Config::PATHRun;609,19786
-std::string Config::PATHBin;610,19815
-std::string Config::PATHSession;611,19844
-std::string Config::PATHLog;612,19877
-std::string Config::PATHRlog;613,19906
-std::string Config::PATHTmp;614,19936
-std::string Config::PATHTsk;615,19965
-std::string Config::PATHMsg;616,19994
-mode_t Config::PATHMode 618,20024
-bool Config::isLive 620,20057
+Config & Config::_(_116,2405
+void Config::init(init126,2657
+void Config::init(init153,3325
+void Config::setLastAccess(setLastAccess191,4802
+void Config::setConfigFile(setConfigFile200,5091
+void Config::readConfigFromFile(readConfigFromFile214,5546
+void Config::readConfigFromDB(readConfigFromDB233,6066
+void Config::saveConfigToDB(saveConfigToDB318,8857
+std::string Config::getRegExFromCfg(getRegExFromCfg369,10507
+void Config::processConfig(processConfig403,11758
+std::string Config::getEnvVar(getEnvVar637,20383
+std::string Config::DBHost;643,20555
+std::string Config::DBPort;644,20583
+std::string Config::DBName;645,20611
+std::string Config::DBUser;646,20639
+std::string Config::DBPwd;647,20667
+std::string Config::PATHBase;649,20695
+std::string Config::PATHData;650,20725
+std::string Config::PATHRun;651,20755
+std::string Config::PATHBin;652,20784
+std::string Config::PATHSession;653,20813
+std::string Config::PATHLog;654,20846
+std::string Config::PATHRlog;655,20875
+std::string Config::PATHTmp;656,20905
+std::string Config::PATHTsk;657,20934
+std::string Config::PATHMsg;658,20963
+mode_t Config::PATHMode 660,20993
+bool Config::isLive 662,21026
 
-fmk/config.h,1945
+fmk/config.h,2207
 #define CONFIG_H42,797
-class CfgGrpGeneral 65,1574
-    CfgGrpGeneral(67,1621
-    CfgGrpGeneral(68,1644
-    virtual void dump(69,1686
-class CfgGrpNetwork 84,2098
-    CfgGrpNetwork(86,2145
-    CfgGrpNetwork(87,2168
-    virtual void dump(88,2210
-class CfgGrpDB 99,2545
-    CfgGrpDB(101,2587
-    CfgGrpDB(102,2605
-    virtual void dump(103,2642
-class CfgGrpProducts 120,3055
-    CfgGrpProducts(122,3103
-    CfgGrpProducts(123,3127
-    virtual void dump(124,3170
-class CfgGrpRulesList 141,3682
-    CfgGrpRulesList(143,3731
-    CfgGrpRulesList(144,3756
-    virtual void dump(149,3892
-class CfgGrpOrchestration 162,4291
-    CfgGrpOrchestration(164,4344
-    CfgGrpOrchestration(165,4373
-    virtual void dump(168,4464
-class CfgGrpUserDefToolsList 179,4803
-    CfgGrpUserDefToolsList(181,4859
-    CfgGrpUserDefToolsList(182,4891
-    virtual void dump(183,4942
-class CfgGrpFlags 202,5497
-    CfgGrpFlags(204,5542
-    CfgGrpFlags(205,5563
-    virtual void dump(206,5603
-class Config 227,6282
-    void init(245,6867
-    virtual void dump(265,7655
-    std::string           cfgFileName;326,10087
-    std::string           cfgFilePath;327,10126
-    std::string           sessionId;328,10165
-    bool hmiPresent;329,10202
-    bool isActualFile;330,10223
-    static std::string DBHost;333,10255
-    static std::string DBPort;334,10286
-    static std::string DBName;335,10317
-    static std::string DBUser;336,10348
-    static std::string DBPwd;337,10379
-    static std::string PATHBase;339,10410
-    static std::string PATHRun;340,10443
-    static std::string PATHBin;341,10475
-    static std::string PATHSession;342,10507
-    static std::string PATHLog;343,10543
-    static std::string PATHRlog;344,10575
-    static std::string PATHTmp;345,10608
-    static std::string PATHTsk;346,10640
-    static std::string PATHMsg;347,10672
-    static mode_t      PATHMode;349,10705
-    static bool isLive;351,10739
+class CfgGrpGeneral 64,1573
+    CfgGrpGeneral(66,1620
+    CfgGrpGeneral(67,1643
+    virtual void dump(68,1685
+class CfgGrpNetwork 83,2097
+    CfgGrpNetwork(85,2144
+    CfgGrpNetwork(86,2167
+    virtual void dump(87,2209
+class CfgGrpDB 98,2544
+    CfgGrpDB(100,2586
+    CfgGrpDB(101,2604
+    virtual void dump(102,2641
+class CfgGrpProducts 119,3054
+    CfgGrpProducts(121,3102
+    CfgGrpProducts(122,3126
+    virtual void dump(123,3169
+class CfgGrpRulesList 140,3681
+    CfgGrpRulesList(142,3730
+    CfgGrpRulesList(143,3755
+    virtual void dump(148,3891
+class CfgGrpOrchestration 161,4290
+    CfgGrpOrchestration(163,4343
+    CfgGrpOrchestration(164,4372
+    virtual void dump(167,4463
+class CfgGrpUserDefToolsList 178,4802
+    CfgGrpUserDefToolsList(180,4858
+    CfgGrpUserDefToolsList(181,4890
+    virtual void dump(182,4941
+class CfgGrpFlags 201,5496
+    CfgGrpFlags(203,5541
+    CfgGrpFlags(204,5562
+    virtual void dump(205,5602
+class Config 226,6281
+    virtual void dump(258,7397
+    Config(319,9829
+    std::string           cfgFileName;321,9846
+    std::string           cfgFilePath;322,9885
+    std::string           sessionId;323,9924
+    bool hmiPresent;324,9961
+    bool isActualFile;325,9982
+        std::string      inbox;329,10027
+        std::string      archive;330,10059
+        std::string      gateway;331,10093
+    } storage;332,10127
+    static std::string DBHost;334,10143
+    static std::string DBPort;335,10174
+    static std::string DBName;336,10205
+    static std::string DBUser;337,10236
+    static std::string DBPwd;338,10267
+    static std::string PATHBase;340,10298
+    static std::string PATHData;341,10331
+    static std::string PATHRun;342,10364
+    static std::string PATHBin;343,10396
+    static std::string PATHSession;344,10428
+    static std::string PATHLog;345,10464
+    static std::string PATHRlog;346,10496
+    static std::string PATHTmp;347,10529
+    static std::string PATHTsk;348,10561
+    static std::string PATHMsg;349,10593
+    static mode_t      PATHMode;351,10626
+    static bool isLive;353,10660
+namespace Configuration 356,10688
+    static ::Config & cfg 357,10714
 
-fmk/datamng.cpp,47
-DataMng::DataMng(5,45
-DataMng::DataMng(9,150
+fmk/datamng.cpp,687
+DataMng::DataMng(75,1567
+DataMng::DataMng(83,1858
+void DataMng::processCmdMsg(processCmdMsg91,2136
+void DataMng::processInDataMsg(processInDataMsg100,2468
+void DataMng::processTskSchedMsg(processTskSchedMsg120,3109
+void DataMng::processTskRepMsg(processTskRepMsg129,3422
+void DataMng::initializeDB(initializeDB140,3781
+void DataMng::saveTaskToDB(saveTaskToDB160,4349
+void DataMng::sanitizeProductVersions(sanitizeProductVersions218,6305
+void DataMng::saveProductsToDB(saveProductsToDB267,7969
+void DataMng::archiveDSSnEAS(archiveDSSnEAS294,8743
+bool DataMng::isProductAvailable(isProductAvailable385,12084
+bool DataMng::getProductLatest(getProductLatest397,12491
 
-fmk/datamng.h,43
-#define DATAMNG_H4,34
-class DataMng 8,77
+fmk/datamng.h,85
+#define DATAMNG_H42,814
+class DataMng 75,1932
+    std::string dbFileName;166,6346
 
-fmk/datatypes.h,5531
+fmk/datatypes.h,5687
 #define DATATYPES_H42,816
 const std::set<std::string> URLSpaces95,2487
 typedef Json::Value  json;109,2852
@@ -350,191 +377,198 @@ typedef Json::Value  json;109,2852
 #define JRECORD(143,4753
 #define SET_CFGGRP(145,4819
 #define CFGGRP(146,4872
-#define DUMPJSTR(148,4908
-#define DUMPJINT(149,4993
-#define DUMPJDLB(150,5075
-#define DUMPJBOOL(151,5160
-#define FOREACH(153,5262
-#define DUMPJSTRIDX(155,5321
-#define DUMPJINTIDX(156,5413
-#define DUMPJDLBIDX(157,5502
-#define DUMPJSTRVEC(159,5595
-#define DUMPJSTRINTMAP(164,5944
-#define DUMPJSTRSTRMAP(173,6586
-class JValue 183,7229
-    JValue(185,7252
-    JValue(186,7268
-    JValue(187,7306
-    JValue operator()(operator()188,7348
-    std::string str(190,7480
-    void fromStr(198,7673
-    json & val(202,7802
-    int size(203,7837
-    json value;205,7888
-class JRecord 208,7908
-    JRecord(210,7948
-    JRecord(211,7965
-    JRecord(212,8000
-    virtual void dump(213,8042
-typedef std::string   ProductType;224,8380
-typedef std::string   DateTime;225,8415
-typedef std::string   DateRange;226,8447
-typedef std::string   URL;227,8480
-typedef std::string   URLSpace;228,8507
-typedef unsigned int  ObsId;229,8539
-typedef std::string   Instrument;230,8568
-typedef std::string   ObsMode;231,8602
-typedef unsigned int  Exposure;232,8633
-typedef std::string   Creator;233,8665
-typedef std::string   Mission;234,8696
-typedef std::string   Origin;235,8727
-typedef std::string   ProcFunction;236,8757
-typedef std::string   FileType;237,8793
-typedef std::string   ProductParams;238,8825
-typedef std::string   ProductId;239,8862
-typedef std::string   ProductVersion;240,8895
-typedef std::string   ProductStatus;241,8933
-typedef unsigned int  ProductSize;242,8970
-typedef std::string   Signature;243,9005
-typedef std::string   FileNamePart;244,9038
-struct ProductMetadata 250,9223
-struct ProductCollection 280,9924
-struct ProductList 285,10019
-    std::vector<ProductMetadata> productList;286,10057
-struct StringList 289,10107
-    std::vector<std::string> items;290,10147
-struct ProductShortList 296,10244
-typedef std::map<std::string,std::string298,10293
-typedef std::map<std::string, std::string> PList;298,10293
-struct ParameterList 300,10344
-    PList paramList;301,10387
-typedef std::string                            TaskName;307,10469
-typedef std::string                            TaskPath;308,10526
-typedef int                                    TaskExitCode;309,10583
-typedef Json::Value                            TaskData;310,10644
-#define TLIST_TASK_STATUS 312,10702
-#define T(322,11288
-enum TaskStatus 323,11318
-enum TaskStatus { TLIST_TASK_STATUS 323,11318
-#undef T324,11357
-struct TaskInfo 329,11483
-    TaskName           taskName;331,11537
-    TaskPath           taskPath;332,11570
-    DateTime           taskStart;333,11603
-    DateTime           taskEnd;334,11637
-    TaskExitCode       taskExitCode;335,11669
-    TaskStatus         taskStatus;336,11706
-    ProductCollection  inputs;337,11741
-    ProductCollection  outputs;338,11772
-    ParameterList      params;339,11804
-    TaskData           taskData;340,11835
-struct TaskAgentInfo 346,11929
-    int         total;347,11972
-    int         maxnum;348,11995
-    int         running;349,12019
-    int         waiting;350,12044
-    int         paused;351,12069
-    int         stopped;352,12093
-    int         failed;353,12118
-    int         finished;354,12142
-    int         load1min;355,12168
-    int         load5min;356,12194
-    int         load15min;357,12220
-    int         uptimesecs;358,12247
-    std::string name;359,12275
-    std::string client;360,12297
-    std::string server;361,12321
-typedef int                   MessageId;373,12576
-typedef int                   MessageVersion;374,12617
-typedef std::string           NodeName;375,12663
-struct NodeList 377,12704
-typedef int                   CRC;379,12745
-struct MessageHeader 381,12781
-    MessageId      msgId;382,12824
-    MessageVersion msgVersion;383,12850
-    NodeName       source;384,12881
-    NodeName       destination;385,12908
-    NodeList       path;386,12940
-    DateTime       dateCreation;387,12965
-    DateTime       dateTransmission;388,12998
-    DateTime       dateReception;389,13035
-    CRC            crc;390,13069
-struct Message 396,13154
-    MessageHeader header;397,13191
-struct Message_INDATA 402,13277
-    ProductCollection    productsMetadata;403,13318
-struct Message_DATA_Exchange 409,13422
-    ParameterList    variables;410,13470
-typedef Message_DATA_Exchange Message_DATA_RQST;416,13563
-typedef Message_DATA_Exchange Message_DATA_INFO;417,13612
-typedef Message_DATA_Exchange Message_MONIT_RQST;419,13662
-typedef Message_DATA_Exchange Message_MONIT_INFO;420,13712
-typedef Message_DATA_Exchange Message_CMD;422,13763
-struct Message_TASK_Processing 424,13807
-    TaskInfo    task;425,13857
-    std::string rule;426,13879
-class Message_TASK_PROC 434,14067
-class Message_TASK_RES 435,14128
-#define TLIST_MESSAGE_TYPES 437,14190
-#define T(450,14877
-enum MessageTypeIdx 451,14908
-enum MessageTypeIdx { TLIST_MESSAGE_TYPES 451,14908
-#undef T452,14953
-#define T(454,14963
-#undef T456,15032
-struct MessageData 462,15121
-    Message * msg;468,15266
-#define UNUSED(473,15297
+#define SET_GRP(148,4908
+#define GRP(149,4948
+#define DUMPJSTR(151,4971
+#define DUMPJINT(152,5056
+#define DUMPJDLB(153,5138
+#define DUMPJBOOL(154,5223
+#define FOREACH(156,5325
+#define DUMPJSTRIDX(158,5384
+#define DUMPJINTIDX(159,5476
+#define DUMPJDLBIDX(160,5565
+#define DUMPJSTRVEC(162,5658
+#define DUMPJSTRINTMAP(167,6007
+#define DUMPJSTRSTRMAP(176,6649
+class JValue 186,7292
+    JValue(188,7315
+    JValue(189,7331
+    JValue(190,7369
+    JValue operator()(operator()191,7411
+    std::string str(193,7543
+    void fromStr(201,7736
+    json & val(205,7865
+    int size(206,7900
+    json value;208,7951
+class JRecord 211,7971
+    JRecord(213,8011
+    JRecord(214,8028
+    JRecord(215,8063
+    virtual void dump(216,8105
+typedef std::string   ProductType;227,8443
+typedef std::string   DateTime;228,8478
+typedef std::string   DateRange;229,8510
+typedef std::string   URL;230,8543
+typedef std::string   URLSpace;231,8570
+typedef unsigned int  ObsId;232,8602
+typedef std::string   Instrument;233,8631
+typedef std::string   ObsMode;234,8665
+typedef unsigned int  Exposure;235,8696
+typedef std::string   Creator;236,8728
+typedef std::string   Mission;237,8759
+typedef std::string   Origin;238,8790
+typedef std::string   ProcFunction;239,8820
+typedef std::string   FileType;240,8856
+typedef std::string   ProductParams;241,8888
+typedef std::string   ProductId;242,8925
+typedef std::string   ProductVersion;243,8958
+typedef std::string   ProductStatus;244,8996
+typedef unsigned int  ProductSize;245,9033
+typedef std::string   Signature;246,9068
+typedef std::string   FileNamePart;247,9101
+struct ProductMetadata 253,9286
+    ProductMetadata(254,9328
+    ProductMetadata(255,9353
+    virtual void dump(256,9397
+struct ProductList 318,11093
+    ProductList(319,11131
+    ProductList(320,11152
+    virtual void dump(326,11341
+    std::vector<ProductMetadata> products;329,11420
+struct ProductCollection 332,11467
+    ProductCollection(333,11511
+    ProductCollection(334,11538
+    virtual void dump(342,11795
+    std::map<std::map345,11883
+    std::map<ProductType, ProductMetadata> products;345,11883
+typedef std::string                            TaskName;348,11940
+typedef std::string                            TaskPath;349,11997
+typedef int                                    TaskExitCode;350,12054
+typedef json                                   TaskData;351,12115
+#define TLIST_TASK_STATUS 353,12173
+#define T(363,12730
+enum TaskStatus 364,12760
+enum TaskStatus { TLIST_TASK_STATUS 364,12760
+#undef T365,12799
+struct TaskInfo 370,12925
+    TaskInfo(371,12960
+    TaskInfo(372,12978
+    virtual void dump(376,13095
+struct ProductList 401,13662
+    std::vector<ProductMetadata> productList;402,13700
+struct StringList 405,13750
+    std::vector<std::string> items;406,13790
+struct ProductShortList 412,13887
+typedef std::map<std::string,std::string414,13936
+typedef std::map<std::string, std::string> PList;414,13936
+struct ParameterList 416,13987
+    PList paramList;417,14030
+struct TaskAgentInfo 424,14113
+    int         total;425,14156
+    int         maxnum;426,14179
+    int         running;427,14203
+    int         waiting;428,14228
+    int         paused;429,14253
+    int         stopped;430,14277
+    int         failed;431,14302
+    int         finished;432,14326
+    int         load1min;433,14352
+    int         load5min;434,14378
+    int         load15min;435,14404
+    int         uptimesecs;436,14431
+    std::string name;437,14459
+    std::string client;438,14481
+    std::string server;439,14505
+typedef int                   MessageId;451,14760
+typedef int                   MessageVersion;452,14801
+typedef std::string           NodeName;453,14847
+struct NodeList 455,14888
+typedef int                   CRC;457,14929
+struct MessageHeader 459,14965
+    MessageId      msgId;460,15008
+    MessageVersion msgVersion;461,15034
+    NodeName       source;462,15065
+    NodeName       destination;463,15092
+    NodeList       path;464,15124
+    DateTime       dateCreation;465,15149
+    DateTime       dateTransmission;466,15182
+    DateTime       dateReception;467,15219
+    CRC            crc;468,15253
+struct Message 474,15338
+    MessageHeader header;475,15375
+struct Message_INDATA 480,15461
+    ProductCollection    productsMetadata;481,15502
+struct Message_DATA_Exchange 487,15606
+    ParameterList    variables;488,15654
+typedef Message_DATA_Exchange Message_DATA_RQST;494,15747
+typedef Message_DATA_Exchange Message_DATA_INFO;495,15796
+typedef Message_DATA_Exchange Message_MONIT_RQST;497,15846
+typedef Message_DATA_Exchange Message_MONIT_INFO;498,15896
+typedef Message_DATA_Exchange Message_CMD;500,15947
+struct Message_TASK_Processing 502,15991
+    TaskInfo    task;503,16041
+    std::string rule;504,16063
+class Message_TASK_PROC 512,16251
+class Message_TASK_RES 513,16312
+#define TLIST_MESSAGE_TYPES 515,16374
+#define T(528,17061
+enum MessageTypeIdx 529,17092
+enum MessageTypeIdx { TLIST_MESSAGE_TYPES 529,17092
+#undef T530,17137
+#define T(532,17147
+#undef T534,17216
+struct MessageData 540,17305
+    Message * msg;546,17450
+#define UNUSED(551,17481
 
-fmk/dbhdl.h,185
+fmk/dbhdl.h,229
 #define DBHDL_H42,810
-class DBHandler 85,2099
-    DBHandler(92,2317
-    virtual ~DBHandler(97,2566
-    virtual std::pair<std::pair175,6371
-    bool connectionParamsSet;277,11357
+typedef std::string MessageString;82,1925
+class DBHandler 88,2136
+    DBHandler(95,2354
+    virtual ~DBHandler(100,2603
+    virtual std::pair<std::pair178,6402
+    bool connectionParamsSet;280,11354
 
-fmk/dbhdlpostgre.cpp,1829
-namespace QPF 59,1239
-DBHdlPostgreSQL::DBHdlPostgreSQL(64,1434
-bool DBHdlPostgreSQL::openConnection(openConnection72,1693
-bool DBHdlPostgreSQL::closeConnection(closeConnection115,3327
-int  DBHdlPostgreSQL::storeProducts(storeProducts127,3669
-int  DBHdlPostgreSQL::retrieveProducts(retrieveProducts172,5185
-bool DBHdlPostgreSQL::storeTask(storeTask224,7477
-bool DBHdlPostgreSQL::checkTask(checkTask261,8624
-bool DBHdlPostgreSQL::updateTable<updateTable280,9197
-bool DBHdlPostgreSQL::updateTable<updateTable291,9652
-bool DBHdlPostgreSQL::updateTable<updateTable302,10124
-bool DBHdlPostgreSQL::updateTable<updateTable313,10603
-bool DBHdlPostgreSQL::updateTask(updateTask324,11111
-bool DBHdlPostgreSQL::retrieveTask(retrieveTask371,13062
-bool DBHdlPostgreSQL::storeState(storeState382,13392
-std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(getCurrentState404,14218
-std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState(getLatestState427,14985
-void DBHdlPostgreSQL::addICommand(addICommand453,15772
-bool DBHdlPostgreSQL::getICommand(getICommand480,16716
-bool DBHdlPostgreSQL::markICommandAsDone(markICommandAsDone514,17899
-bool DBHdlPostgreSQL::removeICommand(removeICommand530,18430
-bool DBHdlPostgreSQL::storeMsg(storeMsg545,18917
-bool DBHdlPostgreSQL::retrieveMsgs(retrieveMsgs572,20104
-bool DBHdlPostgreSQL::getTable(getTable605,21324
-bool DBHdlPostgreSQL::getQuery(getQuery615,21764
-int DBHdlPostgreSQL::getNumRowsInTable(getNumRowsInTable625,22180
-bool DBHdlPostgreSQL::runCmd(runCmd639,22600
-bool DBHdlPostgreSQL::fillWithResult(fillWithResult659,23334
-bool DBHdlPostgreSQL::updTable(updTable681,24030
-int DBHdlPostgreSQL::getVersionCounter(getVersionCounter695,24570
-bool DBHdlPostgreSQL::checkSignature(checkSignature715,25223
+fmk/dbhdlpostgre.cpp,1805
+DBHdlPostgreSQL::DBHdlPostgreSQL(65,1433
+bool DBHdlPostgreSQL::openConnection(openConnection73,1692
+bool DBHdlPostgreSQL::closeConnection(closeConnection116,3291
+int DBHdlPostgreSQL::storeProducts(storeProducts128,3633
+int  DBHdlPostgreSQL::retrieveProducts(retrieveProducts168,5081
+bool DBHdlPostgreSQL::storeTask(storeTask222,7527
+bool DBHdlPostgreSQL::checkTask(checkTask259,8685
+bool DBHdlPostgreSQL::updateTable<updateTable278,9258
+bool DBHdlPostgreSQL::updateTable<updateTable289,9713
+bool DBHdlPostgreSQL::updateTable<updateTable300,10185
+bool DBHdlPostgreSQL::updateTable<updateTable311,10664
+bool DBHdlPostgreSQL::updateTask(updateTask322,11172
+bool DBHdlPostgreSQL::retrieveTask(retrieveTask369,13142
+bool DBHdlPostgreSQL::storeState(storeState380,13472
+std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(getCurrentState402,14298
+std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState(getLatestState425,15065
+void DBHdlPostgreSQL::addICommand(addICommand451,15852
+bool DBHdlPostgreSQL::getICommand(getICommand478,16796
+bool DBHdlPostgreSQL::markICommandAsDone(markICommandAsDone512,17979
+bool DBHdlPostgreSQL::removeICommand(removeICommand528,18510
+bool DBHdlPostgreSQL::storeMsg(storeMsg543,18997
+bool DBHdlPostgreSQL::retrieveMsgs(retrieveMsgs571,20092
+bool DBHdlPostgreSQL::getTable(getTable601,21122
+bool DBHdlPostgreSQL::getQuery(getQuery611,21562
+int DBHdlPostgreSQL::getNumRowsInTable(getNumRowsInTable621,21978
+bool DBHdlPostgreSQL::runCmd(runCmd635,22398
+bool DBHdlPostgreSQL::fillWithResult(fillWithResult655,23132
+bool DBHdlPostgreSQL::updTable(updTable677,23828
+int DBHdlPostgreSQL::getVersionCounter(getVersionCounter691,24368
+bool DBHdlPostgreSQL::checkSignature(checkSignature711,25021
 
-fmk/dbhdlpostgre.h,221
+fmk/dbhdlpostgre.h,198
 #define DBHDLPOSTGRE_H42,831
-namespace QPF 71,1781
-class DBHdlPostgreSQL 76,1978
-    ~DBHdlPostgreSQL(88,2445
-    virtual std::pair<std::pair156,5854
-    PGconn     * conn;266,11156
-    PGresult   * res;267,11179
+class DBHdlPostgreSQL 76,1980
+    ~DBHdlPostgreSQL(88,2447
+    virtual std::pair<std::pair156,5850
+    PGconn     * conn;266,11118
+    PGresult   * res;267,11141
 
 fmk/euclid.h,1202
 #define EUCLID_H42,813
@@ -576,116 +610,119 @@ static std::map<std::map151,4600
                     { TLIST_PREDEF_PROCESSING_FUNCTIONS 153,4683
 #undef T154,4742
 
-fmk/evtmng.cpp,305
-EvtMng::EvtMng(56,1255
-EvtMng::EvtMng(63,1519
-void EvtMng::fromRunningToOperational(fromRunningToOperational70,1803
-void EvtMng::fromOperationalToRunning(fromOperationalToRunning83,2291
-void EvtMng::fromRunningToOff(fromRunningToOff96,2637
-void EvtMng::runEachIteration(runEachIteration107,2957
+fmk/evtmng.cpp,356
+EvtMng::EvtMng(57,1256
+EvtMng::EvtMng(65,1524
+void EvtMng::fromRunningToOperational(fromRunningToOperational73,1811
+void EvtMng::fromOperationalToRunning(fromOperationalToRunning86,2299
+void EvtMng::runEachIteration(runEachIteration99,2645
+void EvtMng::processCmdMsg(processCmdMsg224,7112
+void EvtMng::processTskRepMsg(processTskRepMsg231,7365
 
 fmk/evtmng.h,76
-#define EVTMNG_H42,820
-class EvtMng 71,1762
-    DirWatcher * dw;109,3445
+#define EVTMNG_H42,817
+class EvtMng 72,1778
+    DirWatcher * dw;112,3587
+
+fmk/except.h,391
+#define EXCEPT_H42,805
+class Exception 57,1243
+    Exception(59,1293
+    virtual ~Exception(60,1370
+    virtual char const* what(61,1407
+    virtual int code(62,1478
+    std::string const msg_;64,1545
+    int code_;65,1573
+class RuntimeException 68,1592
+    RuntimeException(70,1644
+class LogicException 73,1714
+    LogicException(75,1764
+class Error 78,1832
+    Error(80,1873
 
 fmk/filenamespec.cpp,1250
-FileNameSpec::FileNameSpec(FileNameSpec69,1464
-FileNameSpec::FileNameSpec(FileNameSpec74,1564
-void FileNameSpec::setFileNameSpec(setFileNameSpec79,1673
-void FileNameSpec::setRegEx(setRegEx86,1828
-void FileNameSpec::setAssignations(setAssignations98,2017
-void FileNameSpec::setProductIdTpl(setProductIdTpl140,3353
-bool FileNameSpec::parseFileName(parseFileName145,3434
-std::string FileNameSpec::placeIn(placeIn282,7959
-void FileNameSpec::decodeSignature(decodeSignature291,8258
-std::string FileNameSpec::buildProductId(buildProductId344,10268
-std::string FileNameSpec::buildVersion(buildVersion372,11062
-std::string FileNameSpec::incrMinorVersion(incrMinorVersion379,11213
-std::regex                        FileNameSpec::re;391,11487
-PCRegEx *                         FileNameSpec::re 393,11545
-std::string                       FileNameSpec::reStr 396,11609
-std::string                       FileNameSpec::assignationsStr 397,11737
-std::map< char, std::set<int> >   FileNameSpec::assignations;398,11838
-std::map< char, std::string >     FileNameSpec::assignationsTpl;399,11900
-std::string                       FileNameSpec::productIdTpl 400,11965
-bool                              FileNameSpec::initialized 402,12047
+FileNameSpec::FileNameSpec(FileNameSpec70,1481
+FileNameSpec::FileNameSpec(FileNameSpec75,1581
+void FileNameSpec::setFileNameSpec(setFileNameSpec80,1690
+void FileNameSpec::setRegEx(setRegEx87,1845
+void FileNameSpec::setAssignations(setAssignations99,2034
+void FileNameSpec::setProductIdTpl(setProductIdTpl141,3370
+bool FileNameSpec::parseFileName(parseFileName146,3451
+std::string FileNameSpec::placeIn(placeIn294,8301
+void FileNameSpec::decodeSignature(decodeSignature303,8600
+std::string FileNameSpec::buildProductId(buildProductId356,10610
+std::string FileNameSpec::buildVersion(buildVersion384,11404
+std::string FileNameSpec::incrMinorVersion(incrMinorVersion391,11555
+std::regex                        FileNameSpec::re;403,11829
+PCRegEx *                         FileNameSpec::re 405,11887
+std::string                       FileNameSpec::reStr 408,11951
+std::string                       FileNameSpec::assignationsStr 409,12081
+std::map< char, std::set<int> >   FileNameSpec::assignations;410,12182
+std::map< char, std::string >     FileNameSpec::assignationsTpl;411,12244
+std::string                       FileNameSpec::productIdTpl 412,12309
+bool                              FileNameSpec::initialized 414,12391
 
-fmk/filenamespec.h,689
+fmk/filenamespec.h,658
 #define FILENAMESPEC_H42,826
-#define USE_CX11_REGEX58,1260
-class FileNameSpec 87,2129
-    static std::regex                        re;117,2987
-    static PCRegEx *                         re;119,3042
-    static std::string                       reStr;122,3099
-    static std::string                       assignationsStr;123,3151
-    static std::map<std::map124,3213
-    static std::map< char, std::set<int> >   assignations;124,3213
-    static std::map<std::map125,3272
-    static std::map< char, std::string >     assignationsTpl;125,3272
-    static std::string                       productIdTpl;126,3334
-    static bool                              initialized;128,3394
+class FileNameSpec 87,2131
+    static std::regex                        re;117,2989
+    static PCRegEx *                         re;119,3044
+    static std::string                       reStr;122,3101
+    static std::string                       assignationsStr;123,3153
+    static std::map<std::map124,3215
+    static std::map< char, std::set<int> >   assignations;124,3215
+    static std::map<std::map125,3274
+    static std::map< char, std::string >     assignationsTpl;125,3274
+    static std::string                       productIdTpl;126,3336
+    static bool                              initialized;128,3396
 
-fmk/logmng.cpp,43
-LogMng::LogMng(5,44
-LogMng::LogMng(9,147
+fmk/logmng.cpp,98
+LogMng::LogMng(56,1235
+LogMng::LogMng(64,1503
+void LogMng::processCmdMsg(processCmdMsg72,1779
 
-fmk/logmng.h,41
-#define LOGMNG_H4,33
-class LogMng 8,75
+fmk/logmng.h,46
+#define LOGMNG_H42,810
+class LogMng 75,1926
 
-fmk/message.h,1410
+fmk/message.h,1002
 #define MESSAGE_H4,34
-class MsgHeader 11,251
-    MsgHeader(13,294
-    MsgHeader(14,313
-    virtual void dump(15,351
-class MessageBase 42,1073
-    MessageBase(44,1118
-    MessageBase(45,1139
-    MessageBase(46,1195
-    virtual void init(47,1244
-    virtual void dump(50,1321
-    MsgHeader   header;53,1376
-class MsgBodyCMD 59,1579
-    MsgBodyCMD(61,1623
-    MsgBodyCMD(62,1643
-    MsgBodyCMD(63,1689
-    virtual void dump(64,1728
-class MsgBodyINDATA 73,1980
-    MsgBodyINDATA(75,2027
-    MsgBodyINDATA(76,2050
-    MsgBodyINDATA(77,2099
-    virtual void dump(78,2141
-class MsgBodyMONIT 87,2414
-    MsgBodyMONIT(89,2460
-    MsgBodyMONIT(90,2482
-    MsgBodyMONIT(91,2530
-    virtual void dump(92,2571
-class MsgBodyTSKSCHED 101,2827
-    MsgBodyTSKSCHED(103,2876
-    MsgBodyTSKSCHED(104,2901
-    MsgBodyTSKSCHED(105,2952
-    virtual void dump(106,2996
-class MsgBodyTSKMONIT 115,3252
-    MsgBodyTSKMONIT(117,3301
-    MsgBodyTSKMONIT(118,3326
-    MsgBodyTSKMONIT(119,3377
-    virtual void dump(120,3421
-class MsgBodyTSKREP 129,3675
-    MsgBodyTSKREP(131,3722
-    MsgBodyTSKREP(132,3745
-    MsgBodyTSKREP(133,3794
-    virtual void dump(134,3836
-class Message 144,4111
-    Message(146,4156
-    Message(147,4173
-    Message(148,4229
-    virtual void init(149,4278
-    virtual void dump(153,4390
-    void buildHdr(157,4466
-    void buildBody(175,5214
-    T body;179,5305
+class MsgHeader 13,269
+    MsgHeader(15,312
+    MsgHeader(16,331
+    virtual void dump(17,369
+class MessageBase 44,1091
+    MessageBase(46,1136
+    MessageBase(47,1157
+    MessageBase(48,1213
+    virtual void init(49,1262
+    virtual void dump(53,1355
+    MsgHeader   header;56,1410
+class MsgBodyCMD 62,1613
+    MsgBodyCMD(64,1657
+    MsgBodyCMD(65,1677
+    MsgBodyCMD(66,1723
+    virtual void dump(67,1762
+class MsgBodyINDATA 76,2014
+    MsgBodyINDATA(78,2061
+    MsgBodyINDATA(79,2084
+    MsgBodyINDATA(80,2133
+    virtual void dump(88,2405
+    std::vector<ProductMetadata> products;91,2484
+class MsgBodyTSK 97,2706
+    MsgBodyTSK(99,2750
+    MsgBodyTSK(100,2770
+    MsgBodyTSK(101,2816
+    virtual void dump(102,2855
+class Message 112,3130
+    Message(114,3175
+    Message(115,3192
+    Message(116,3248
+    virtual void init(117,3297
+    virtual void dump(121,3409
+    void buildHdr(125,3485
+    void buildBody(143,4233
+    T body;147,4324
 
 fmk/sync.h,182
 #define SYNC_H4,31
@@ -705,49 +742,97 @@ fmk/tskage.h,41
 #define TSKAGE_H4,33
 class TskAge 8,75
 
-fmk/tskmng.cpp,43
+fmk/tskmng.cpp,98
 TskMng::TskMng(5,44
 TskMng::TskMng(9,147
+void TskMng::runEachIteration(runEachIteration14,249
 
 fmk/tskmng.h,41
 #define TSKMNG_H4,33
 class TskMng 8,75
 
-fmk/tskorc.cpp,98
-TskOrc::TskOrc(5,44
-TskOrc::TskOrc(9,147
-void TskOrc::runEachIteration(runEachIteration13,249
+fmk/tskorc.cpp,557
+using Configuration::cfg;55,1020
+TskOrc::TskOrc(68,1450
+TskOrc::TskOrc(76,1718
+void TskOrc::defineOrchestrationParams(defineOrchestrationParams84,2006
+void TskOrc::fromRunningToOperational(fromRunningToOperational126,3591
+void TskOrc::runEachIteration(runEachIteration153,4609
+void TskOrc::processCmdMsg(processCmdMsg160,4817
+void TskOrc::processInDataMsg(processInDataMsg169,5141
+bool TskOrc::checkRulesForProductType(checkRulesForProductType206,6557
+#define EVAL_CONDITION227,7326
+bool TskOrc::sendTaskSchedMsg(sendTaskSchedMsg338,11470
 
-fmk/tskorc.h,41
-#define TSKORC_H4,33
-class TskOrc 8,75
+fmk/tskorc.h,1345
+#define TSKORC_H42,822
+class TskOrc 75,1934
+    struct Rule 78,1977
+        std::string              name;79,1995
+        std::vector<std::string> inputs;80,2034
+        std::vector<std::string> outputs;81,2075
+        std::string              processingElement;82,2117
+        std::string              condition;83,2169
+    typedef std::map<Rule Rule86,2221
+    typedef std::map<Rule *, ProductList>  RuleInputs;86,2221
+    struct Processor 88,2277
+        std::string name;89,2300
+        std::string exePath;90,2326
+        std::string inPath;91,2355
+        std::string outPath;92,2383
+        std::string version;93,2412
+        int         counter;94,2441
+    struct OrchestrationParameters 97,2478
+        std::vector<std::string>            productTypes;98,2515
+        std::vector<Rule *>                 rules;99,2573
+        std::map<std::map100,2624
+        std::map<std::string, Processor *>  processors;100,2624
+    struct OrchestrationMaps 103,2688
+        std::multimap<std::multimap104,2719
+        std::multimap<std::string, Rule *>  prodAsInput;104,2719
+        std::map<std::map105,2776
+        std::map<Rule *, std::string>       ruleDesc;105,2776
+    OrchestrationParameters  orcParams;164,5412
+    OrchestrationMaps        orcMaps;165,5452
+    ProductCollection        catalogue;167,5491
 
-fmk/urlhdl.cpp,995
-URLHandler::URLHandler(66,1405
-ProductMetadata & URLHandler::fromExternal2Inbox(fromExternal2Inbox73,1641
-ProductMetadata & URLHandler::fromOutbox2External(fromOutbox2External102,2642
-ProductMetadata & URLHandler::fromFolder2Inbox(fromFolder2Inbox113,2995
-ProductMetadata & URLHandler::fromInbox2LocalArch(fromInbox2LocalArch146,4078
-ProductMetadata & URLHandler::fromLocalArch2Gateway(fromLocalArch2Gateway198,5853
-ProductMetadata & URLHandler::fromGateway2Processing(fromGateway2Processing233,7033
-ProductMetadata & URLHandler::fromProcessing2Gateway(fromProcessing2Gateway272,8225
-ProductMetadata & URLHandler::fromGateway2LocalArch(fromGateway2LocalArch315,9576
-int URLHandler::relocate(relocate350,10692
-int URLHandler::copyfile(copyfile404,12586
-int URLHandler::rcopyfile(rcopyfile424,13165
-int URLHandler::runlink(runlink444,13774
-void URLHandler::setRemoteCopyParams(setRemoteCopyParams458,14158
-void URLHandler::setProcElemRunDir(setProcElemRunDir469,14555
+fmk/urlhdl.cpp,1060
+#define showBacktrace(59,1051
+using Configuration::cfg;69,1318
+URLHandler::URLHandler(74,1514
+ProductMetadata & URLHandler::fromExternal2Inbox(fromExternal2Inbox81,1750
+ProductMetadata & URLHandler::fromOutbox2External(fromOutbox2External110,2732
+ProductMetadata & URLHandler::fromFolder2Inbox(fromFolder2Inbox121,3085
+ProductMetadata & URLHandler::fromInbox2LocalArch(fromInbox2LocalArch157,4189
+ProductMetadata & URLHandler::fromLocalArch2Gateway(fromLocalArch2Gateway213,6010
+ProductMetadata & URLHandler::fromGateway2Processing(fromGateway2Processing250,7168
+ProductMetadata & URLHandler::fromProcessing2Gateway(fromProcessing2Gateway291,8368
+ProductMetadata & URLHandler::fromGateway2LocalArch(fromGateway2LocalArch336,9727
+int URLHandler::relocate(relocate373,10821
+int URLHandler::copyfile(copyfile427,12715
+int URLHandler::rcopyfile(rcopyfile447,13294
+int URLHandler::runlink(runlink467,13903
+void URLHandler::setRemoteCopyParams(setRemoteCopyParams481,14287
+void URLHandler::setProcElemRunDir(setProcElemRunDir492,14684
 
-fmk/urlhdl.h,274
+fmk/urlhdl.h,544
 #define URLHANDLER_H42,814
 class URLHandler 76,1961
-    std::string workDir;157,5515
-    std::string intTaskDir;158,5540
-    std::string taskExchgDir;159,5568
-    std::string master_address;160,5598
-    std::string remote_address;161,5630
-    bool isRemote;162,5662
+    enum LocalArchiveMethod 83,2092
+        LINK,84,2122
+        MOVE,85,2136
+        COPY,86,2150
+        COPY_TO_REMOTE,87,2164
+        COPY_TO_MASTER,88,2188
+        SYMLINK89,2212
+    std::string workDir;166,5673
+    std::string intTaskDir;167,5698
+    std::string taskExchgDir;168,5726
+    std::string master_address;169,5756
+    std::string remote_address;170,5788
+    std::string productUrl;172,5821
+    std::string productUrlSpace;173,5849
+    bool isRemote;175,5883
 
 infix/infixeval.h,1651
 #define INFIXEVAL_H42,837
@@ -804,33 +889,33 @@ class Evaluator 170,4531
     istringstream str;186,5127
     int status;187,5181
 
-infix/infixeval.tcc,1005
+infix/infixeval.tcc,1007
 #define DEBUG_INFIX44,856
-#  define DBG(47,896
-#  define DBG(49,986
-namespace InFix 58,1236
-#define T(60,1255
-char const * InfixEvErrorNames[InfixEvErrorNames61,1273
-#undef T62,1329
-#define T(64,1339
-char const * InfixEvErrorMsgs[InfixEvErrorMsgs65,1356
-#undef T66,1411
-#define T(68,1421
-const char * TokenName 69,1437
-#undef T70,1477
-vector<string> split(77,1751
-Token<NumericType> TokensList<NumericType>::getToken(getToken94,2271
-struct Precedence 198,5299
-    int inputSymbol;199,5319
-    int topOfStack;200,5340
-} PREC_TABLE 201,5360
-NumericType Evaluator<NumericType>::getValue(getValue223,6288
-NumericType Evaluator<NumericType>::eval(eval257,7379
-void Evaluator<NumericType>::processToken(processToken289,8304
-NumericType Evaluator<NumericType>::getTop(getTop334,9640
-string Evaluator<NumericType>::getTopSymbol(getTopSymbol352,10195
-void Evaluator<NumericType>::binaryOp(binaryOp371,10813
-template<> map<string, int> Symbols<int>::symbolMap symbolMap431,12579
+#  define DBGI(47,896
+#  define DBGI(49,987
+namespace InFix 58,1238
+#define T(60,1257
+char const * InfixEvErrorNames[InfixEvErrorNames61,1275
+#undef T62,1331
+#define T(64,1341
+char const * InfixEvErrorMsgs[InfixEvErrorMsgs65,1358
+#undef T66,1413
+#define T(68,1423
+const char * TokenName 69,1439
+#undef T70,1479
+vector<string> split(77,1753
+Token<NumericType> TokensList<NumericType>::getToken(getToken94,2273
+struct Precedence 198,5304
+    int inputSymbol;199,5324
+    int topOfStack;200,5345
+} PREC_TABLE 201,5365
+NumericType Evaluator<NumericType>::getValue(getValue223,6293
+NumericType Evaluator<NumericType>::eval(eval257,7386
+void Evaluator<NumericType>::processToken(processToken289,8312
+NumericType Evaluator<NumericType>::getTop(getTop334,9649
+string Evaluator<NumericType>::getTopSymbol(getTopSymbol352,10204
+void Evaluator<NumericType>::binaryOp(binaryOp371,10822
+template<> map<string, int> Symbols<int>::symbolMap symbolMap431,12588
 
 json/jsoncpp.cpp,20348
 #define LIB_JSONCPP_JSON_TOOL_H_INCLUDED88,3746
@@ -1344,6 +1429,15 @@ class Log 102,3086
     static LogLevel minimumLogLevel;318,11516
     static bool isInitialised;322,11654
 
+nbproject/configurations.xml,475
+<?xml version=1,0
+          <preBuildCommand>${CMAKE} -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=DCMAKE_BUILD_TYPE84,2639
+          <preBuildCommand>${CMAKE} -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=${IDE_CC} -DCMAKE_CXX_COMPILER=DCMAKE_CXX_COMPILER84,2639
+          <preBuildCommand>${CMAKE} -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER=${IDE_CC} -DCMAKE_CXX_COMPILER=${IDE_CXX} -DCMAKE_C_FLAGS_DEBUG=DCMAKE_C_FLAGS_DEBUG84,2639
+
+nbproject/project.xml,19
+<?xml version=1,0
+
 nncomm/bus.cpp,205
 Bus::Bus(Bus6,185
 Bus::Bus(Bus10,263
@@ -1465,9 +1559,9 @@ nncomm/protlayer.cpp,330
 ProtocolLayer::ProtocolLayer(11,142
 ProtocolLayer::ProtocolLayerClass ProtocolLayer::getClass(getClass15,206
 void ProtocolLayer::createPipeline(createPipeline20,298
-void ProtocolLayer::createPubSub(createPubSub48,1317
-void ProtocolLayer::createSurvey(createSurvey78,2304
-void ProtocolLayer::createBus(createBus105,3227
+void ProtocolLayer::createPubSub(createPubSub49,1385
+void ProtocolLayer::createSurvey(createSurvey83,2549
+void ProtocolLayer::createBus(createBus111,3540
 
 nncomm/protlayer.h,509
 #define PROTLAYER_H4,36
@@ -1493,18 +1587,19 @@ nncomm/pubsub.h,43
 #define PUBSUB_H4,33
 class PubSub 12,276
 
-nncomm/scalprotrole.cpp,701
+nncomm/scalprotrole.cpp,751
 ScalabilityProtocolRole::ScalabilityProtocolRole(3,27
 ScalabilityProtocolRole::~ScalabilityProtocolRole(~ScalabilityProtocolRole8,143
 void ScalabilityProtocolRole::createSocket(createSocket13,243
 void ScalabilityProtocolRole::update(update20,414
-void ScalabilityProtocolRole::setMsgOut(setMsgOut35,737
-int ScalabilityProtocolRole::getClass(getClass43,916
-std::string ScalabilityProtocolRole::getName(getName48,983
-void ScalabilityProtocolRole::setName(setName53,1056
-std::string ScalabilityProtocolRole::getAddress(getAddress58,1140
-void ScalabilityProtocolRole::getIncommingMessageStrings(getIncommingMessageStrings63,1215
-int ScalabilityProtocolRole::getevents(getevents74,1556
+bool ScalabilityProtocolRole::next(next36,746
+void ScalabilityProtocolRole::setMsgOut(setMsgOut46,970
+int ScalabilityProtocolRole::getClass(getClass54,1149
+std::string ScalabilityProtocolRole::getName(getName59,1216
+void ScalabilityProtocolRole::setName(setName64,1289
+std::string ScalabilityProtocolRole::getAddress(getAddress69,1373
+void ScalabilityProtocolRole::getIncommingMessageStrings(getIncommingMessageStrings74,1448
+int ScalabilityProtocolRole::getevents(getevents89,1911
 
 nncomm/scalprotrole.h,733
 #define SCALPROTROLE_H4,39
@@ -1517,17 +1612,17 @@ typedef std::string                  MessageString;28,400
 typedef nn::socket                   Socket;29,452
 typedef std::queue<MessageString>    MsgList;30,497
 class ScalabilityProtocolRole 32,544
-    Socket *    sck;50,1188
-    MsgList     iMsgList;51,1209
-    MsgList     oMsgList;52,1235
-    bool        readyToGo;53,1261
-    int         elemClass;54,1288
-    std::string elemName;55,1315
-    std::string address;56,1341
-    char        buf[buf57,1366
-    int         rc;58,1405
-    int         endPoint;59,1425
-    int         incMsgsMask;60,1451
+    Socket *    sck;51,1230
+    MsgList     iMsgList;52,1251
+    MsgList     oMsgList;53,1277
+    bool        readyToGo;54,1303
+    int         elemClass;55,1330
+    std::string elemName;56,1357
+    std::string address;57,1383
+    char        buf[buf58,1408
+    int         rc;59,1447
+    int         endPoint;60,1467
+    int         incMsgsMask;61,1493
 
 nncomm/survey.cpp,333
 Survey::Survey(Survey6,191
@@ -1542,6 +1637,487 @@ nncomm/survey.h,74
 #define SURVEY_H4,33
 class Survey 14,299
     int maxRespondents;25,704
+
+run/file.cfg,181
+        "notifyMsgArrival": true,162,4404
+        "groupTaskAgentLogs": false,163,4438
+        "allowReprocessing": true,164,4475
+        "intermediateProducts": false,165,4510
+
+run/qpfdb.sql,18981
+-- SET lock_timeout 15,388
+SET client_encoding 16,413
+SET standard_conforming_strings 17,443
+SET check_function_bodies 18,481
+SET client_min_messages 19,516
+-- Name: plpgsql;22,626
+-- Name: plpgsql; Type: EXTENSION;22,626
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;23,679
+-- Name: EXTENSION plpgsql;26,817
+-- Name: EXTENSION plpgsql; Type: COMMENT;26,817
+SET search_path 29,943
+SET default_tablespace 31,982
+SET default_with_oids 33,1012
+-- Name: alerts; Type: TABLE;40,1284
+-- Name: alerts; Type: TABLE; Schema: public;40,1284
+-- Name: alerts; Type: TABLE; Schema: public; Owner: eucops;40,1284
+ALTER TABLE alerts OWNER TO eucops;65,2123
+-- Name: alerts_alert_id_seq;68,2234
+-- Name: alerts_alert_id_seq; Type: SEQUENCE;68,2234
+-- Name: alerts_alert_id_seq; Type: SEQUENCE; Schema: public;68,2234
+    CACHE 74,2414
+ALTER TABLE alerts_alert_id_seq OWNER TO eucops;76,2428
+-- Name: alerts_alert_id_seq;79,2552
+-- Name: alerts_alert_id_seq; Type: SEQUENCE OWNED BY;79,2552
+-- Name: alerts_alert_id_seq; Type: SEQUENCE OWNED BY; Schema: public;79,2552
+ALTER SEQUENCE alerts_alert_id_seq OWNED BY alerts.alert_id;alert_id80,2637
+-- Name: qpfstates; Type: TABLE;87,2942
+-- Name: qpfstates; Type: TABLE; Schema: public;87,2942
+-- Name: qpfstates; Type: TABLE; Schema: public; Owner: eucops;87,2942
+ALTER TABLE qpfstates OWNER TO eucops;98,3296
+-- Name: qpfstates_qpfstate_id_seq;101,3410
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE;101,3410
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE; Schema: public;101,3410
+    CACHE 107,3602
+ALTER TABLE qpfstates_qpfstate_id_seq OWNER TO eucops;109,3616
+-- Name: qpfstates_qpfstate_id_seq;112,3746
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE OWNED BY;112,3746
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE OWNED BY; Schema: public;112,3746
+ALTER SEQUENCE qpfstates_qpfstate_id_seq OWNED BY qpfstates.qpfstate_id;qpfstate_id113,3837
+-- Name: configuration; Type: TABLE;120,4158
+-- Name: configuration; Type: TABLE; Schema: public;120,4158
+-- Name: configuration; Type: TABLE; Schema: public; Owner: eucops;120,4158
+ALTER TABLE configuration OWNER TO eucops;127,4381
+-- Name: creators; Type: TABLE;134,4667
+-- Name: creators; Type: TABLE; Schema: public;134,4667
+-- Name: creators; Type: TABLE; Schema: public; Owner: eucops;134,4667
+ALTER TABLE creators OWNER TO eucops;140,4843
+-- Name: instruments; Type: TABLE;147,5127
+-- Name: instruments; Type: TABLE; Schema: public;147,5127
+-- Name: instruments; Type: TABLE; Schema: public; Owner: eucops;147,5127
+ALTER TABLE instruments OWNER TO eucops;153,5310
+-- Name: message_type; Type: TABLE;160,5598
+-- Name: message_type; Type: TABLE; Schema: public;160,5598
+-- Name: message_type; Type: TABLE; Schema: public; Owner: eucops;160,5598
+ALTER TABLE message_type OWNER TO eucops;166,5781
+-- Name: messages; Type: TABLE;173,6066
+-- Name: messages; Type: TABLE; Schema: public;173,6066
+-- Name: messages; Type: TABLE; Schema: public; Owner: eucops;173,6066
+ALTER TABLE messages OWNER TO eucops;186,6559
+-- Name: messages_id_seq;189,6672
+-- Name: messages_id_seq; Type: SEQUENCE;189,6672
+-- Name: messages_id_seq; Type: SEQUENCE; Schema: public;189,6672
+    CACHE 195,6844
+ALTER TABLE messages_id_seq OWNER TO eucops;197,6858
+-- Name: messages_id_seq;200,6978
+-- Name: messages_id_seq; Type: SEQUENCE OWNED BY;200,6978
+-- Name: messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public;200,6978
+ALTER SEQUENCE messages_id_seq OWNED BY messages.id;id201,7059
+-- Name: node_states; Type: TABLE;208,7358
+-- Name: node_states; Type: TABLE; Schema: public;208,7358
+-- Name: node_states; Type: TABLE; Schema: public; Owner: eucops;208,7358
+ALTER TABLE node_states OWNER TO eucops;214,7550
+-- Name: observation_modes; Type: TABLE;221,7843
+-- Name: observation_modes; Type: TABLE; Schema: public;221,7843
+-- Name: observation_modes; Type: TABLE; Schema: public; Owner: eucops;221,7843
+ALTER TABLE observation_modes OWNER TO eucops;227,8037
+-- Name: product_status; Type: TABLE;234,8333
+-- Name: product_status; Type: TABLE; Schema: public;234,8333
+-- Name: product_status; Type: TABLE; Schema: public; Owner: eucops;234,8333
+ALTER TABLE product_status OWNER TO eucops;240,8527
+-- Name: products_info; Type: TABLE;247,8819
+-- Name: products_info; Type: TABLE; Schema: public;247,8819
+-- Name: products_info; Type: TABLE; Schema: public; Owner: eucops;247,8819
+ALTER TABLE products_info OWNER TO eucops;265,9432
+-- Name: products_info_id_seq;268,9550
+-- Name: products_info_id_seq; Type: SEQUENCE;268,9550
+-- Name: products_info_id_seq; Type: SEQUENCE; Schema: public;268,9550
+    CACHE 274,9732
+ALTER TABLE products_info_id_seq OWNER TO eucops;276,9746
+-- Name: products_info_id_seq;279,9871
+-- Name: products_info_id_seq; Type: SEQUENCE OWNED BY;279,9871
+-- Name: products_info_id_seq; Type: SEQUENCE OWNED BY; Schema: public;279,9871
+ALTER SEQUENCE products_info_id_seq OWNED BY products_info.id;id280,9957
+-- Name: task_inputs; Type: TABLE;287,10266
+-- Name: task_inputs; Type: TABLE; Schema: public;287,10266
+-- Name: task_inputs; Type: TABLE; Schema: public; Owner: eucops;287,10266
+ALTER TABLE task_inputs OWNER TO eucops;293,10467
+-- Name: task_outputs; Type: TABLE;300,10755
+-- Name: task_outputs; Type: TABLE; Schema: public;300,10755
+-- Name: task_outputs; Type: TABLE; Schema: public; Owner: eucops;300,10755
+ALTER TABLE task_outputs OWNER TO eucops;306,10958
+-- Name: task_status; Type: TABLE;313,11246
+-- Name: task_status; Type: TABLE; Schema: public;313,11246
+-- Name: task_status; Type: TABLE; Schema: public; Owner: eucops;313,11246
+ALTER TABLE task_status OWNER TO eucops;319,11431
+-- Name: tasks_info; Type: TABLE;326,11717
+-- Name: tasks_info; Type: TABLE; Schema: public;326,11717
+-- Name: tasks_info; Type: TABLE; Schema: public; Owner: eucops;326,11717
+ALTER TABLE tasks_info OWNER TO eucops;340,12167
+-- Name: tasks_info_id_seq;343,12282
+-- Name: tasks_info_id_seq; Type: SEQUENCE;343,12282
+-- Name: tasks_info_id_seq; Type: SEQUENCE; Schema: public;343,12282
+    CACHE 349,12458
+ALTER TABLE tasks_info_id_seq OWNER TO eucops;351,12472
+-- Name: tasks_info_id_seq;354,12594
+-- Name: tasks_info_id_seq; Type: SEQUENCE OWNED BY;354,12594
+-- Name: tasks_info_id_seq; Type: SEQUENCE OWNED BY; Schema: public;354,12594
+ALTER SEQUENCE tasks_info_id_seq OWNED BY tasks_info.id;id355,12677
+-- Name: transmissions; Type: TABLE;362,12982
+-- Name: transmissions; Type: TABLE; Schema: public;362,12982
+-- Name: transmissions; Type: TABLE; Schema: public; Owner: eucops;362,12982
+ALTER TABLE transmissions OWNER TO eucops;373,13293
+-- Name: transmissions_id_seq;376,13411
+-- Name: transmissions_id_seq; Type: SEQUENCE;376,13411
+-- Name: transmissions_id_seq; Type: SEQUENCE; Schema: public;376,13411
+    CACHE 382,13593
+ALTER TABLE transmissions_id_seq OWNER TO eucops;384,13607
+-- Name: transmissions_id_seq;387,13732
+-- Name: transmissions_id_seq; Type: SEQUENCE OWNED BY;387,13732
+-- Name: transmissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public;387,13732
+ALTER SEQUENCE transmissions_id_seq OWNED BY transmissions.id;id388,13818
+-- Name: icommands; Type: TABLE;395,14125
+-- Name: icommands; Type: TABLE; Schema: public;395,14125
+-- Name: icommands; Type: TABLE; Schema: public; Owner: eucops;395,14125
+ALTER TABLE icommands OWNER TO eucops;405,14396
+-- Name: icommands_id_seq;408,14510
+-- Name: icommands_id_seq; Type: SEQUENCE;408,14510
+-- Name: icommands_id_seq; Type: SEQUENCE; Schema: public;408,14510
+CACHE 414,14668
+ALTER TABLE icommands_id_seq OWNER TO eucops;416,14678
+-- Name: icommands_id_seq;419,14799
+-- Name: icommands_id_seq; Type: SEQUENCE OWNED BY;419,14799
+-- Name: icommands_id_seq; Type: SEQUENCE OWNED BY; Schema: public;419,14799
+ALTER SEQUENCE icommands_id_seq OWNED BY icommands.id;id420,14881
+-- Name: pvc; Type: TABLE;427,15174
+-- Name: pvc; Type: TABLE; Schema: public;427,15174
+-- Name: pvc; Type: TABLE; Schema: public; Owner: eucops;427,15174
+ALTER TABLE pvc OWNER TO eucops;437,15429
+-- Name: pvc_id_seq;440,15537
+-- Name: pvc_id_seq; Type: SEQUENCE;440,15537
+-- Name: pvc_id_seq; Type: SEQUENCE; Schema: public;440,15537
+CACHE 446,15683
+ALTER TABLE pvc_id_seq OWNER TO eucops;448,15693
+-- Name: pvc_id_seq;451,15808
+-- Name: pvc_id_seq; Type: SEQUENCE OWNED BY;451,15808
+-- Name: pvc_id_seq; Type: SEQUENCE OWNED BY; Schema: public;451,15808
+ALTER SEQUENCE pvc_id_seq OWNED BY pvc.id;id452,15884
+1	2016-02-09 14:01:42	1	V0.1                            	LE1_Processor                   	First version of LE1_processor script,456,16068
+-- Name: alert_id; Type: DEFAULT;463,16796
+-- Name: alert_id; Type: DEFAULT; Schema: public;463,16796
+ALTER TABLE ONLY alerts ALTER COLUMN alert_id SET DEFAULT nextval('alerts_alert_id_seq'::regclass)regclass464,16860
+-- Name: qpfstate_id;467,17035
+-- Name: qpfstate_id; Type: DEFAULT;467,17035
+-- Name: qpfstate_id; Type: DEFAULT; Schema: public;467,17035
+ALTER TABLE ONLY qpfstates ALTER COLUMN qpfstate_id SET DEFAULT nextval('qpfstates_qpfstate_id_seq'::regclass)regclass468,17102
+-- Name: id;471,17289
+-- Name: id; Type: DEFAULT;471,17289
+-- Name: id; Type: DEFAULT; Schema: public;471,17289
+ALTER TABLE ONLY messages ALTER COLUMN id SET DEFAULT nextval('messages_id_seq'::regclass)regclass472,17347
+-- Name: id;475,17514
+-- Name: id; Type: DEFAULT;475,17514
+-- Name: id; Type: DEFAULT; Schema: public;475,17514
+ALTER TABLE ONLY products_info ALTER COLUMN id SET DEFAULT nextval('products_info_id_seq'::regclass)regclass476,17572
+-- Name: id;479,17749
+-- Name: id; Type: DEFAULT;479,17749
+-- Name: id; Type: DEFAULT; Schema: public;479,17749
+ALTER TABLE ONLY tasks_info ALTER COLUMN id SET DEFAULT nextval('tasks_info_id_seq'::regclass)regclass480,17807
+-- Name: id;483,17978
+-- Name: id; Type: DEFAULT;483,17978
+-- Name: id; Type: DEFAULT; Schema: public;483,17978
+ALTER TABLE ONLY transmissions ALTER COLUMN id SET DEFAULT nextval('transmissions_id_seq'::regclass)regclass484,18036
+-- Name: id;487,18213
+-- Name: id; Type: DEFAULT;487,18213
+-- Name: id; Type: DEFAULT; Schema: public;487,18213
+ALTER TABLE ONLY icommands ALTER COLUMN id SET DEFAULT nextval('icommands_id_seq'::regclass)regclass488,18271
+-- Name: alerts_alert_id_seq;491,18440
+-- Name: alerts_alert_id_seq; Type: SEQUENCE SET;491,18440
+-- Name: alerts_alert_id_seq; Type: SEQUENCE SET; Schema: public;491,18440
+SELECT pg_catalog.setval('alerts_alert_id_seq', 1, false)492,18520
+-- Name: qpfstates_qpfstate_id_seq;495,18654
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE SET;495,18654
+-- Name: qpfstates_qpfstate_id_seq; Type: SEQUENCE SET; Schema: public;495,18654
+SELECT pg_catalog.setval('qpfstates_qpfstate_id_seq', 1, false)496,18740
+ -- Data for Name: creators; Type: TABLE DATA;500,18881
+ -- Data for Name: creators; Type: TABLE DATA; Schema: public;500,18881
+ -- Data for Name: instruments; Type: TABLE DATA;508,19130
+ -- Data for Name: instruments; Type: TABLE DATA; Schema: public;508,19130
+ -- Data for Name: message_type; Type: TABLE DATA;517,19379
+ -- Data for Name: message_type; Type: TABLE DATA; Schema: public;517,19379
+ -- Data for Name: messages; Type: TABLE DATA;522,19594
+ -- Data for Name: messages; Type: TABLE DATA; Schema: public;522,19594
+-- Name: messages_id_seq;527,19894
+-- Name: messages_id_seq; Type: SEQUENCE SET;527,19894
+-- Name: messages_id_seq; Type: SEQUENCE SET; Schema: public;527,19894
+SELECT pg_catalog.setval('messages_id_seq', 1, false)528,19970
+ -- Data for Name: node_states; Type: TABLE DATA;531,20100
+ -- Data for Name: node_states; Type: TABLE DATA; Schema: public;531,20100
+ -- Data for Name: observation_modes; Type: TABLE DATA;536,20311
+ -- Data for Name: observation_modes; Type: TABLE DATA; Schema: public;536,20311
+ -- Data for Name: product_status; Type: TABLE DATA;543,20554
+ -- Data for Name: product_status; Type: TABLE DATA; Schema: public;543,20554
+ -- Data for Name: products_info; Type: TABLE DATA;550,20793
+ -- Data for Name: products_info; Type: TABLE DATA; Schema: public;550,20793
+-- Name: products_info_id_seq;555,21161
+-- Name: products_info_id_seq; Type: SEQUENCE SET;555,21161
+-- Name: products_info_id_seq; Type: SEQUENCE SET; Schema: public;555,21161
+SELECT pg_catalog.setval('products_info_id_seq', 69106, true)556,21242
+ -- Data for Name: task_inputs; Type: TABLE DATA;559,21380
+ -- Data for Name: task_inputs; Type: TABLE DATA; Schema: public;559,21380
+ -- Data for Name: task_outputs; Type: TABLE DATA;564,21589
+ -- Data for Name: task_outputs; Type: TABLE DATA; Schema: public;564,21589
+ -- Data for Name: task_status; Type: TABLE DATA;569,21800
+ -- Data for Name: task_status; Type: TABLE DATA; Schema: public;569,21800
+ -- Data for Name: tasks_info; Type: TABLE DATA;579,22071
+ -- Data for Name: tasks_info; Type: TABLE DATA; Schema: public;579,22071
+-- Name: tasks_info_id_seq;584,22375
+-- Name: tasks_info_id_seq; Type: SEQUENCE SET;584,22375
+-- Name: tasks_info_id_seq; Type: SEQUENCE SET; Schema: public;584,22375
+SELECT pg_catalog.setval('tasks_info_id_seq', 22606, true)585,22453
+ -- Data for Name: transmissions; Type: TABLE DATA;588,22588
+ -- Data for Name: transmissions; Type: TABLE DATA; Schema: public;588,22588
+-- Name: transmissions_id_seq;593,22846
+-- Name: transmissions_id_seq; Type: SEQUENCE SET;593,22846
+-- Name: transmissions_id_seq; Type: SEQUENCE SET; Schema: public;593,22846
+SELECT pg_catalog.setval('transmissions_id_seq', 928641, true)594,22927
+-- Name: alerts_pkey;597,23066
+-- Name: alerts_pkey; Type: CONSTRAINT;597,23066
+-- Name: alerts_pkey; Type: CONSTRAINT; Schema: public;597,23066
+-- Name: alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;597,23066
+-- Name: qpfstates_pkey;603,23307
+-- Name: qpfstates_pkey; Type: CONSTRAINT;603,23307
+-- Name: qpfstates_pkey; Type: CONSTRAINT; Schema: public;603,23307
+-- Name: qpfstates_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;603,23307
+-- Name: configuration_pkey;609,23556
+-- Name: configuration_pkey; Type: CONSTRAINT;609,23556
+-- Name: configuration_pkey; Type: CONSTRAINT; Schema: public;609,23556
+-- Name: configuration_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;609,23556
+-- Name: creators_pkey;615,23817
+-- Name: creators_pkey; Type: CONSTRAINT;615,23817
+-- Name: creators_pkey; Type: CONSTRAINT; Schema: public;615,23817
+-- Name: creators_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;615,23817
+-- Name: instruments_pkey;621,24066
+-- Name: instruments_pkey; Type: CONSTRAINT;621,24066
+-- Name: instruments_pkey; Type: CONSTRAINT; Schema: public;621,24066
+-- Name: instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;621,24066
+-- Name: message_type_pkey;627,24327
+-- Name: message_type_pkey; Type: CONSTRAINT;627,24327
+-- Name: message_type_pkey; Type: CONSTRAINT; Schema: public;627,24327
+-- Name: message_type_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;627,24327
+-- Name: messages_pkey;633,24590
+-- Name: messages_pkey; Type: CONSTRAINT;633,24590
+-- Name: messages_pkey; Type: CONSTRAINT; Schema: public;633,24590
+-- Name: messages_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;633,24590
+-- Name: node_states_pkey;639,24878
+-- Name: node_states_pkey; Type: CONSTRAINT;639,24878
+-- Name: node_states_pkey; Type: CONSTRAINT; Schema: public;639,24878
+-- Name: node_states_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;639,24878
+-- Name: observation_modes_pkey;645,25135
+-- Name: observation_modes_pkey; Type: CONSTRAINT;645,25135
+-- Name: observation_modes_pkey; Type: CONSTRAINT; Schema: public;645,25135
+-- Name: observation_modes_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;645,25135
+-- Name: product_status_pkey;651,25411
+-- Name: product_status_pkey; Type: CONSTRAINT;651,25411
+-- Name: product_status_pkey; Type: CONSTRAINT; Schema: public;651,25411
+-- Name: product_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;651,25411
+-- Name: products_info_pkey;657,25685
+-- Name: products_info_pkey; Type: CONSTRAINT;657,25685
+-- Name: products_info_pkey; Type: CONSTRAINT; Schema: public;657,25685
+-- Name: products_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;657,25685
+-- Name: task_inputs_pkey;663,25949
+-- Name: task_inputs_pkey; Type: CONSTRAINT;663,25949
+-- Name: task_inputs_pkey; Type: CONSTRAINT; Schema: public;663,25949
+-- Name: task_inputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;663,25949
+-- Name: task_outputs_pkey;669,26216
+-- Name: task_outputs_pkey; Type: CONSTRAINT;669,26216
+-- Name: task_outputs_pkey; Type: CONSTRAINT; Schema: public;669,26216
+-- Name: task_outputs_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;669,26216
+-- Name: task_status_pkey;675,26486
+-- Name: task_status_pkey; Type: CONSTRAINT;675,26486
+-- Name: task_status_pkey; Type: CONSTRAINT; Schema: public;675,26486
+-- Name: task_status_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;675,26486
+-- Name: tasks_info_pkey;681,26748
+-- Name: tasks_info_pkey; Type: CONSTRAINT;681,26748
+-- Name: tasks_info_pkey; Type: CONSTRAINT; Schema: public;681,26748
+-- Name: tasks_info_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;681,26748
+-- Name: transmissions_pkey;687,27000
+-- Name: transmissions_pkey; Type: CONSTRAINT;687,27000
+-- Name: transmissions_pkey; Type: CONSTRAINT; Schema: public;687,27000
+-- Name: transmissions_pkey; Type: CONSTRAINT; Schema: public; Owner: eucops;687,27000
+-- Name: products_info_creator_id_fkey;693,27256
+-- Name: products_info_creator_id_fkey; Type: FK CONSTRAINT;693,27256
+-- Name: products_info_creator_id_fkey; Type: FK CONSTRAINT; Schema: public;693,27256
+-- Name: products_info_instrument_id_fkey;700,27568
+-- Name: products_info_instrument_id_fkey; Type: FK CONSTRAINT;700,27568
+-- Name: products_info_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public;700,27568
+-- Name: products_info_product_status_id_fkey;707,27895
+-- Name: products_info_product_status_id_fkey; Type: FK CONSTRAINT;707,27895
+-- Name: products_info_product_status_id_fkey; Type: FK CONSTRAINT; Schema: public;707,27895
+-- Name: task_inputs_task_id_fkey;714,28241
+-- Name: task_inputs_task_id_fkey; Type: FK CONSTRAINT;714,28241
+-- Name: task_inputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public;714,28241
+-- Name: task_outputs_task_id_fkey;721,28537
+-- Name: task_outputs_task_id_fkey; Type: FK CONSTRAINT;721,28537
+-- Name: task_outputs_task_id_fkey; Type: FK CONSTRAINT; Schema: public;721,28537
+-- Name: tasks_info_task_status_id_fkey;728,28836
+-- Name: tasks_info_task_status_id_fkey; Type: FK CONSTRAINT;728,28836
+-- Name: tasks_info_task_status_id_fkey; Type: FK CONSTRAINT; Schema: public;728,28836
+-- Name: public;735,29158
+-- Name: public; Type: ACL;735,29158
+GRANT ALL ON SCHEMA public TO PUBLIC;736,29211
+GRANT ALL ON SCHEMA public TO eucops;737,29249
+
+run/QPFHMI.conf,17
+lastAccess=2,10
+
+run/QPF-workarea.tgz,24
+œäòÐ¢‘®§y3×y32,765
+
+scripts/BuildQPF.sh,1254
+SCRIPT_PATH=18,637
+SCRIPT_NAME=19,670
+        SCRIPT_PATH=22,782
+SCRIPT_PATH=27,904
+VERSION=69,1687
+    REV_ID=74,1824
+    wgit=78,1933
+        REV_ID=80,1995
+        REV_ID=85,2081
+usage 112,2895
+say 134,3909
+step 139,4027
+die 144,4104
+perform 149,4156
+perform_dontexit 164,4584
+checkapp 173,4850
+searchlib 181,5072
+searchsyslib 195,5397
+install_exe 202,5611
+install_lib 208,5755
+install_scpt 216,5937
+install_contrib 223,6129
+        h|+h) usage 241,6586
+        c|+c) COMPILE=242,6609
+        i|+i) INSTALL=243,6640
+        n|+n) FAKE=244,6671
+        r|+r) REMOVE=245,6699
+        b|+b) RECREATEDB=246,6729
+        D|+D) COMP_FLAGS=247,6763
+        p|+p) HMI=248,6817
+        w|+w) WORK_AREA=249,6843
+        H|+H) PSQL_HOST=250,6880
+        P|+P) PSQL_PORT=251,6917
+        I|+I) IP=252,6954
+        v|+v) VERBOSE=253,6984
+        *)    usage 254,7015
+OPTIND=258,7083
+    CMAKE_OPTS=283,7587
+    CMAKE_OPTS=289,7743
+        perform cmake -D HMI=307,8227
+        perform cmake -D HMI=309,8285
+COMPLSTATUS=314,8371
+    COMPLSTATUS=318,8483
+    QPF_INI=345,9158
+    hnamefull=357,9501
+        hip=361,9588
+            PS3=373,9961
+                options[options376,10076
+    QPF_DB_LOCATION=410,11087
+
+scripts/ClearForQPF.sh,116
+delete from icommands;21,751
+delete from alerts;22,774
+delete from qpfstates;23,794
+pths=31,927
+    sz=40,1125
+
+scripts/clear_qpf_data.sh,26
+FLDR=3,13
+    FLDR=6,46
+
+scripts/GenerateRelease.sh,933
+SCRIPT_PATH=17,599
+SCRIPT_NAME=18,632
+        SCRIPT_PATH=21,744
+SCRIPT_PATH=26,866
+usage 59,1703
+say 71,2115
+die 75,2160
+        h|+h) usage 85,2296
+        d|+d) TARGET_FOLDER=86,2319
+        v|+v) VERSION=87,2360
+        t|+t) TIMESTAMP=88,2395
+        *)    usage 89,2432
+OPTIND=93,2500
+((n++)); content[content99,2583
+((n++)); content[content100,2614
+((n++)); content[content101,2644
+((n++)); content[content102,2680
+((n++)); content[content103,2713
+((n++)); content[content104,2747
+((n++)); content[content105,2778
+((n++)); content[content106,2807
+((n++)); content[content107,2835
+((n++)); content[content108,2866
+((n++)); content[content109,2893
+((n++)); content[content110,2920
+((n++)); content[content111,2950
+((n++)); content[content112,2993
+((n++)); content[content113,3037
+((n++)); content[content114,3087
+((n++)); content[content115,3131
+((n++)); content[content116,3168
+
+scripts/InstallCOTS.sh,543
+SCRIPT_PATH=18,640
+SCRIPT_NAME=19,673
+        SCRIPT_PATH=22,785
+SCRIPT_PATH=27,907
+VERSION=52,1224
+usage 67,1740
+say 85,2415
+step 90,2533
+die 95,2610
+        h|+h) usage 107,2796
+        A|+A) QT=109,2834
+        a|+a) QT=117,3032
+        q|+q) QT=125,3229
+        p|+p) PGSQL=127,3270
+        z|+z) ZMQ=129,3314
+        r|+r) PCRE=131,3356
+        c|+c) CURL=133,3399
+        u|+u) UUID=135,3442
+        d|+d) DOCKER=137,3485
+              exit 140,3551
+OPTIND=145,3628
+    PSQL_PGDG=162,4089
+    export PATH=184,4917
+
+scripts/pgsql_start_server.sh,15
+status=23,787
+
+scripts/RunQPF.sh,341
+QPFDIR=16,529
+QPFHMI=19,587
+QPF_SESSIONS_DIR=20,615
+_ONHDR=23,659
+greetings 39,973
+usage 48,1323
+say 61,1717
+die 66,1791
+DBUSER=75,1898
+THIS_HOST=86,2122
+	    usage 92,2244
+	    QPFEXE=95,2279
+	    CFG_FILE=96,2302
+	    DBG=101,2420
+	    CFG_FILE=104,2474
+	    SESSION=107,2525
+        *)    usage 109,2560
+OPTIND=113,2628
+
+scripts/ssh-connect.sh,12
+    s=4,36
 
 str/str.cpp,509
 #define showBacktrace(50,942
@@ -1574,10 +2150,10 @@ struct MasterNodeElements 18,269
     LogMng  * logMng;21,341
     TskOrc  * tskOrc;22,363
     TskMng  * tskMng;23,385
-typedef MasterNodeElements * MasterNodeElementsPtr;25,410
-Synchronizer synchro;27,463
-std::vector<CommNode*> createElementsNetwork(32,657
-int main(125,4507
+typedef MasterNodeElements * MasterNodeElementsPtr;26,411
+Synchronizer synchro;28,464
+std::vector<CommNode*> createElementsNetwork(33,658
+int main(139,4887
 
 tools/dwatcher.cpp,249
 DirWatcher::DirWatcher(DirWatcher64,1388
@@ -1601,6 +2177,27 @@ class DirWatcher 79,1987
     std::map<int, std::string>  watchedDirs;102,2442
     std::queue<DirWatchEvent>   events;103,2487
     bool                        keepWatching;104,2527
+
+tools/PCRegEx.h,500
+#define PCREGEX_H2,18
+#define PCRE2_CODE_UNIT_WIDTH 4,37
+class PCRegEx 12,165
+    PCRegEx(15,190
+    PCRegEx(16,246
+    ~PCRegEx(17,341
+    void clear(19,370
+    void global(30,598
+    bool set(32,637
+    bool match(56,1542
+    void get(86,2626
+    bool findAll;100,3064
+    std::string sre;102,3083
+    std::string sstr;103,3104
+    pcre2_code *re;re105,3127
+    PCRE2_SPTR cre;107,3148
+    PCRE2_SPTR cstr;108,3232
+    pcre2_match_data * match_data;110,3310
+    int rc;111,3345
 
 tools/propdef.h,191
 #define PROPDEF_H42,852
@@ -1710,35 +2307,33 @@ struct SysInfo 196,6273
 #define PROCUPTIME 232,7044
 #define PROCLOADAVG 236,7109
 
-uuid/uuid.cpp,872
-namespace QPF 49,1054
-UUID::UUID(UUID51,1071
-void UUID::clear(clear57,1116
-bool UUID::compare(compare64,1183
-void UUID::copy(copy71,1287
-void UUID::generate(generate78,1371
-void UUID::generate_random(generate_random83,1427
-void UUID::generate_time(generate_time88,1497
-bool UUID::generate_time_safe(generate_time_safe93,1563
-bool UUID::is_null(is_null100,1667
-bool UUID::parse(parse107,1748
-bool UUID::parse(parse112,1828
-void UUID::unparse(unparse119,1935
-void UUID::unparse_lower(unparse_lower124,2003
-void UUID::unparse_upper(unparse_upper129,2083
-std::string UUID::asString(asString134,2163
-std::string UUID::asLowerString(asLowerString141,2292
-std::string UUID::asUpperString(asUpperString148,2432
-time_t UUID::time(time157,2591
-int UUID::type(type162,2678
-int UUID::variant(variant167,2732
-uuid_t & UUID::uuid(uuid172,2792
+uuid/uuidxx.cpp,849
+UUID::UUID(UUID51,1075
+void UUID::clear(clear57,1120
+bool UUID::compare(compare64,1187
+void UUID::copy(copy71,1291
+void UUID::generate(generate78,1375
+void UUID::generate_random(generate_random83,1431
+void UUID::generate_time(generate_time88,1501
+bool UUID::generate_time_safe(generate_time_safe93,1567
+bool UUID::is_null(is_null100,1671
+bool UUID::parse(parse107,1752
+bool UUID::parse(parse112,1832
+void UUID::unparse(unparse119,1939
+void UUID::unparse_lower(unparse_lower124,2007
+void UUID::unparse_upper(unparse_upper129,2087
+std::string UUID::asString(asString134,2167
+std::string UUID::asLowerString(asLowerString141,2296
+std::string UUID::asUpperString(asUpperString148,2436
+time_t UUID::time(time157,2595
+int UUID::type(type162,2682
+int UUID::variant(variant167,2736
+uuid_t & UUID::uuid(uuid172,2796
 
-uuid/uuid.h,89
-#define UUID_H42,828
-namespace QPF 71,1756
-class UUID 77,1978
-    uuid_t uu;104,2586
+uuid/uuidxx.h,68
+#define UUIDXX_H42,832
+class UUID 77,1986
+    uuid_t uu;104,2594
 
 version.h,370
 #define VERSION_H44,811
@@ -1763,9 +2358,185 @@ tests/CMakeLists.txt,0
 
 str/CMakeLists.txt,0
 
+scripts/pgsql_initdb.sh,0
+
+scripts/docker_start.sh,0
+
+scripts/CreateDockerContainer.sh,0
+
+scripts/build_20170228102105.log,0
+
+scripts/build_20170227124640.log,0
+
+scripts/build_20170227124549.log,0
+
+scripts/build_20170227114912.log,0
+
+scripts/build_20170227113127.log,0
+
+scripts/build_20170227113052.log,0
+
+scripts/build_20170227095200.log,0
+
+scripts/build_20170220154851.log,0
+
+scripts/build_20170220143947.log,0
+
+scripts/build_20170220143349.log,0
+
+scripts/build_20170220143136.log,0
+
+scripts/build_20170220143105.log,0
+
+scripts/build_20170220142138.log,0
+
+scripts/build_20170220115658.log,0
+
+scripts/build_20170220114925.log,0
+
+scripts/build_20170220114621.log,0
+
+scripts/build_20170220113049.log,0
+
+scripts/build_20170220112234.log,0
+
+scripts/build_20170220112047.log,0
+
+scripts/build_20170220103457.log,0
+
+scripts/build_20170220103332.log,0
+
+scripts/build_20170220103257.log,0
+
+scripts/build_20170220102701.log,0
+
+scripts/build_20170220102604.log,0
+
+scripts/build_20170220101047.log,0
+
+scripts/build_20170220101013.log,0
+
+scripts/build_20170220095145.log,0
+
+scripts/build_20170213135146.log,0
+
+scripts/build_20170213135134.log,0
+
+scripts/build_20170213134836.log,0
+
+scripts/build_20170213130032.log,0
+
+scripts/build_20170213125402.log,0
+
+scripts/build_20170213095807.log,0
+
+scripts/build_20170213095721.log,0
+
+scripts/build_20170213095635.log,0
+
+scripts/build_20170213095541.log,0
+
+scripts/build_20170213095429.log,0
+
+scripts/build_20170213094200.log,0
+
+scripts/build_20170213094058.log,0
+
+scripts/build_20170213093419.log,0
+
+scripts/build_20170206125714.log,0
+
+scripts/build_20170206124611.log,0
+
+scripts/build_20170205120435.log,0
+
+scripts/build_20170205114138.log,0
+
+scripts/build_20170205111202.log,0
+
+scripts/build_20170127124455.log,0
+
+scripts/build_20170127124341.log,0
+
+scripts/build_20170127112714.log,0
+
+scripts/build_20170116155737.log,0
+
+scripts/build_20170116155655.log,0
+
+scripts/build_20170116154800.log,0
+
+scripts/build_20170116151847.log,0
+
+scripts/build_20170116144212.log,0
+
+scripts/build_20170116133707.log,0
+
+scripts/build_20170116123545.log,0
+
+scripts/build_20170116112542.log,0
+
+scripts/build_20170116112522.log,0
+
+scripts/build_20170113154123.log,0
+
+scripts/build_20170113154046.log,0
+
+scripts/build_20170113153328.log,0
+
+scripts/build_20170113153150.log,0
+
+scripts/build_20170113153040.log,0
+
+scripts/build_20170113153020.log,0
+
+scripts/build_20170113151840.log,0
+
+scripts/build_20170113151211.log,0
+
+scripts/build_20170113120008.log,0
+
+scripts/build_20170113115917.log,0
+
+scripts/build_20170113115710.log,0
+
+scripts/build_20170113115548.log,0
+
+scripts/build_20170112155216.log,0
+
+scripts/build_20170112153944.log,0
+
+scripts/build_20170112140916.log,0
+
+scripts/build_20170112122039.log,0
+
+scripts/build_20170112122024.log,0
+
+scripts/build_20170112121734.log,0
+
+scripts/build_20170112121708.log,0
+
+scripts/build_20170112121637.log,0
+
+scripts/build_20170112120431.log,0
+
+scripts/build_20170112115223.log,0
+
+scripts/build_20170112115157.log,0
+
+run/qpf,0
+
+run/old,0
+
+run/filenamespec.tpl,0
+
+run/Dockerfile-VV-20150907,0
+
 nncomm/commnode.cpp,0
 
 nncomm/CMakeLists.txt,0
+
+nbproject/private,0
 
 log/CMakeLists.txt,0
 
@@ -1780,8 +2551,6 @@ infix/infix.pro,0
 infix/CMakeLists.txt,0
 
 fmk/sync.cpp,0
-
-fmk/fmk,0
 
 fmk/CMakeLists.txt,0
 
