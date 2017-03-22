@@ -20,6 +20,7 @@ set (libnncomm_hdr
   bus.h
   pipeline.h
   pubsub.h
+  reqrep.h
   survey.h
   commnode.h
   protlayer.h
@@ -31,6 +32,7 @@ set (libnncomm_src
   bus.cpp
   pipeline.cpp
   pubsub.cpp
+  reqrep.cpp
   survey.cpp
 #  commnode.cpp
   protlayer.cpp

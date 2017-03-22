@@ -2,8 +2,6 @@
 #include <fstream>
 #include <sstream>
 
-#include "protlayer.h"
-
 #include "evtmng.h"
 #include "datamng.h"
 #include "logmng.h"
@@ -11,9 +9,15 @@
 #include "tskmng.h"
 #include "tskage.h"
 
+#include "survey.h"
+#include "pubsub.h"
+#include "reqrep.h"
+
 #include "message.h"
 #include "channels.h"
 #include "config.h"
+#include "str.h"
+
 
 using Configuration::cfg;
 
@@ -32,68 +36,129 @@ Synchronizer synchro;
 //----------------------------------------------------------------------
 // createElementsNetwork
 //----------------------------------------------------------------------
-std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
-                                             std::vector<CommNode*>  & ag,
-                                             std::string thisHost,
-                                             int startingPort)
+void createElementsNetwork(MasterNodeElements & m,
+                           std::vector<CommNode*>  & ag,
+                           std::string thisHost,
+                           int startingPort)
 {
-    // Handy lambda function to concatenate vectors
-    auto concat = [](std::vector<CommNode*> a, std::vector<CommNode*> b)
-        -> std::vector<CommNode*> { a.insert(a.end(), b.begin(), b.end()); return a;};
-
     // Handy lambda to compute ports number, h=1:procHosts, i=0:agentsInHost
     // We will assume agentsInHost is < 10
     auto portnum = [](int start, int h, int i) -> int
         { return start + 10 * (h - 1) + i; };
 
-    // Port to use for the connections (range starts with startingPort)
-    std::vector<int> agPort;
-
-    // Vector of agent names
-    char sAgName[20];
-    std::vector<std::string> agName;
-    std::vector<std::string> agHost;
-
-    //========================================
+    //======================================================================
     // 1. Gather host information
-    //========================================
-    char hostname[100];
-    gethostname(hostname, 100);
-    //std::string thisHost(hostname);
-    std::string masterAddress = cfg.network.masterNode();
+    //======================================================================
 
-    // Assuming a max. of 9 agents per proc. host, each prot.layer involving agents
-    // uses a set of ports given by this number
-    int protLayerPortStep = cfg.network.processingNodes().size() * 10;
+    std::string masterAddress = cfg.network.masterNode();
+    bool isMasterHost = (thisHost == masterAddress);
 
     DBG("MasterAddress is " << masterAddress);
 
-    //========================================
-    // 2. Create the elements
-    //========================================
-    if (thisHost == masterAddress) {
+    //======================================================================
+    // 2. Create the elements and connections for the host we are running on
+    //======================================================================
+
+    // Agent names, hosts and ports (port range starts with startingPort)
+    char sAgName[20];
+    std::vector<std::string> agName;
+    std::vector<std::string> agHost;
+    std::vector<int> agPortCmd;
+    std::vector<int> agPortTsk;
+
+    // Connection addresses and channel
+    std::string bindAddr;
+    std::string connAddr;
+    std::string chnl;
+
+    if (isMasterHost) {
+
+        //-----------------------------------------------------------------
         // a. Create master node elements
+        //-----------------------------------------------------------------
         m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
         m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
         m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
         m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
         m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
-        // b. Fill agents vector with as many zeroes as total number of agents
+
+        //-----------------------------------------------------------------
+        // b. Fill agent vectors for all the declared processing hosts
+        //-----------------------------------------------------------------
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
             for (unsigned int i = 0; i < kv.second; ++i) {
                 sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
-                ag.push_back(0);
                 agName.push_back(std::string(sAgName));
-                agPort.push_back(portnum(startingPort, h, i));
-                agHost.push_back(kv.first);
+                agPortCmd.push_back(portnum(startingPort, h, i));
+                agPortTsk.push_back(portnum(startingPort+1000, h, i));
             }
             ++h;
         }
+
+        //-----------------------------------------------------------------
+        // c. Create component connections
+        //-----------------------------------------------------------------
+
+        // CHANNEL CMD - SURVEY
+        // - Surveyor: EvtMng
+        // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+        chnl     = ChnlCmd;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
+        for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
+            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        }
+
+        // CHANNEL INDATA -  PUBSUB
+        // - Publisher: EvtMng
+        // - Subscriber: DataMng TskOrc
+        chnl     = ChnlInData;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+        // CHANNEL TASK-SCHEDULING - PUBSUB
+        // - Publisher: TskOrc
+        // - Subscriber: DataMng TskMng
+        chnl     = ChnlTskSched;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+        // CHANNEL TASK-PROCESSING - REQREP
+        // - Out/In: TskAge*/TskMng
+        h = 0;
+        for (auto & p : agPortTsk) {
+            chnl = ChnlTskProc + "_" + agName.at(h);
+            bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+            m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+            ++h;
+        }
+
+        // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+        // - Publisher: TskMng
+        // - Subscriber: DataMng EvtMng QPFHMI
+        chnl     = ChnlTskRepDist;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
     } else {
-        // a. There are no master nodes in this host
-        m = MasterNodeElements {0, 0, 0, 0, 0};
-        // b. Fill agents vector with as agents for this host
+
+        //-----------------------------------------------------------------
+        // a. Fill agents vector with as agents for this host
+        //-----------------------------------------------------------------
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
             if (thisHost == kv.first) {
@@ -102,118 +167,28 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro));
                     agName.push_back(std::string(sAgName));
-                    agPort.push_back(startingPort + 100 * (h - 1) + i);
-                    agHost.push_back(kv.first);
+                    agPortTsk.push_back(portnum(startingPort, h, i));
                 }
             }
             ++h;
         }
+
+        //-----------------------------------------------------------------
+        // b. Create agent connections
+        //-----------------------------------------------------------------
+
+        // CHANNEL TASK-PROCESSING - REQREP
+        // - Out/In: TskAge*/TskMng
+        h = 0;
+        for (auto & a : ag) {
+            chnl = ChnlTskProc + "_" + agName.at(h);
+            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(h));
+            ReqRep * r = new ReqRep(NN_REQ, connAddr);
+            a->addConnection(chnl, r);
+            ++h;
+        }
+
     }
-
-    //========================================
-    // 3. Create the protocol layers
-    //========================================
-    std::vector<CommNode*> allCommNodes =
-        concat(std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}, ag);
-
-    ProtocolLayer * p = 0;
-    std::vector<ProtocolLayer *> protocolLayers;
-
-    //-----------------------------------------------------------------
-    // Channel CMD - SURVEY
-    // - Surveyor: EvtMng
-    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-    p = new ProtocolLayer;
-    p->createSurvey(ChnlCmd,
-                    m.evtMng,
-                    allCommNodes,
-                    masterAddress);
-    protocolLayers.push_back(p);
-
-    //-----------------------------------------------------------------
-    // Channel INDATA -  PUBSUB
-    // - Publisher: EvtMng
-    // - Subscriber: DataMng TskOrc
-    p = new ProtocolLayer;
-    p->createPubSub(ChnlInData,
-                    std::vector<CommNode*> {m.evtMng},
-                    std::vector<CommNode*> {m.datMng, m.tskOrc},
-                    masterAddress);
-    protocolLayers.push_back(p);
-
-    //-----------------------------------------------------------------
-    // Channel TASK-SCHEDULING - PUBSUB
-    // - Publisher: TskOrc
-    // - Subscriber: DataMng TskMng
-    p = new ProtocolLayer;
-    p->createPubSub(ChnlTskSched,
-                    std::vector<CommNode*> {m.tskOrc},
-                    std::vector<CommNode*> {m.datMng, m.tskMng},
-                    masterAddress);
-    protocolLayers.push_back(p);
-
-    //-----------------------------------------------------------------
-    // Channel TASK-REQUEST - PIPELINE
-    // - Out/In: TskAge*/TskMng
-    int k = 0;
-    for (auto & c: ag) {
-        p = new ProtocolLayer;
-        p->createPipeline(ChnlTskRqst + "_" + agName.at(k),
-                          c,
-                          m.tskMng,
-                          agHost.at(k),
-                          masterAddress,
-                          agPort.at(k));
-        protocolLayers.push_back(p);
-        ++k;
-    }
-
-    //-----------------------------------------------------------------
-    // Channel TASK-PROCESSING - PIPELINE
-    // - Out/In: TskMng/TskAge*
-    k = 0;
-    for (auto & c: ag) {
-        p = new ProtocolLayer;
-        p->createPipeline(ChnlTskProc + "_" + agName.at(k),
-                          m.tskMng,
-                          c,
-                          masterAddress,
-                          agHost.at(k),
-                          agPort.at(k) + protLayerPortStep);
-        protocolLayers.push_back(p);
-        ++k;
-    }
-
-    //-----------------------------------------------------------------
-    // Channel TASK-REPORTING - PIPELINE
-    // - Out/In: TskAge*/TskMng
-    k = 0;
-    for (auto & c: ag) {
-        p = new ProtocolLayer;
-        p->createPipeline(ChnlTskRep + "_" + agName.at(k),
-                          c,
-                          m.tskMng,
-                          agHost.at(k),
-                          masterAddress,
-                          agPort.at(k) + 2 * protLayerPortStep);
-        protocolLayers.push_back(p);
-        ++k;
-    }
-
-    //-----------------------------------------------------------------
-    // Channel TASK-REPORTING-DISTRIBUTION - PUBSUB
-    // - Publisher: TskMng
-    // - Subscriber: DataMng EvtMng QPFHMI
-    p = new ProtocolLayer;
-    p->createPubSub(ChnlTskRepDist,
-                    std::vector<CommNode*> {m.tskMng},
-                    std::vector<CommNode*> {m.datMng, m.evtMng},
-                    masterAddress);
-    protocolLayers.push_back(p);
-
-    // Append event manager to list of nodes
-    allCommNodes.push_back(m.evtMng);
-    return allCommNodes;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -221,15 +196,8 @@ std::vector<CommNode*> createElementsNetwork(MasterNodeElements & m,
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char * argv[])
 {
-    std::string cfgFileName(argv[1]);
-    std::ifstream cfgFile(cfgFileName);
-    std::stringstream buffer;
-    buffer << cfgFile.rdbuf();
-
-    JValue v;
-    v.fromStr(buffer.str());
-
-    cfg.init(v.val());
+    // Initialize configuration
+    cfg.init(std::string(argv[1]));
 
     std::cerr << cfg.str() << std::endl;
     std::cerr << cfg.general.appName() << std::endl;
@@ -237,18 +205,15 @@ int main(int argc, char * argv[])
     for (auto & kv : cfg.network.processingNodes()) {
         std::cerr << kv.first << ": " << kv.second << std::endl;
     }
-
-    cfg.dump();
-
-    DBG("Config::PATHBase: " << Config::PATHBase);
+    // cfg.dump();
+    // DBG("Config::PATHBase: " << Config::PATHBase);
 
     //------------------------------------------------------------
 
     MasterNodeElements masterNodeElems;
     std::vector<CommNode*> agentsNodes;
 
-    std::vector<CommNode*> allCommNodes =
-        createElementsNetwork(masterNodeElems, agentsNodes, std::string(argv[2]), 55000);
+    createElementsNetwork(masterNodeElems, agentsNodes, std::string(argv[2]), 55000);
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

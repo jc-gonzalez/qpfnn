@@ -141,6 +141,12 @@ void Component::fromInitialisedToRunning()
 {
     transitTo(RUNNING);
     InfoMsg("New state: " + getStateName(getState()));
+    for (auto & kv: connections) {
+        const ChannelDescriptor & chnl = kv.first;
+        ScalabilityProtocolRole * conn = kv.second;
+        std::string ch(kv.first);
+        InfoMsg("Connection " + ch + " - " + conn->getName() + " @ " + conn->getAddress());
+    }
 }
 
 //----------------------------------------------------------------------

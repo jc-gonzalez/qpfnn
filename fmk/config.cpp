@@ -122,8 +122,9 @@ void Config::init(std::string fName)
 
         fName = ""; // clear filename, to read from DB
     }
+
     if (! fName.empty()) {
-        setConfigFile(std::string(fName));
+        setConfigFile(fName);
         readConfigFromFile();
         saveConfigToDB();
     } else {
@@ -147,13 +148,13 @@ void Config::setLastAccess(std::string last)
 //----------------------------------------------------------------------
 void Config::setConfigFile(std::string fName)
 {
-/*
+
     char actualpath [PATH_MAX+1];
     char * ptr;
     ptr = realpath(fName.c_str(), actualpath);
     cfgFileName = std::string(ptr);
     cfgFilePath = std::string(dirname(ptr));
-*/}
+}
 
 //----------------------------------------------------------------------
 // Method: readConfigFromFile
@@ -161,6 +162,12 @@ void Config::setConfigFile(std::string fName)
 //----------------------------------------------------------------------
 void Config::readConfigFromFile()
 {
+    std::ifstream cfgFile(cfgFileName);
+    std::stringstream buffer;
+    buffer << cfgFile.rdbuf();
+    fromStr(buffer.str());
+    init(value);
+
 /*    std::ifstream cfgJsonFile(cfgFileName);
     if (!cfgJsonFile.good()) {
         cfgJsonFile.close();

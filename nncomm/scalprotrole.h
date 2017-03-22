@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/sockios.h>
+#include <mutex>
 
 #define NN_IN  1
 #define NN_OUT 2
@@ -59,6 +60,7 @@ protected:
     int         rc;
     int         endPoint;
     int         incMsgsMask;
+    std::mutex  mtxMsgLists;
 };
 
 #endif

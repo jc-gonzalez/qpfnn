@@ -99,6 +99,32 @@ void TskMng::fromRunningToOperational()
         emptyInfo.load          = 0;
         agentInfo[ag] = emptyInfo;
     }
+
+    transitTo(OPERATIONAL);
+    InfoMsg("New state: " + getStateName(getState()));
+}
+
+//----------------------------------------------------------------------
+// Method: processIncommingMessages
+//----------------------------------------------------------------------
+void TskMng::processIncommingMessages()
+{
+    MessageString m;
+    TRC("TskMng::processIncommingmessages()");
+    for (auto & kv: connections) {
+        const ChannelDescriptor & chnl = kv.first;
+        ScalabilityProtocolRole * conn = kv.second;
+        while (conn->next(m)) {
+            Message<MsgBodyTSK> msg(m);
+            std::string type(msg.header.type());
+            DBG(compName << " received the message [" << m << "] through the channel " + chnl);
+            if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
+            else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
+            else if (type == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
+            else if (type == ChnlTskRep)   { processTskRepMsg(conn, m); }
+            else    { WarnMsg("Message from unidentified channel " + chnl); }
+        }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -134,6 +160,31 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    // Define ans set task object
+    Message<MsgBodyTSK> msg(m);
+    std::string agName(msg.header.source());
+    DBG("TASK REQUEST FROM " << agName << " RECEIVED");
+
+    // Create message and send
+    msg.buildHdr(ChnlTskProc,
+                 ChnlTskProc,
+                 "1.0",
+                 compName,
+                 "*",
+                 "", "", "");
+
+    MsgBodyTSK body;
+    std::string content("{\"name\":\"tsktsk\", \"data\":[1,2,3]}");
+    body["info"] = JValue(content).val();
+    msg.buildBody(body);
+
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    ChannelDescriptor chnl(ChnlTskProc + "_" + agName);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
+    }
 }
 
 //----------------------------------------------------------------------

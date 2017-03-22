@@ -1,4 +1,5 @@
 #include "scalprotrole.h"
+#include <cassert>
 
 ScalabilityProtocolRole::ScalabilityProtocolRole()
     : sck(0), readyToGo(false), incMsgsMask(NN_IN | NN_OUT)
@@ -13,6 +14,8 @@ ScalabilityProtocolRole::~ScalabilityProtocolRole()
 void ScalabilityProtocolRole::createSocket(int protocol, int domain)
 {
     sck = new Socket {domain, protocol};
+    assert(sck != 0);
+    assert(sck->fd() >= 0);
     TRC(elemName << ": " << sck);
     readyToGo = true;
 }
@@ -23,19 +26,12 @@ void ScalabilityProtocolRole::update()
 
     // Get incomming messages, if any
     getIncommingMessageStrings();
-
-    // Process incoming messages
-    /*
-    while (! iMsgList.empty()) {
-        MessageString m = iMsgList.front();
-        processMessageString(m);
-        iMsgList.pop();
-    }*/
 }
 
 bool ScalabilityProtocolRole::next(MessageString & m)
 {
-    bool thereAreMessages = ! iMsgList.empty();
+    std::unique_lock<std::mutex> ulck(mtxMsgLists);
+    bool thereAreMessages = !iMsgList.empty();
     if (thereAreMessages) {
         m = iMsgList.front();
         iMsgList.pop();
@@ -73,11 +69,13 @@ std::string ScalabilityProtocolRole::getAddress()
 
 void ScalabilityProtocolRole::getIncommingMessageStrings()
 {
-    int rev = getevents(sck->fd(), incMsgsMask, 10);
+    int rev = getevents(sck->fd(), incMsgsMask, 50);
     TRC(elemName << ": checking incomming messages... " << rev);
-    if (rev & NN_IN == NN_IN) {
+    //if (rev & NN_IN == NN_IN) {
+    if (rev != 0) {
         rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);
         if (rc > 0) {
+            std::unique_lock<std::mutex> ulck(mtxMsgLists);
             memset((void*)(buf + rc), 0, MAX_MESSAGE_SIZE - rc);
             iMsgList.push(MessageString(buf));
         } else {

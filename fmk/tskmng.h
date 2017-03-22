@@ -112,6 +112,11 @@ protected:
 
 protected:
     //----------------------------------------------------------------------
+    // Method: processIncommingMessages
+    //----------------------------------------------------------------------
+    virtual void processIncommingMessages();
+
+    //----------------------------------------------------------------------
     // Method: processCmdMsg
     //----------------------------------------------------------------------
     void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
