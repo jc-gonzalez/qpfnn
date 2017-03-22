@@ -1,0 +1,504 @@
+/******************************************************************************
+ * File:    deployer.cpp
+ *          This file is part of QLA Processing Framework
+ *
+ * Domain:  QPF.QPF.Deployer
+ *
+ * Version:  1.1
+ *
+ * Date:    2015/07/01
+ *
+ * Author:   J C Gonzalez
+ *
+ * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ *_____________________________________________________________________________
+ *
+ * Topic: General Information
+ *
+ * Purpose:
+ *   Implement Deployer class
+ *
+ * Created by:
+ *   J C Gonzalez
+ *
+ * Status:
+ *   Prototype
+ *
+ * Dependencies:
+ *   none
+ *
+ * Files read / modified:
+ *   none
+ *
+ * History:
+ *   See <Changelog>
+ *
+ * About: License Conditions
+ *   See <License>
+ *
+ ******************************************************************************/
+
+#include "deployer.h"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+     
+#include "survey.h"
+#include "pubsub.h"
+#include "reqrep.h"
+
+#include "message.h"
+#include "channels.h"
+#include "config.h"
+#include "str.h"
+#include "dbg.h"
+
+using Configuration::cfg;
+
+#define MINOR_SYNC_DELAY_MS    500
+
+////////////////////////////////////////////////////////////////////////////
+// Namespace: QPF
+// -----------------------
+//
+// Library namespace
+////////////////////////////////////////////////////////////////////////////
+//namespace QPF {
+
+Deployer * deployerCatcher;
+
+//----------------------------------------------------------------------
+// Ancillary signal handler
+//----------------------------------------------------------------------
+void signalCatcher(int s)
+{
+    deployerCatcher->actionOnSigInt();
+}
+
+//----------------------------------------------------------------------
+// Constructor: Deployer
+//----------------------------------------------------------------------
+Deployer::Deployer(int argc, char *argv[])
+{
+    //== Change value for delay between peer nodes launches (default: 50000us)
+    if ((!processCmdLineOpts(argc, argv)) || (cfgFileName.empty())) {
+        usage(EXIT_FAILURE);
+    }
+
+    //== ReadConfiguration
+    readConfiguration();
+
+    //== Install signal handler
+    deployerCatcher = this;
+    installSignalHandlers();
+}
+
+//----------------------------------------------------------------------
+// Destructor: Deployer
+//----------------------------------------------------------------------
+Deployer::~Deployer()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: run
+// Launches the system components and starts the system
+//----------------------------------------------------------------------
+int Deployer::run()
+{
+    // Greetings...
+    sayHello();
+
+    // System components creation and setup
+    createElementsNetwork();
+
+    // START!
+    delay(MINOR_SYNC_DELAY_MS);
+    synchro.notify();
+
+    // FOREVER
+    delay(MINOR_SYNC_DELAY_MS);
+    synchro.wait();
+
+    // Bye, bye
+    INFO("Exiting...");
+    return EXIT_SUCCESS;
+}
+
+//----------------------------------------------------------------------
+// Method: usage
+// Shows usage information
+//----------------------------------------------------------------------
+bool Deployer::usage(int code)
+{
+    INFO("Usage: " << exeName << "  -c configFile  -p initialPort  [-v]  [-h]");
+    INFO("where:");
+    INFO("\t-c cfgFile          System is reconfigured with configuration in");
+    INFO("\t                    file cfgFile (configuration is then saved to DB).");
+    INFO("\t-p initialPort      Set initial port for system set up.");
+    INFO("\t                    file cfgFile (configuration is then saved to DB).");
+    INFO("\t-v                  Sets verbose output.");
+    INFO("\t-h                  Shows this help message.");
+    exit(code);
+}
+
+//----------------------------------------------------------------------
+// Method: processCmdLineOpts
+// Processes command line options to configure execution
+//----------------------------------------------------------------------
+bool Deployer::processCmdLineOpts(int argc, char * argv[])
+{
+    bool retVal = true;
+    int exitCode = EXIT_FAILURE;
+
+    exeName = std::string(argv[0]);
+    
+    int opt;
+    while ((opt = getopt(argc, argv, "hvp:c:m:")) != -1) {
+        switch (opt) {
+        case 'v':
+            break;
+        case 'c':
+            setConfigFile(std::string(optarg));
+            break;
+        case 'p':
+            setInitialPort(atoi(optarg));
+            break;
+        case 'h':
+            exitCode = EXIT_SUCCESS;
+        default: /* '?' */
+            usage(exitCode);
+        }
+    }
+
+    getHostnameAndIp(currentHostName, currentHostAddr);
+        
+    return retVal;
+}
+
+//----------------------------------------------------------------------
+// Method: setConfigFile
+// Sets the name of the configuration file to be used
+//----------------------------------------------------------------------
+void Deployer::setConfigFile(std::string fName)
+{
+    cfgFileName = fName;
+}
+
+//----------------------------------------------------------------------
+// Method: setInitialPort
+// Sets the initial port for communications set up
+//----------------------------------------------------------------------
+void Deployer::setInitialPort(int port)
+{
+    initialPort = port;
+}
+
+//----------------------------------------------------------------------
+// Method: setCurrentHost
+// Set the address (IP) of the current host
+//----------------------------------------------------------------------
+void Deployer::setCurrentHost(std::string host)
+{
+    currentHostAddr = host;
+}
+
+//----------------------------------------------------------------------
+// Method: readConfiguration
+// Retrieves the configuration for the execution of the system (from
+// a disk file or from the internal database)
+//----------------------------------------------------------------------
+void Deployer::readConfiguration()
+{
+    // Initialize configuration
+    cfg.init(cfgFileName);
+
+    std::cerr << cfg.str() << std::endl;
+    std::cerr << cfg.general.appName() << std::endl;
+    std::cerr << cfg.network.masterNode() << std::endl;
+    for (auto & kv : cfg.network.processingNodes()) {
+        std::cerr << kv.first << ": " << kv.second << std::endl;
+    }
+    // cfg.dump();
+    // DBG("Config::PATHBase: " << Config::PATHBase);
+}
+
+//----------------------------------------------------------------------
+// Method: delay
+// Waits for a small time lapse for system sync
+//----------------------------------------------------------------------
+int Deployer::delay(int ms)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+//----------------------------------------------------------------------
+// Method: sayHello
+// Shows a minimal title and build id for the application
+//----------------------------------------------------------------------
+void Deployer::sayHello()
+{
+    std::string buildId(BUILD_ID);
+    if (buildId.empty()) {
+        char buf[20];
+        sprintf(buf, "%ld", (long)(time(0)));
+        buildId = std::string(buf);
+    }
+    std::string hline("----------------------------------------"
+                      "--------------------------------------");
+    std::cout << hline << std::endl
+              << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
+              << " " << APP_DATE << " - "
+              << APP_RELEASE << " Build " << buildId << std::endl
+              << hline << std::endl << std::endl;
+}
+
+//----------------------------------------------------------------------
+// Method: getHostnameAndIp
+// Gets from the system the host name and ip address of the host
+//----------------------------------------------------------------------
+void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)
+{
+    const int MaxHostNameLen = 100;
+    const int MaxAddrStringLen = 512;
+    char hostname[MaxHostNameLen];
+    char addrString[MaxAddrStringLen];
+    struct hostent * hostPtr = 0;
+    int errorNum;
+
+    // Get hostname from the system
+    gethostname(hostname, MaxHostNameLen);
+
+    // If necessary, get the domain to form the canonical name.
+    if (NULL == strchr(hostname, (int)'.')) {
+        int x;
+        hostPtr = gethostbyname(hostname);
+
+        if (!strchr(hostPtr->h_name, '.')) {
+            if (hostPtr->h_aliases) {
+                for (x = 0; hostPtr->h_aliases[x]; ++x) {
+                    if (strchr(hostPtr->h_aliases[x], '.') &&
+                        (!strncasecmp(hostPtr->h_aliases[x],
+                                      hostPtr->h_name,
+                                      strlen(hostPtr->h_name)))) {
+                        strcpy(hostname, hostPtr->h_aliases[x]);
+                    }
+                }
+            }
+        } else {
+            strcpy(hostname, hostPtr->h_name);
+        }
+    }
+
+    hName = std::string(hostname);
+
+    //hostPtr = getipnodebyname(hostname, AF_INET,
+    //                        (AI_ADDRCONFIG | AI_V4MAPPED), &errorNum);
+
+    struct addrinfo *ai;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET; /* IPv4 address family */
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = (AI_ADDRCONFIG | AI_V4MAPPED); //AI_DEFAULT;
+
+    if (getaddrinfo(hostname, NULL, &hints, &ai)) {
+      printf("getaddrinfo() failed\n");
+    } else {
+      //if (inet_ntop(ai->ai_family, ai->ai_addr, addrString, 512))
+      if (0 == getnameinfo(ai->ai_addr, sizeof(struct sockaddr),
+			   addrString, 512, NULL, 0, NI_NUMERICHOST))
+        ipAddr = std::string(addrString);
+    }
+    freeaddrinfo(ai);
+}
+
+//----------------------------------------------------------------------
+// Method: actionOnSigInt
+// Actions to be performed when capturing SigInt
+//----------------------------------------------------------------------
+void Deployer::actionOnSigInt()
+{
+}
+
+//----------------------------------------------------------------------
+// Method: installSignalHandlers
+// Install signal handlers
+//----------------------------------------------------------------------
+void Deployer::installSignalHandlers()
+{
+    sigIntHandler.sa_handler = signalCatcher;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+}
+
+//----------------------------------------------------------------------
+// createElementsNetwork
+//----------------------------------------------------------------------
+void Deployer::createElementsNetwork()
+{
+    // Handy lambda to compute ports number, h=1:procHosts, i=0:agentsInHost
+    // We will assume agentsInHost is < 10
+    auto portnum = [](int start, int h, int i) -> int
+        { return start + 10 * (h - 1) + i; };
+
+    //======================================================================
+    // 1. Gather host information
+    //======================================================================
+
+    MasterNodeElements & m = masterNodeElems;
+    std::vector<CommNode*>  & ag = agentsNodes;
+    std::string & thisHost = currentHostAddr;
+    int & startingPort = initialPort;
+
+    masterAddress = cfg.network.masterNode();
+    isMasterHost = (thisHost == masterAddress);
+
+    TRC("MasterAddress is " << masterAddress);
+
+    //======================================================================
+    // 2. Create the elements and connections for the host we are running on
+    //======================================================================
+
+    // Agent names, hosts and ports (port range starts with startingPort)
+    char sAgName[20];
+    std::vector<std::string> agName;
+    std::vector<std::string> agHost;
+    std::vector<int> agPortCmd;
+    std::vector<int> agPortTsk;
+
+    // Connection addresses and channel
+    std::string bindAddr;
+    std::string connAddr;
+    std::string chnl;
+
+    if (isMasterHost) {
+
+        //-----------------------------------------------------------------
+        // a. Create master node elements
+        //-----------------------------------------------------------------
+        m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
+        m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
+        m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
+        m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
+        m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
+
+        //-----------------------------------------------------------------
+        // b. Fill agent vectors for all the declared processing hosts
+        //-----------------------------------------------------------------
+        int h = 1;
+        for (auto & kv : cfg.network.processingNodes()) {
+            for (unsigned int i = 0; i < kv.second; ++i) {
+                sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+                agName.push_back(std::string(sAgName));
+                agPortCmd.push_back(portnum(startingPort, h, i));
+                agPortTsk.push_back(portnum(startingPort+1000, h, i));
+            }
+            ++h;
+        }
+
+        //-----------------------------------------------------------------
+        // c. Create component connections
+        //-----------------------------------------------------------------
+
+        // CHANNEL CMD - SURVEY
+        // - Surveyor: EvtMng
+        // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+        chnl     = ChnlCmd;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
+        for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
+            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        }
+
+        // CHANNEL INDATA -  PUBSUB
+        // - Publisher: EvtMng
+        // - Subscriber: DataMng TskOrc
+        chnl     = ChnlInData;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+        // CHANNEL TASK-SCHEDULING - PUBSUB
+        // - Publisher: TskOrc
+        // - Subscriber: DataMng TskMng
+        chnl     = ChnlTskSched;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+        // CHANNEL TASK-PROCESSING - REQREP
+        // - Out/In: TskAge*/TskMng
+        h = 0;
+        for (auto & p : agPortTsk) {
+            chnl = ChnlTskProc + "_" + agName.at(h);
+            bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+            m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+            ++h;
+        }
+
+        // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+        // - Publisher: TskMng
+        // - Subscriber: DataMng EvtMng QPFHMI
+        chnl     = ChnlTskRepDist;
+        bindAddr = "inproc://" + chnl;
+        connAddr = bindAddr;
+        m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+        for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
+            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+    } else {
+
+        //-----------------------------------------------------------------
+        // a. Fill agents vector with as agents for this host
+        //-----------------------------------------------------------------
+        int h = 1;
+        for (auto & kv : cfg.network.processingNodes()) {
+            if (thisHost == kv.first) {
+                int numOfTskAgents = kv.second;
+                for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+                    sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+                    ag.push_back(new TskAge(sAgName, thisHost, &synchro));
+                    agName.push_back(std::string(sAgName));
+                    agPortTsk.push_back(portnum(startingPort, h, i));
+                }
+            }
+            ++h;
+        }
+
+        //-----------------------------------------------------------------
+        // b. Create agent connections
+        //-----------------------------------------------------------------
+
+        // CHANNEL TASK-PROCESSING - REQREP
+        // - Out/In: TskAge*/TskMng
+        h = 0;
+        for (auto & a : ag) {
+            chnl = ChnlTskProc + "_" + agName.at(h);
+            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(h));
+            ReqRep * r = new ReqRep(NN_REQ, connAddr);
+            a->addConnection(chnl, r);
+            ++h;
+        }
+
+    }
+}
+
+//}

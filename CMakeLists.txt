@@ -34,7 +34,7 @@ add_subdirectory (str)
 add_subdirectory (tools)
 add_subdirectory (uuid)
 add_subdirectory (fmk)
-#add_subdirectory (qpf)
+add_subdirectory (qpf)
 #add_subdirectory (qpfhmi)
 
 if (HMI)
