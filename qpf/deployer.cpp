@@ -144,6 +144,8 @@ int Deployer::run()
 //----------------------------------------------------------------------
 bool Deployer::usage(int code)
 {
+    Dbg::verbosityLevel = Dbg::INFO_LEVEL;
+    
     INFO("Usage: " << exeName << "  -c configFile -p initialPort [-H hostName ] [ -I ipAddress ] [ -v ] [ -h ]\n"
          "where:\n"
          "\t-c cfgFile          System is reconfigured with configuration in\n"
@@ -156,6 +158,7 @@ bool Deployer::usage(int code)
          "\t                    this information from the system).\n"
          "\t-v                  Sets verbose output.\n\n"
          "\t-h                  Shows this help message.\n");
+
     exit(code);
 }
 
