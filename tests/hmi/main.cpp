@@ -29,6 +29,8 @@ Synchronizer synchro;
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char * argv[])
 {
+    Dbg::verbosityLevel = Dbg::TRACE_LEVEL;
+
     // Initialize configuration
     cfg.init(std::string(argv[1]));
 
