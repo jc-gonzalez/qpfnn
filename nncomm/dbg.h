@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+/*
 #define TRACE_LEVEL     2
 #define DEBUG_LEVEL     1
 #define INFO_LEVEL      0
@@ -34,5 +35,29 @@
 #  define DBG(x)
 #  define TRC(x)
 #endif
+*/
+
+#define TRC(x)  \
+    do { if (Dbg::verbosityLevel >= Dbg::TRACE_LEVEL) {			\
+	    std::cerr << __FUNCTION__ << ":" << __LINE__ << ' ' << x << '\n'; \
+	} } while (0)
+#define DBG(x)  \
+    do { if (Dbg::verbosityLevel >= Dbg::DEBUG_LEVEL) {			\
+	    std::cerr << __FUNCTION__ << ":" << __LINE__ << ' ' << x << '\n'; \
+	} } while (0)
+#define INFO(x)  \
+    do { if (Dbg::verbosityLevel >= Dbg::INFO_LEVEL) {			\
+	    std::cerr << x << '\n'; \
+	} } while (0)
+
+namespace Dbg {
+
+    const int SILENT_LEVEL = 0;
+    const int INFO_LEVEL   = 1;
+    const int DEBUG_LEVEL  = 2;
+    const int TRACE_LEVEL  = 3;
+
+    extern int verbosityLevel;		 
+}
 
 #endif

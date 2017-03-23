@@ -139,11 +139,17 @@ private:
     void setInitialPort(int port);
 
     //----------------------------------------------------------------------
-    // Method: setCurrentHost
+    // Method: setCurrentHostName
+    // Set the host name the current host
+    //----------------------------------------------------------------------
+    void setCurrentHostName(std::string host);
+
+    //----------------------------------------------------------------------
+    // Method: setCurrentHostAddr
     // Set the address (IP) of the current host
     //----------------------------------------------------------------------
-    void setCurrentHost(std::string host);
-
+    void setCurrentHostAddr(std::string addr);
+    
     //----------------------------------------------------------------------
     // Method: readConfiguration
     // Retrieves the configuration for the execution of the system (from

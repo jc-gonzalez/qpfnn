@@ -28,6 +28,7 @@ set (libnncomm_hdr
 
 set (libnncomm_src
   err.cpp
+  dbg.cpp
   scalprotrole.cpp
   bus.cpp
   pipeline.cpp

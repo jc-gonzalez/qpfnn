@@ -64,6 +64,8 @@ using Configuration::cfg;
 
 #define MINOR_SYNC_DELAY_MS    500
 
+#define DEFAULT_INITIAL_PORT   50000
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -87,6 +89,10 @@ void signalCatcher(int s)
 //----------------------------------------------------------------------
 Deployer::Deployer(int argc, char *argv[])
 {
+    // Get host info
+    getHostnameAndIp(currentHostName, currentHostAddr);    
+    setInitialPort(DEFAULT_INITIAL_PORT);
+    
     //== Change value for delay between peer nodes launches (default: 50000us)
     if ((!processCmdLineOpts(argc, argv)) || (cfgFileName.empty())) {
         usage(EXIT_FAILURE);
@@ -138,14 +144,18 @@ int Deployer::run()
 //----------------------------------------------------------------------
 bool Deployer::usage(int code)
 {
-    INFO("Usage: " << exeName << "  -c configFile  -p initialPort  [-v]  [-h]");
-    INFO("where:");
-    INFO("\t-c cfgFile          System is reconfigured with configuration in");
-    INFO("\t                    file cfgFile (configuration is then saved to DB).");
-    INFO("\t-p initialPort      Set initial port for system set up.");
-    INFO("\t                    file cfgFile (configuration is then saved to DB).");
-    INFO("\t-v                  Sets verbose output.");
-    INFO("\t-h                  Shows this help message.");
+    INFO("Usage: " << exeName << "  -c configFile -p initialPort [-H hostName ] [ -I ipAddress ] [ -v ] [ -h ]\n"
+         "where:\n"
+         "\t-c cfgFile          System is reconfigured with configuration in\n"
+         "\t                    file cfgFile (configuration is then saved to DB).\n"
+         "\t-p initialPort      Set initial port for system set up (default:"
+	 << DEFAULT_INITIAL_PORT << ").\n\n"
+         "\t-H hostName         Set the host name (by default the program takes\n"
+         "\t                    this information from the system).\n"
+         "\t-I IPaddress        Set the host IP address (by default the program takes\n"
+         "\t                    this information from the system).\n"
+         "\t-v                  Sets verbose output.\n\n"
+         "\t-h                  Shows this help message.\n");
     exit(code);
 }
 
@@ -161,15 +171,22 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     exeName = std::string(argv[0]);
     
     int opt;
-    while ((opt = getopt(argc, argv, "hvp:c:m:")) != -1) {
+    while ((opt = getopt(argc, argv, "hvp:c:H:I:")) != -1) {
         switch (opt) {
         case 'v':
+	    Dbg::verbosityLevel++;
             break;
         case 'c':
             setConfigFile(std::string(optarg));
             break;
         case 'p':
             setInitialPort(atoi(optarg));
+            break;
+        case 'H':
+            setCurrentHostName(std::string(optarg));
+            break;
+        case 'I':
+            setCurrentHostAddr(std::string(optarg));
             break;
         case 'h':
             exitCode = EXIT_SUCCESS;
@@ -178,8 +195,6 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
         }
     }
 
-    getHostnameAndIp(currentHostName, currentHostAddr);
-        
     return retVal;
 }
 
@@ -202,12 +217,21 @@ void Deployer::setInitialPort(int port)
 }
 
 //----------------------------------------------------------------------
-// Method: setCurrentHost
+// Method: setCurrentHostName
+// Set the host name the current host
+//----------------------------------------------------------------------
+void Deployer::setCurrentHostName(std::string host)
+{
+    currentHostName = host;
+}
+
+//----------------------------------------------------------------------
+// Method: setCurrentHostAddr
 // Set the address (IP) of the current host
 //----------------------------------------------------------------------
-void Deployer::setCurrentHost(std::string host)
+void Deployer::setCurrentHostAddr(std::string addr)
 {
-    currentHostAddr = host;
+    currentHostAddr = addr;
 }
 
 //----------------------------------------------------------------------
@@ -220,14 +244,14 @@ void Deployer::readConfiguration()
     // Initialize configuration
     cfg.init(cfgFileName);
 
-    std::cerr << cfg.str() << std::endl;
-    std::cerr << cfg.general.appName() << std::endl;
-    std::cerr << cfg.network.masterNode() << std::endl;
+    TRC(cfg.str());
+    TRC(cfg.general.appName());
+    TRC(cfg.network.masterNode());
     for (auto & kv : cfg.network.processingNodes()) {
-        std::cerr << kv.first << ": " << kv.second << std::endl;
+        TRC(kv.first << ": " << kv.second);
     }
     // cfg.dump();
-    // DBG("Config::PATHBase: " << Config::PATHBase);
+    TRC("Config::PATHBase: " << Config::PATHBase);
 }
 
 //----------------------------------------------------------------------
@@ -251,13 +275,15 @@ void Deployer::sayHello()
         sprintf(buf, "%ld", (long)(time(0)));
         buildId = std::string(buf);
     }
-    std::string hline("----------------------------------------"
-                      "--------------------------------------");
-    std::cout << hline << std::endl
-              << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
-              << " " << APP_DATE << " - "
-              << APP_RELEASE << " Build " << buildId << std::endl
-              << hline << std::endl << std::endl;
+
+    const std::string hline("----------------------------------------"
+			    "--------------------------------------");
+    INFO(hline << std::endl
+	 << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
+	 << " " << APP_DATE << " - "
+	 << APP_RELEASE << " Build " << buildId << std::endl
+	 << " Started at " << currentHostName << " [" << currentHostAddr << "]" << std::endl
+	 << hline << std::endl);
 }
 
 //----------------------------------------------------------------------
@@ -373,7 +399,6 @@ void Deployer::createElementsNetwork()
     char sAgName[20];
     std::vector<std::string> agName;
     std::vector<std::string> agHost;
-    std::vector<int> agPortCmd;
     std::vector<int> agPortTsk;
 
     // Connection addresses and channel
@@ -381,92 +406,10 @@ void Deployer::createElementsNetwork()
     std::string connAddr;
     std::string chnl;
 
-    if (isMasterHost) {
+    //=== If we are running on a processing host ==========================
+    if (! isMasterHost) {
 
-        //-----------------------------------------------------------------
-        // a. Create master node elements
-        //-----------------------------------------------------------------
-        m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
-        m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
-        m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
-        m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
-        m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
-
-        //-----------------------------------------------------------------
-        // b. Fill agent vectors for all the declared processing hosts
-        //-----------------------------------------------------------------
-        int h = 1;
-        for (auto & kv : cfg.network.processingNodes()) {
-            for (unsigned int i = 0; i < kv.second; ++i) {
-                sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
-                agName.push_back(std::string(sAgName));
-                agPortCmd.push_back(portnum(startingPort, h, i));
-                agPortTsk.push_back(portnum(startingPort+1000, h, i));
-            }
-            ++h;
-        }
-
-        //-----------------------------------------------------------------
-        // c. Create component connections
-        //-----------------------------------------------------------------
-
-        // CHANNEL CMD - SURVEY
-        // - Surveyor: EvtMng
-        // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
-        chnl     = ChnlCmd;
-        bindAddr = "inproc://" + chnl;
-        connAddr = bindAddr;
-        m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
-        for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
-        }
-
-        // CHANNEL INDATA -  PUBSUB
-        // - Publisher: EvtMng
-        // - Subscriber: DataMng TskOrc
-        chnl     = ChnlInData;
-        bindAddr = "inproc://" + chnl;
-        connAddr = bindAddr;
-        m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
-            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-        }
-
-        // CHANNEL TASK-SCHEDULING - PUBSUB
-        // - Publisher: TskOrc
-        // - Subscriber: DataMng TskMng
-        chnl     = ChnlTskSched;
-        bindAddr = "inproc://" + chnl;
-        connAddr = bindAddr;
-        m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-        for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
-            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-        }
-
-        // CHANNEL TASK-PROCESSING - REQREP
-        // - Out/In: TskAge*/TskMng
-        h = 0;
-        for (auto & p : agPortTsk) {
-            chnl = ChnlTskProc + "_" + agName.at(h);
-            bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-            m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
-            ++h;
-        }
-
-        // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
-        // - Publisher: TskMng
-        // - Subscriber: DataMng EvtMng QPFHMI
-        chnl     = ChnlTskRepDist;
-        bindAddr = "inproc://" + chnl;
-        connAddr = bindAddr;
-        m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
-        for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
-            c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-        }
-
-    } else {
-
-        //-----------------------------------------------------------------
+	//-----------------------------------------------------------------
         // a. Fill agents vector with as agents for this host
         //-----------------------------------------------------------------
         int h = 1;
@@ -477,7 +420,7 @@ void Deployer::createElementsNetwork()
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro));
                     agName.push_back(std::string(sAgName));
-                    agPortTsk.push_back(portnum(startingPort, h, i));
+                    agPortTsk.push_back(portnum(startingPort + 1, h, i));
                 }
             }
             ++h;
@@ -498,7 +441,97 @@ void Deployer::createElementsNetwork()
             ++h;
         }
 
+	return;
     }
+
+    //=== Else, we are running on the master host =========================
+    
+    //-----------------------------------------------------------------
+    // a. Create master node elements
+    //-----------------------------------------------------------------
+    m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
+    m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
+    m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
+    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
+    m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
+
+    //-----------------------------------------------------------------
+    // b. Fill agent vectors for all the declared processing hosts
+    //-----------------------------------------------------------------
+    int h = 1;
+    for (auto & kv : cfg.network.processingNodes()) {
+	for (unsigned int i = 0; i < kv.second; ++i) {
+	    sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+	    agName.push_back(std::string(sAgName));
+	    agPortTsk.push_back(portnum(startingPort + 1, h, i));
+	}
+	++h;
+    }
+
+    //-----------------------------------------------------------------
+    // c. Create component connections
+    //-----------------------------------------------------------------
+
+    // CHANNEL CMD - SURVEY
+    // - Surveyor: EvtMng
+    // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+    chnl     = ChnlCmd;
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
+    for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
+	c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+    }
+
+    // CHANNEL HMICMD - REQREP
+    // - Out/In: QPFHMI/EvtMng
+    chnl     = ChnlHMICmd;
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+    m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+
+    // CHANNEL INDATA -  PUBSUB
+    // - Publisher: EvtMng
+    // - Subscriber: DataMng TskOrc
+    chnl     = ChnlInData;
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
+	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
+    // CHANNEL TASK-SCHEDULING - PUBSUB
+    // - Publisher: TskOrc
+    // - Subscriber: DataMng TskMng
+    chnl     = ChnlTskSched;
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
+	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
+    // CHANNEL TASK-PROCESSING - REQREP
+    // - Out/In: TskAge*/TskMng
+    h = 0;
+    for (auto & p : agPortTsk) {
+	chnl = ChnlTskProc + "_" + agName.at(h);
+	bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+	m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+	++h;
+    }
+
+    // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+    // - Publisher: TskMng
+    // - Subscriber: DataMng EvtMng QPFHMI
+    chnl     = ChnlTskRepDist;
+    bindAddr = "inproc://" + chnl;
+    connAddr = bindAddr;
+    m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
+	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+    }
+
 }
 
 //}

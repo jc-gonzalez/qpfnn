@@ -82,7 +82,7 @@ public:
         for (int i = 0; i < prds.size(); ++i) {
             products.push_back(ProductMetadata(prds[i]));
         }
-        DBG("MsgBodyINDATA initialized");
+        TRC("MsgBodyINDATA initialized");
     }
     virtual void dump() {
         for (auto & v: products) { v.dump(); }

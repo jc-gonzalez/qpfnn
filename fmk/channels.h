@@ -7,7 +7,9 @@
 
 #undef T
 
-#define TLISTOF_CHANNELS  T(CMD),               \
+#define TLISTOF_CHANNELS                        \
+        T(CMD),                                 \
+        T(HMICMD),                              \
         T(INDATA),                              \
         T(TSKSCHED),                            \
         T(TSKPROC),                             \
@@ -24,6 +26,7 @@ const ChannelDescriptor ChannelAcronym[] = { TLISTOF_CHANNELS };
 #undef T
 
 const ChannelDescriptor ChnlCmd        (ChannelAcronym[CHNL_CMD]);
+const ChannelDescriptor ChnlHMICmd     (ChannelAcronym[CHNL_HMICMD]);
 const ChannelDescriptor ChnlInData     (ChannelAcronym[CHNL_INDATA]);
 const ChannelDescriptor ChnlTskSched   (ChannelAcronym[CHNL_TSKSCHED]);
 const ChannelDescriptor ChnlTskProc    (ChannelAcronym[CHNL_TSKPROC]);
