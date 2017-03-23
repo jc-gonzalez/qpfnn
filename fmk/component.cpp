@@ -198,6 +198,7 @@ void Component::processIncommingMessages()
         while (conn->next(m)) {
             DBG(compName << " received the message [" << m << "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
+            else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
             else if (chnl == ChnlTskSched)   { processTskSchedMsg(conn, m); }
             else if (chnl == ChnlTskRqst)    { processTskRqstMsg(conn, m); }

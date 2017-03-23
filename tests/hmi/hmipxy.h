@@ -1,8 +1,8 @@
 /******************************************************************************
- * File:    evtmng.h
+ * File:    hmipxy.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.Component
+ * Domain:  QPF.libQPF.HMIProxy
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare Component class
+ *   Declare HMIProxy class
  *
  * Created by:
  *   J C Gonzalez
@@ -25,7 +25,7 @@
  *   Prototype
  *
  * Dependencies:
- *   MsgTypes, CommNode
+ *   Component
  *
  * Files read / modified:
  *   none
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef EVTMNG_H
-#define EVTMNG_H
+#ifndef HMIPXY_H
+#define HMIPXY_H
 
 //============================================================
 // Group: External Dependencies
@@ -47,19 +47,21 @@
 
 //------------------------------------------------------------
 // Topic: System headers
+//   - thread
 //------------------------------------------------------------
+#include <thread>
+#include <mutex>
 
 //------------------------------------------------------------
 // Topic: External packages
+//   none
 //------------------------------------------------------------
 
 //------------------------------------------------------------
 // Topic: Project headers
-//   . component.h
-//   - dwatcher.h
+//   - component.h
 //------------------------------------------------------------
 #include "component.h"
-#include "dwatcher.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -69,29 +71,23 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
-class EvtMng : public Component {
+//==========================================================================
+// Class: HMIProxy
+//==========================================================================
+class HMIProxy : public Component {
 
 public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(const char * name, const char * addr = 0, Synchronizer * s = 0);
+    HMIProxy(const char * name, const char * addr = 0, Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    EvtMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
+    HMIProxy(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
-    //----------------------------------------------------------------------
-    // Method: fromRunningToOperational
-    //----------------------------------------------------------------------
-    virtual void fromRunningToOperational();
-
-    //----------------------------------------------------------------------
-    // Method: fromOperationalToRunning
-    //----------------------------------------------------------------------
-    virtual void fromOperationalToRunning();
-
+protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
@@ -99,21 +95,13 @@ public:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processCmdMsg
+    // Method: processIncommingMessages
     //----------------------------------------------------------------------
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
+    void processIncommingMessages();
 
-    //----------------------------------------------------------------------
-    // Method: processHMICmdMsg
-    //----------------------------------------------------------------------
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
-    // Method: processTskRepMsg
-    //----------------------------------------------------------------------
-    virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-private:
-    DirWatcher * dw;
 };
-#endif
+
+//}
+
+#endif  /* TASKAGENT_H */

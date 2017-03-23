@@ -226,6 +226,30 @@ void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
+// Method: processCmdMsg
+//----------------------------------------------------------------------
+void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    // Create message and send
+    Message<MsgBodyCMD> msg;
+    msg.buildHdr(ChnlHMICmd,
+                 ChnlHMICmd,
+                 "1.0",
+                 compName,
+                 "*",
+                 "", "", "");
+
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    std::string chnl(ChnlHMICmd);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
+        InfoMsg("Sending response via channel " + chnl);
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: processTskRepMsg
 //----------------------------------------------------------------------
 void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
