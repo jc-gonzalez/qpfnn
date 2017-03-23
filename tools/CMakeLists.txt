@@ -13,12 +13,14 @@ project (tools)
 
 set (libtools_hdr
   propdef.h
+  alert.h
   dwatcher.h
   sm.h
   tools.h
 )
 
 set (libtools_src
+  alert.cpp
   dwatcher.cpp
   sm.cpp
   tools.cpp

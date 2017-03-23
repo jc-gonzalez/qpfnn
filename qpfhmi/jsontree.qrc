@@ -1,0 +1,15 @@
+<RCC>
+  <qresource prefix="/">
+    <file>img/refresh.png</file>
+    <file>img/collapse.png</file>
+    <file>img/expand.png</file>
+    <file>img/brick.png</file>
+    <file>img/bullet_black.png</file>
+    <file>img/bullet_blue.png</file>
+    <file>img/bullet_green.png</file>
+    <file>img/bullet_orange.png</file>
+    <file>img/bullet_purple.png</file>
+    <file>img/bullet_red.png</file>
+    <file>img/table.png</file>
+  </qresource>
+</RCC>

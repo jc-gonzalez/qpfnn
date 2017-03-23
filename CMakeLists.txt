@@ -16,8 +16,8 @@ project (QPF)
 set (PROJECT_NAME QPF)
 
 set (QPF_MAJOR 1)
-set (QPF_MINOR 0)
-set (QPF_PATCH 1)
+set (QPF_MINOR 2)
+set (QPF_PATCH rc1)
 
 set (QPF_VERSION ${QPF_MAJOR}.${QPF_MINOR}.${QPF_PATCH})
 
@@ -35,11 +35,10 @@ add_subdirectory (tools)
 add_subdirectory (uuid)
 add_subdirectory (fmk)
 add_subdirectory (qpf)
-#add_subdirectory (qpfhmi)
 
 if (HMI)
   message ("HMI component will be generated as well")
-  add_subdirectory (qpfgui)
+  add_subdirectory (qpfhmi)
 endif()
 
 add_subdirectory (tests)

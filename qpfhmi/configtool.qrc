@@ -1,0 +1,16 @@
+<RCC>
+  <qresource prefix="/img">
+    <file>img/plus.png</file>
+    <file>img/minus.png</file>
+    <file>img/QPF.png</file>
+    <file>img/checkmarks.png</file>
+    <file>img/exttools.png</file>
+    <file>img/processing.png</file>
+    <file>img/storage.png</file>
+    <file>img/products.png</file>
+    <file>img/network.png</file>
+    <file>img/general.png</file>
+    <file>img/orchestration.png</file>
+    <file>img/machines.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,8 @@
+<RCC>
+  <qresource>
+    <file>img/txlarrow.png</file>
+    <file>img/txline.png</file>
+    <file>img/txorigin.png</file>
+    <file>img/txrarrow.png</file>
+  </qresource>
+</RCC>

@@ -318,35 +318,35 @@ private:
 private:
     Config() {}
 
+public:
     std::string           cfgFileName;
     std::string           cfgFilePath;
     std::string           sessionId;
-    bool hmiPresent;
-    bool isActualFile;
+    bool                  hmiPresent;
+    bool                  isActualFile;
 
-public:
     struct {
-        std::string      inbox;
-        std::string      archive;
-        std::string      gateway;
+        std::string       inbox;
+        std::string       archive;
+        std::string       gateway;
     } storage;
 
-    static std::string DBHost;
-    static std::string DBPort;
-    static std::string DBName;
-    static std::string DBUser;
-    static std::string DBPwd;
+    static std::string    DBHost;
+    static std::string    DBPort;
+    static std::string    DBName;
+    static std::string    DBUser;
+    static std::string    DBPwd;
 
-    static std::string PATHBase;
-    static std::string PATHData;
-    static std::string PATHRun;
-    static std::string PATHBin;
-    static std::string PATHSession;
-    static std::string PATHLog;
-    static std::string PATHRlog;
-    static std::string PATHTmp;
-    static std::string PATHTsk;
-    static std::string PATHMsg;
+    static std::string    PATHBase;
+    static std::string    PATHData;
+    static std::string    PATHRun;
+    static std::string    PATHBin;
+    static std::string    PATHSession;
+    static std::string    PATHLog;
+    static std::string    PATHRlog;
+    static std::string    PATHTmp;
+    static std::string    PATHTsk;
+    static std::string    PATHMsg;
 
     static mode_t      PATHMode;
 

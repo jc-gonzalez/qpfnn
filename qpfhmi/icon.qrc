@@ -1,0 +1,11 @@
+<RCC>
+  <qresource prefix="/">
+    <file>img/alerts.png</file>
+    <file>img/logs.png</file>
+    <file>img/monit.png</file>
+    <file>img/storage2.png</file>
+    <file>img/messages.png</file>
+    <file>img/EuclidQPF.png</file>
+    <file>img/QPF.png</file>
+  </qresource>
+</RCC>

@@ -50,8 +50,8 @@
 #include "tools.h"
 #include "channels.h"
 #include "message.h"
-
 #include "config.h"
+
 using Configuration::cfg;
 
 ////////////////////////////////////////////////////////////////////////////
