@@ -70,6 +70,7 @@ void LogFrame::clearMsg()
 
 void LogFrame::displayLed(QString msgType)
 {
+    /*
     std::string msgt(msgType.toStdString());
     if (msgt == MSG_INDATA) {
         ui->lblMsgData->setStyleSheet("{bgcolor: #white;}");
@@ -87,7 +88,7 @@ void LogFrame::displayLed(QString msgType)
         ui->lblMsgTsk->setStyleSheet("{bgcolor: #green;}");
     } else if (msgt == MSG_TASK_RES) {
         ui->lblMsgTsk->setStyleSheet("{bgcolor: #red;}");
-    }
+        }*/
     QTimer::singleShot(10, this, SLOT(clearLed()));
 }
 

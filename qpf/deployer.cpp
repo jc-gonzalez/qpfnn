@@ -49,7 +49,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-     
+
 #include "survey.h"
 #include "pubsub.h"
 #include "reqrep.h"
@@ -90,9 +90,9 @@ void signalCatcher(int s)
 Deployer::Deployer(int argc, char *argv[])
 {
     // Get host info
-    getHostnameAndIp(currentHostName, currentHostAddr);    
+    getHostnameAndIp(currentHostName, currentHostAddr);
     setInitialPort(DEFAULT_INITIAL_PORT);
-    
+
     //== Change value for delay between peer nodes launches (default: 50000us)
     if ((!processCmdLineOpts(argc, argv)) || (cfgFileName.empty())) {
         usage(EXIT_FAILURE);
@@ -145,8 +145,9 @@ int Deployer::run()
 bool Deployer::usage(int code)
 {
     Dbg::verbosityLevel = Dbg::INFO_LEVEL;
-    
-    INFO("Usage: " << exeName << "  -c configFile -p initialPort [-H hostName ] [ -I ipAddress ] [ -v ] [ -h ]\n"
+
+    INFO("Usage: " << exeName << "  -c configFile "
+         "[ -p initialPort ] [-H hostName ] [ -I ipAddress ] [ -v ] [ -h ]\n"
          "where:\n"
          "\t-c cfgFile          System is reconfigured with configuration in\n"
          "\t                    file cfgFile (configuration is then saved to DB).\n"
@@ -156,7 +157,7 @@ bool Deployer::usage(int code)
          "\t                    this information from the system).\n"
          "\t-I IPaddress        Set the host IP address (by default the program takes\n"
          "\t                    this information from the system).\n"
-         "\t-v                  Sets verbose output.\n\n"
+         "\t-v                  Increases verbosity (default:silent operation).\n\n"
          "\t-h                  Shows this help message.\n");
 
     exit(code);
@@ -172,7 +173,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     int exitCode = EXIT_FAILURE;
 
     exeName = std::string(argv[0]);
-    
+
     int opt;
     while ((opt = getopt(argc, argv, "hvp:c:H:I:")) != -1) {
         switch (opt) {
@@ -253,7 +254,7 @@ void Deployer::readConfiguration()
     for (auto & kv : cfg.network.processingNodes()) {
         TRC(kv.first << ": " << kv.second);
     }
-    // cfg.dump();
+    cfg.dump();
     TRC("Config::PATHBase: " << Config::PATHBase);
 }
 
@@ -281,11 +282,11 @@ void Deployer::sayHello()
 
     const std::string hline("----------------------------------------"
 			    "--------------------------------------");
-    INFO(hline << std::endl
-	 << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
+    INFO(hline << '\n'
+	 << " " << APP_NAME << " - " << APP_LONG_NAME << '\n'
 	 << " " << APP_DATE << " - "
-	 << APP_RELEASE << " Build " << buildId << std::endl
-	 << " Started at " << currentHostName << " [" << currentHostAddr << "]" << std::endl
+	 << APP_RELEASE << " Build " << buildId << '\n'
+	 << " Started at " << currentHostName << " [" << currentHostAddr << "]\n"
 	 << hline << std::endl);
 }
 
@@ -448,7 +449,7 @@ void Deployer::createElementsNetwork()
     }
 
     //=== Else, we are running on the master host =========================
-    
+
     //-----------------------------------------------------------------
     // a. Create master node elements
     //-----------------------------------------------------------------

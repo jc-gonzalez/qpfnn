@@ -83,72 +83,6 @@ class DBHandler {DBHandler88,2136
     virtual ~DBHandler() {}~DBHandler100,2603
     bool connectionParamsSet;connectionParamsSet280,11354
 
-fmk/config.h,3315
-#define CONFIG_HCONFIG_H42,797
-class CfgGrpGeneral : public JRecord {CfgGrpGeneral64,1573
-    CfgGrpGeneral() {}CfgGrpGeneral66,1620
-    CfgGrpGeneral(json v) : JRecord(v) {}CfgGrpGeneral67,1643
-    virtual void dump() {dump68,1685
-class CfgGrpNetwork : public JRecord {CfgGrpNetwork83,2097
-    CfgGrpNetwork() {}CfgGrpNetwork85,2144
-    CfgGrpNetwork(json v) : JRecord(v) {}CfgGrpNetwork86,2167
-    virtual void dump() {dump87,2209
-class CfgGrpDB : public JRecord {CfgGrpDB98,2544
-    CfgGrpDB() {}CfgGrpDB100,2586
-    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB101,2604
-    virtual void dump() {dump102,2641
-class CfgGrpProducts : public JRecord {CfgGrpProducts119,3054
-    CfgGrpProducts() {}CfgGrpProducts121,3102
-    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts122,3126
-    virtual void dump() {dump123,3169
-class CfgGrpRulesList : public JRecord {CfgGrpRulesList140,3681
-    CfgGrpRulesList() {}CfgGrpRulesList142,3730
-    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList143,3755
-    virtual void dump() {dump148,3891
-class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration161,4290
-    CfgGrpOrchestration() {}CfgGrpOrchestration163,4343
-    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration164,4372
-    virtual void dump() {dump167,4466
-class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList178,4808
-    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList180,4864
-    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList181,4896
-    virtual void dump() {dump182,4947
-class CfgGrpFlags : public JRecord {CfgGrpFlags201,5502
-    CfgGrpFlags() {}CfgGrpFlags203,5547
-    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags204,5568
-    virtual void dump() {dump205,5608
-class Config : public JRecord {Config226,6287
-    virtual void dump() {dump258,7478
-    Config() {}Config319,9910
-    std::string           cfgFileName;cfgFileName321,9927
-    std::string           cfgFilePath;cfgFilePath322,9966
-    std::string           sessionId;sessionId323,10005
-    bool hmiPresent;hmiPresent324,10042
-    bool isActualFile;isActualFile325,10063
-        std::string      inbox;inbox329,10108
-        std::string      archive;archive330,10140
-        std::string      gateway;gateway331,10174
-    } storage;storage332,10208
-    static std::string DBHost;DBHost334,10224
-    static std::string DBPort;DBPort335,10255
-    static std::string DBName;DBName336,10286
-    static std::string DBUser;DBUser337,10317
-    static std::string DBPwd;DBPwd338,10348
-    static std::string PATHBase;PATHBase340,10379
-    static std::string PATHData;PATHData341,10412
-    static std::string PATHRun;PATHRun342,10445
-    static std::string PATHBin;PATHBin343,10477
-    static std::string PATHSession;PATHSession344,10509
-    static std::string PATHLog;PATHLog345,10545
-    static std::string PATHRlog;PATHRlog346,10577
-    static std::string PATHTmp;PATHTmp347,10610
-    static std::string PATHTsk;PATHTsk348,10642
-    static std::string PATHMsg;PATHMsg349,10674
-    static mode_t      PATHMode;PATHMode351,10707
-    static bool isLive;isLive353,10741
-namespace Configuration {Configuration356,10769
-    static ::Config & cfg = ::Config::_();cfg357,10795
-
 fmk/config.cpp,1510
 #define WRITE_MESSAGE_FILESWRITE_MESSAGE_FILES55,980
 Config & Config::_()_65,1251
@@ -161,24 +95,24 @@ void Config::readConfigFromDB()readConfigFromDB188,5063
 void Config::saveConfigToDB()saveConfigToDB273,7854
 std::string Config::getRegExFromCfg(std::string & regexStr)getRegExFromCfg324,9504
 void Config::processConfig()processConfig358,10755
-std::string Config::getEnvVar(std::string const & key) constgetEnvVar592,19380
-std::string Config::DBHost;DBHost598,19552
-std::string Config::DBPort;DBPort599,19580
-std::string Config::DBName;DBName600,19608
-std::string Config::DBUser;DBUser601,19636
-std::string Config::DBPwd;DBPwd602,19664
-std::string Config::PATHBase;PATHBase604,19692
-std::string Config::PATHData;PATHData605,19722
-std::string Config::PATHRun;PATHRun606,19752
-std::string Config::PATHBin;PATHBin607,19781
-std::string Config::PATHSession;PATHSession608,19810
-std::string Config::PATHLog;PATHLog609,19843
-std::string Config::PATHRlog;PATHRlog610,19872
-std::string Config::PATHTmp;PATHTmp611,19902
-std::string Config::PATHTsk;PATHTsk612,19931
-std::string Config::PATHMsg;PATHMsg613,19960
-mode_t Config::PATHMode = 0755;PATHMode615,19990
-bool Config::isLive = false;isLive617,20023
+std::string Config::getEnvVar(std::string const & key) constgetEnvVar593,19476
+std::string Config::DBHost;DBHost599,19648
+std::string Config::DBPort;DBPort600,19676
+std::string Config::DBName;DBName601,19704
+std::string Config::DBUser;DBUser602,19732
+std::string Config::DBPwd;DBPwd603,19760
+std::string Config::PATHBase;PATHBase605,19788
+std::string Config::PATHData;PATHData606,19818
+std::string Config::PATHRun;PATHRun607,19848
+std::string Config::PATHBin;PATHBin608,19877
+std::string Config::PATHSession;PATHSession609,19906
+std::string Config::PATHLog;PATHLog610,19939
+std::string Config::PATHRlog;PATHRlog611,19968
+std::string Config::PATHTmp;PATHTmp612,19998
+std::string Config::PATHTsk;PATHTsk613,20027
+std::string Config::PATHMsg;PATHMsg614,20056
+mode_t Config::PATHMode = 0755;PATHMode616,20086
+bool Config::isLive = false;isLive618,20119
 
 fmk/datamng.cpp,1166
 DataMng::DataMng(const char * name, const char * addr, Synchronizer * s)DataMng75,1567
@@ -289,7 +223,7 @@ class URLHandler {URLHandler76,1961
     std::string productUrlSpace;productUrlSpace173,5849
     bool isRemote;isRemote175,5883
 
-fmk/datatypes.h,4461
+fmk/datatypes.h,4679
 #define DATATYPES_HDATATYPES_H42,816
 typedef Json::Value  json;json109,2852
 #define JSTR(JSTR111,2880
@@ -381,7 +315,11 @@ struct TaskInfo : public JRecord {TaskInfo367,12836
     TaskInfo() {}TaskInfo368,12871
     TaskInfo(json v) : JRecord(v) {TaskInfo369,12889
     virtual void dump() {dump373,13006
-#define UNUSED(UNUSED397,13552
+struct TaskAgentInfo : public JRecord {TaskAgentInfo397,13552
+    TaskAgentInfo() {}TaskAgentInfo398,13592
+    TaskAgentInfo(json v) : JRecord(v) {}TaskAgentInfo399,13615
+    virtual void dump() {dump400,13657
+#define UNUSED(UNUSED431,14303
 
 fmk/logmng.h,82
 #define LOGMNG_HLOGMNG_H42,810
@@ -419,13 +357,13 @@ fmk/tskorc.cpp,788
 TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s)TskOrc68,1450
 TskOrc::TskOrc(std::string name, std::string addr, Synchronizer * s)TskOrc76,1718
 void TskOrc::defineOrchestrationParams()defineOrchestrationParams84,2006
-void TskOrc::fromRunningToOperational()fromRunningToOperational126,3591
-void TskOrc::runEachIteration()runEachIteration153,4609
-void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg160,4817
-void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)processInDataMsg169,5141
-bool TskOrc::checkRulesForProductType(std::string prodType,checkRulesForProductType206,6557
-#define EVAL_CONDITIONEVAL_CONDITION227,7326
-bool TskOrc::sendTaskSchedMsg(Rule * rule,sendTaskSchedMsg338,11470
+void TskOrc::fromRunningToOperational()fromRunningToOperational126,3590
+void TskOrc::runEachIteration()runEachIteration153,4608
+void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg160,4816
+void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)processInDataMsg169,5140
+bool TskOrc::checkRulesForProductType(std::string prodType,checkRulesForProductType206,6556
+#define EVAL_CONDITIONEVAL_CONDITION227,7325
+bool TskOrc::sendTaskSchedMsg(Rule * rule,sendTaskSchedMsg338,11469
 
 fmk/filenamespec.h,691
 #define FILENAMESPEC_HFILENAMESPEC_H42,826
@@ -608,6 +546,82 @@ void Component::run()run267,8836
 void Component::setStep(int s)setStep310,9973
 void Component::defineValidTransitions()defineValidTransitions320,10310
 void Component::afterTransition(int fromState, int toState)afterTransition346,11298
+
+fmk/config.h,3526
+#define CONFIG_HCONFIG_H42,797
+#define DEFAULT_INITIAL_PORT DEFAULT_INITIAL_PORT61,1395
+class CfgGrpGeneral : public JRecord {CfgGrpGeneral66,1611
+    CfgGrpGeneral() {}CfgGrpGeneral68,1658
+    CfgGrpGeneral(json v) : JRecord(v) {}CfgGrpGeneral69,1681
+    virtual void dump() {dump70,1723
+class CfgGrpNetwork : public JRecord {CfgGrpNetwork85,2135
+    CfgGrpNetwork() {}CfgGrpNetwork87,2182
+    CfgGrpNetwork(json v) : JRecord(v) {}CfgGrpNetwork88,2205
+    virtual void dump() {dump89,2247
+class CfgGrpDB : public JRecord {CfgGrpDB100,2582
+    CfgGrpDB() {}CfgGrpDB102,2624
+    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB103,2642
+    virtual void dump() {dump104,2679
+class CfgGrpProducts : public JRecord {CfgGrpProducts121,3092
+    CfgGrpProducts() {}CfgGrpProducts123,3140
+    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts124,3164
+    virtual void dump() {dump125,3207
+class CfgGrpRulesList : public JRecord {CfgGrpRulesList142,3719
+    CfgGrpRulesList() {}CfgGrpRulesList144,3768
+    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList145,3793
+    virtual void dump() {dump150,3929
+class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration163,4328
+    CfgGrpOrchestration() {}CfgGrpOrchestration165,4381
+    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration166,4410
+    virtual void dump() {dump169,4504
+class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList180,4846
+    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList182,4902
+    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList183,4934
+    virtual void dump() {dump184,4985
+class CfgGrpFlags : public JRecord {CfgGrpFlags203,5540
+    CfgGrpFlags() {}CfgGrpFlags205,5585
+    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags206,5606
+    virtual void dump() {dump207,5646
+class Config : public JRecord {Config228,6325
+    virtual void dump() {dump260,7516
+    Config() {}Config321,9948
+    std::string           cfgFileName;cfgFileName324,9973
+    std::string           cfgFilePath;cfgFilePath325,10012
+    std::string           sessionId;sessionId326,10051
+    bool                  hmiPresent;hmiPresent327,10088
+    bool                  isActualFile;isActualFile328,10126
+        std::string       inbox;inbox331,10180
+        std::string       archive;archive332,10213
+        std::string       gateway;gateway333,10248
+        std::string       userArea;userArea334,10283
+    } storage;storage335,10319
+    static std::string    DBHost;DBHost337,10335
+    static std::string    DBPort;DBPort338,10369
+    static std::string    DBName;DBName339,10403
+    static std::string    DBUser;DBUser340,10437
+    static std::string    DBPwd;DBPwd341,10471
+    static std::string    PATHBase;PATHBase343,10505
+    static std::string    PATHData;PATHData344,10541
+    static std::string    PATHRun;PATHRun345,10577
+    static std::string    PATHBin;PATHBin346,10612
+    static std::string    PATHSession;PATHSession347,10647
+    static std::string    PATHLog;PATHLog348,10686
+    static std::string    PATHRlog;PATHRlog349,10721
+    static std::string    PATHTmp;PATHTmp350,10757
+    static std::string    PATHTsk;PATHTsk351,10792
+    static std::string    PATHMsg;PATHMsg352,10827
+    static mode_t         PATHMode;PATHMode354,10863
+    static bool           isLive;isLive356,10900
+namespace Configuration {Configuration359,10938
+    static ::Config & cfg = ::Config::_();cfg360,10964
+
+fmk/datatypes.cpp,276
+#define T(T51,1059
+std::map<TaskStatus, std::string> TaskStatusName = { TLIST_TASK_STATUS };TaskStatusName52,1094
+#undef TT53,1168
+#define T(T55,1178
+std::map<std::string, TaskStatus> TaskStatusValue = { TLIST_TASK_STATUS };TaskStatusValue56,1213
+#undef TT57,1288
 
 infix/infixeval.h,2237
 #define INFIXEVAL_HINFIXEVAL_H42,837
@@ -2444,7 +2458,7 @@ CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
 CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
 CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
 
-build/tests/Makefile,396
+build/qpf/Makefile,396
 SUFFIXES =SUFFIXES15,456
 SHELL = /bin/shSHELL30,811
 CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
@@ -2484,17 +2498,7 @@ CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
 CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
 CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
 
-build/Makefile,396
-SUFFIXES =SUFFIXES15,456
-SHELL = /bin/shSHELL30,811
-CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
-RM = /usr/bin/cmake -E remove -fRM36,916
-EQUALS = =EQUALS39,985
-CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
-CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
-CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
-
-build/qpf/Makefile,396
+build/tests/Makefile,396
 SUFFIXES =SUFFIXES15,456
 SHELL = /bin/shSHELL30,811
 CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
@@ -2821,7 +2825,7 @@ void QPF::MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int 
 const QMetaObject QPF::MainWindow::staticMetaObject = {staticMetaObject365,16074
 const QMetaObject *QPF::MainWindow::metaObject() constmetaObject371,16293
 void *QPF::MainWindow::qt_metacast(const char *_clname)qt_metacast376,16450
-int QPF::MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)qt_metacall386,16870
+int QPF::MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)qt_metacall386,16852
 
 build/qpfhmi/moc_procalertmodel.cpp,985
 struct qt_meta_stringdata_QPF__ProcAlertModel_t {qt_meta_stringdata_QPF__ProcAlertModel_t21,795
@@ -3098,248 +3102,175 @@ class Ui_DlgShowTaskInfoUi_DlgShowTaskInfo28,866
 namespace Ui {Ui94,3366
     class DlgShowTaskInfo: public Ui_DlgShowTaskInfo {};DlgShowTaskInfo95,3381
 
-build/qpfhmi/ui_configtool.h,13548
+build/qpfhmi/ui_configtool.h,9591
 #define UI_CONFIGTOOL_HUI_CONFIGTOOL_H10,387
-class Ui_ConfigToolUi_ConfigTool40,1220
-    QVBoxLayout *verticalLayout;verticalLayout43,1250
-    QHBoxLayout *horizontalLayout_35;horizontalLayout_3544,1283
-    QLabel *label;label45,1321
-    QLabel *lblConfigName;lblConfigName46,1340
-    QHBoxLayout *horizontalLayout;horizontalLayout47,1367
-    QVBoxLayout *verticalLayout_2;verticalLayout_248,1402
-    QPushButton *tbtnGeneral;tbtnGeneral49,1437
-    QPushButton *tbtnMachines;tbtnMachines50,1467
-    QPushButton *tbtnProdProc;tbtnProdProc51,1498
-    QPushButton *tbtnNetwork;tbtnNetwork52,1529
-    QPushButton *tbtnOrchestration;tbtnOrchestration53,1559
-    QPushButton *tbtnExtTools;tbtnExtTools54,1595
-    QPushButton *tbtnStorage;tbtnStorage55,1626
-    QPushButton *tbtnFlags;tbtnFlags56,1656
-    QSpacerItem *verticalSpacer;verticalSpacer57,1684
-    QStackedWidget *gpboxProc;gpboxProc58,1717
-    QWidget *pageGeneral;pageGeneral59,1748
-    QVBoxLayout *verticalLayout_3;verticalLayout_360,1774
-    QGroupBox *groupBox;groupBox61,1809
-    QVBoxLayout *verticalLayout_4;verticalLayout_462,1834
-    QHBoxLayout *horizontalLayout_3;horizontalLayout_363,1869
-    QLabel *applicationNameLabel;applicationNameLabel64,1906
-    QLineEdit *edAppName;edAppName65,1940
-    QSpacerItem *horizontalSpacer_3;horizontalSpacer_366,1966
-    QHBoxLayout *horizontalLayout_4;horizontalLayout_467,2003
-    QLabel *applicationVersionLabel;applicationVersionLabel68,2040
-    QLineEdit *edAppVersion;edAppVersion69,2077
-    QSpacerItem *horizontalSpacer_4;horizontalSpacer_470,2106
-    QHBoxLayout *horizontalLayout_5;horizontalLayout_571,2143
-    QLabel *lastAccessLabel;lastAccessLabel72,2180
-    QLineEdit *edLastAccess;edLastAccess73,2209
-    QSpacerItem *horizontalSpacer_5;horizontalSpacer_574,2238
-    QHBoxLayout *horizontalLayout_6;horizontalLayout_675,2275
-    QLabel *runAreaPathLabel;runAreaPathLabel76,2312
-    QLineEdit *edWorkArea;edWorkArea77,2342
-    QSpacerItem *horizontalSpacer_8;horizontalSpacer_878,2369
-    QGroupBox *groupBox_10;groupBox_1079,2406
-    QVBoxLayout *verticalLayout_29;verticalLayout_2980,2434
-    QHBoxLayout *horizontalLayout_33;horizontalLayout_3381,2470
-    QLabel *lblUser;lblUser82,2508
-    QLineEdit *edUser;edUser83,2529
-    QSpacerItem *horizontalSpacer_14;horizontalSpacer_1484,2552
-    QHBoxLayout *horizontalLayout_34;horizontalLayout_3485,2590
-    QLabel *lblHost;lblHost86,2628
-    QLineEdit *edHost;edHost87,2649
-    QSpacerItem *horizontalSpacer_15;horizontalSpacer_1588,2672
-    QFrame *line;line89,2710
-    QHBoxLayout *horizontalLayout_36;horizontalLayout_3690,2728
-    QLabel *lblExec;lblExec91,2766
-    QLineEdit *edExec;edExec92,2787
-    QSpacerItem *horizontalSpacer_17;horizontalSpacer_1793,2810
-    QHBoxLayout *horizontalLayout_37;horizontalLayout_3794,2848
-    QLabel *lblPATH;lblPATH95,2886
-    QLineEdit *edPATH;edPATH96,2907
-    QSpacerItem *horizontalSpacer_18;horizontalSpacer_1897,2930
-    QHBoxLayout *horizontalLayout_38;horizontalLayout_3898,2968
-    QLabel *lblLDPATH;lblLDPATH99,3006
-    QLineEdit *edLDPATH;edLDPATH100,3029
-    QSpacerItem *horizontalSpacer_19;horizontalSpacer_19101,3054
-    QSpacerItem *verticalSpacer_2;verticalSpacer_2102,3092
-    QWidget *pageMachines;pageMachines103,3127
-    QHBoxLayout *horizontalLayout_7;horizontalLayout_7104,3154
-    QVBoxLayout *verticalLayout_10;verticalLayout_10105,3191
-    QGroupBox *gpboxHosts;gpboxHosts106,3227
-    QVBoxLayout *verticalLayout_6;verticalLayout_6107,3254
-    QTableView *tblviewHosts;tblviewHosts108,3289
-    QHBoxLayout *horizontalLayout_18;horizontalLayout_18109,3319
-    QPushButton *btnAddHost;btnAddHost110,3357
-    QPushButton *btnRemoveHost;btnRemoveHost111,3386
-    QSpacerItem *horizontalSpacer_9;horizontalSpacer_9112,3418
-    QGroupBox *groupBox_11;groupBox_11113,3455
-    QHBoxLayout *horizontalLayout_13;horizontalLayout_13114,3483
-    QHBoxLayout *horizontalLayout_8;horizontalLayout_8115,3521
-    QLabel *lbl;lbl116,3558
-    QComboBox *cboxMasterHost;cboxMasterHost117,3575
-    QSpacerItem *horizontalSpacer_7;horizontalSpacer_7118,3606
-    QHBoxLayout *horizontalLayout_9;horizontalLayout_9119,3643
-    QLabel *lbl_2;lbl_2120,3680
-    QHBoxLayout *horizontalLayout_11;horizontalLayout_11121,3699
-    QSpinBox *spboxBasePort;spboxBasePort122,3737
-    QSpacerItem *horizontalSpacer_6;horizontalSpacer_6123,3766
-    QWidget *pageProdProc;pageProdProc124,3803
-    QHBoxLayout *horizontalLayout_12;horizontalLayout_12125,3830
-    QGroupBox *gpboxPT;gpboxPT126,3868
-    QVBoxLayout *verticalLayout_9;verticalLayout_9127,3892
-    QListView *listProductTypes;listProductTypes128,3927
-    QHBoxLayout *horizontalLayout_31;horizontalLayout_31129,3960
-    QPushButton *btnAddProduct;btnAddProduct130,3998
-    QPushButton *btnRemoveProduct;btnRemoveProduct131,4030
-    QSpacerItem *horizontalSpacer_12;horizontalSpacer_12132,4065
-    QGroupBox *groupBox_5;groupBox_5133,4103
-    QVBoxLayout *verticalLayout_22;verticalLayout_22134,4130
-    QListView *listProcs;listProcs135,4166
-    QHBoxLayout *horizontalLayout_30;horizontalLayout_30136,4192
-    QPushButton *btnAddProcessor;btnAddProcessor137,4230
-    QPushButton *btnRemoveProcessor;btnRemoveProcessor138,4264
-    QSpacerItem *horizontalSpacer_16;horizontalSpacer_16139,4301
-    QWidget *pageNetwork;pageNetwork140,4339
-    QVBoxLayout *verticalLayout_11;verticalLayout_11141,4365
-    QGroupBox *gpboxNet;gpboxNet142,4401
-    QHBoxLayout *horizontalLayout_10;horizontalLayout_10143,4426
-    QTableView *tblviewNet;tblviewNet144,4464
-    QWidget *pageOrchestration;pageOrchestration145,4492
-    QVBoxLayout *verticalLayout_23;verticalLayout_23146,4524
-    QGroupBox *gpboxRules;gpboxRules147,4560
-    QVBoxLayout *verticalLayout_7;verticalLayout_7148,4587
-    QTableView *tblviewRules;tblviewRules149,4622
-    QHBoxLayout *horizontalLayout_17;horizontalLayout_17150,4652
-    QPushButton *btnAddRule;btnAddRule151,4690
-    QPushButton *btnRemoveRule;btnRemoveRule152,4719
-    QSpacerItem *horizontalSpacer_10;horizontalSpacer_10153,4751
-    QWidget *pageExtTools;pageExtTools154,4789
-    QVBoxLayout *verticalLayout_14;verticalLayout_14155,4816
-    QGroupBox *gpboxNet_2;gpboxNet_2156,4852
-    QVBoxLayout *verticalLayout_12;verticalLayout_12157,4879
-    QTableWidget *tblwdgUserDefTools;tblwdgUserDefTools158,4915
-    QHBoxLayout *horizontalLayout_14;horizontalLayout_14159,4953
-    QPushButton *btnAddNewUdefTool;btnAddNewUdefTool160,4991
-    QPushButton *btnRemoveUdefTool;btnRemoveUdefTool161,5027
-    QSpacerItem *horizontalSpacer_21;horizontalSpacer_21162,5063
-    QPushButton *btnEditUdefTool;btnEditUdefTool163,5101
-    QSpacerItem *horizontalSpacer_20;horizontalSpacer_20164,5135
-    QWidget *pageStorage;pageStorage165,5173
-    QVBoxLayout *verticalLayout_5;verticalLayout_5166,5199
-    QGroupBox *groupBox_2;groupBox_2167,5234
-    QVBoxLayout *verticalLayout_8;verticalLayout_8168,5261
-    QGridLayout *gridLayout;gridLayout169,5296
-    QToolButton *tbtnSetBasePath;tbtnSetBasePath170,5325
-    QLineEdit *nedInbox;nedInbox171,5359
-    QLabel *label_30;label_30172,5384
-    QLabel *label_26;label_26173,5406
-    QLineEdit *edBasePath;edBasePath174,5428
-    QLabel *label_27;label_27175,5455
-    QLineEdit *nedLocalArchiveFolder;nedLocalArchiveFolder176,5477
-    QLabel *label_28;label_28177,5515
-    QLineEdit *nedOutbox;nedOutbox178,5537
-    QLabel *label_29;label_29179,5563
-    QLineEdit *nedUserReprocArea;nedUserReprocArea180,5585
-    QLabel *label_31;label_31181,5619
-    QLineEdit *nedRunFolder;nedRunFolder182,5641
-    QSplitter *splitter;splitter183,5670
-    QGroupBox *gpboxInput;gpboxInput184,5695
-    QVBoxLayout *verticalLayout_24;verticalLayout_24185,5722
-    QHBoxLayout *horizontalLayout_19;horizontalLayout_19186,5758
-    QLabel *label_7;label_7187,5796
-    QComboBox *cboxInProtocol;cboxInProtocol188,5817
-    QHBoxLayout *horizontalLayout_20;horizontalLayout_20189,5848
-    QLabel *label_13;label_13190,5886
-    QLineEdit *edInAddr;edInAddr191,5908
-    QHBoxLayout *horizontalLayout_21;horizontalLayout_21192,5933
-    QLabel *label_14;label_14193,5971
-    QLineEdit *edInPort;edInPort194,5993
-    QSpacerItem *horizontalSpacer_11;horizontalSpacer_11195,6018
-    QHBoxLayout *horizontalLayout_22;horizontalLayout_22196,6056
-    QLabel *label_15;label_15197,6094
-    QLineEdit *edInUser;edInUser198,6116
-    QHBoxLayout *horizontalLayout_23;horizontalLayout_23199,6141
-    QLabel *label_16;label_16200,6179
-    QLineEdit *edInPasswd;edInPasswd201,6201
-    QHBoxLayout *horizontalLayout_24;horizontalLayout_24202,6228
-    QLabel *label_17;label_17203,6266
-    QLineEdit *edInInbox;edInInbox204,6288
-    QToolButton *tbtnGetInbox;tbtnGetInbox205,6314
-    QGroupBox *gpboxOutput;gpboxOutput206,6345
-    QVBoxLayout *verticalLayout_25;verticalLayout_25207,6373
-    QHBoxLayout *horizontalLayout_25;horizontalLayout_25208,6409
-    QLabel *label_18;label_18209,6447
-    QComboBox *cboxOutProtocol;cboxOutProtocol210,6469
-    QHBoxLayout *horizontalLayout_26;horizontalLayout_26211,6501
-    QLabel *label_19;label_19212,6539
-    QLineEdit *edOutAddr;edOutAddr213,6561
-    QHBoxLayout *horizontalLayout_27;horizontalLayout_27214,6587
-    QLabel *label_20;label_20215,6625
-    QLineEdit *edOutPort;edOutPort216,6647
-    QSpacerItem *horizontalSpacer_13;horizontalSpacer_13217,6673
-    QHBoxLayout *horizontalLayout_28;horizontalLayout_28218,6711
-    QLabel *label_21;label_21219,6749
-    QLineEdit *edOutUser;edOutUser220,6771
-    QHBoxLayout *horizontalLayout_29;horizontalLayout_29221,6797
-    QLabel *label_22;label_22222,6835
-    QLineEdit *edOutPasswd;edOutPasswd223,6857
-    QHBoxLayout *horizontalLayout_32;horizontalLayout_32224,6885
-    QLabel *label_25;label_25225,6923
-    QSpacerItem *verticalSpacer_15;verticalSpacer_15226,6945
-    QWidget *pageFlags;pageFlags227,6981
-    QVBoxLayout *verticalLayout_21;verticalLayout_21228,7005
-    QGroupBox *groupBox_3;groupBox_3229,7041
-    QHBoxLayout *horizontalLayout_15;horizontalLayout_15230,7068
-    QVBoxLayout *verticalLayout_17;verticalLayout_17231,7106
-    QGroupBox *grpboxWriteMsgsDisk;grpboxWriteMsgsDisk232,7142
-    QVBoxLayout *verticalLayout_15;verticalLayout_15233,7178
-    QCheckBox *chkMsgsINDATAToDisk;chkMsgsINDATAToDisk234,7214
-    QCheckBox *chkMsgsDATARQSTToDisk;chkMsgsDATARQSTToDisk235,7250
-    QCheckBox *chkMsgsDATAINFOToDisk;chkMsgsDATAINFOToDisk236,7288
-    QCheckBox *chkMsgsMONITRQSTToDisk;chkMsgsMONITRQSTToDisk237,7326
-    QCheckBox *chkMsgsMONITINFOToDisk;chkMsgsMONITINFOToDisk238,7365
-    QCheckBox *chkMsgsTASKPROCToDisk;chkMsgsTASKPROCToDisk239,7404
-    QCheckBox *chkMsgsTASKRESToDisk;chkMsgsTASKRESToDisk240,7442
-    QCheckBox *chkMsgsSTARTToDisk;chkMsgsSTARTToDisk241,7479
-    QCheckBox *chkMsgsSTOPToDisk;chkMsgsSTOPToDisk242,7514
-    QCheckBox *chkMsgsCMDToDisk;chkMsgsCMDToDisk243,7548
-    QCheckBox *chkMsgsIncommingInLog;chkMsgsIncommingInLog244,7581
-    QVBoxLayout *verticalLayout_18;verticalLayout_18245,7619
-    QGroupBox *grpboxWriteMsgsDisk_2;grpboxWriteMsgsDisk_2246,7655
-    QVBoxLayout *verticalLayout_16;verticalLayout_16247,7693
-    QCheckBox *chkMsgsINDATAToDisk_2;chkMsgsINDATAToDisk_2248,7729
-    QCheckBox *chkMsgsDATARQSTToDisk_2;chkMsgsDATARQSTToDisk_2249,7767
-    QCheckBox *chkMsgsDATAINFOToDisk_2;chkMsgsDATAINFOToDisk_2250,7807
-    QCheckBox *chkMsgsMONITRQSTToDisk_2;chkMsgsMONITRQSTToDisk_2251,7847
-    QCheckBox *chkMsgsMONITINFOToDisk_2;chkMsgsMONITINFOToDisk_2252,7888
-    QCheckBox *chkMsgsTASKPROCToDisk_2;chkMsgsTASKPROCToDisk_2253,7929
-    QCheckBox *chkMsgsTASKRESToDisk_2;chkMsgsTASKRESToDisk_2254,7969
-    QCheckBox *chkMsgsSTARTToDisk_2;chkMsgsSTARTToDisk_2255,8008
-    QCheckBox *chkMsgsSTOPToDisk_2;chkMsgsSTOPToDisk_2256,8045
-    QCheckBox *chkMsgsCMDToDisk_2;chkMsgsCMDToDisk_2257,8081
-    QCheckBox *chkGroupTskAgentLogs;chkGroupTskAgentLogs258,8116
-    QHBoxLayout *horizontalLayout_16;horizontalLayout_16259,8153
-    QGroupBox *groupBox_4;groupBox_4260,8191
-    QVBoxLayout *verticalLayout_13;verticalLayout_13261,8218
-    QCheckBox *chkAllowReproc;chkAllowReproc262,8254
-    QCheckBox *chkGenerateIntermedProd;chkGenerateIntermedProd263,8285
-    QVBoxLayout *verticalLayout_20;verticalLayout_20264,8325
-    QGroupBox *groupBox_6;groupBox_6265,8361
-    QVBoxLayout *verticalLayout_19;verticalLayout_19266,8388
-    QCheckBox *chkSendOutputsToArchive;chkSendOutputsToArchive267,8424
-    QSpacerItem *verticalSpacer_4;verticalSpacer_4268,8464
-    QSpacerItem *verticalSpacer_5;verticalSpacer_5269,8499
-    QHBoxLayout *horizontalLayout_2;horizontalLayout_2270,8534
-    QSpacerItem *horizontalSpacer_2;horizontalSpacer_2271,8571
-    QPushButton *btnDiscard;btnDiscard272,8608
-    QSpacerItem *horizontalSpacer;horizontalSpacer273,8637
-    QPushButton *btnSaveAs;btnSaveAs274,8672
-    QPushButton *btnSave;btnSave275,8700
-    QPushButton *btnApply;btnApply276,8726
-    QButtonGroup *btngrpSection;btngrpSection277,8753
-    void setupUi(QDialog *ConfigTool)setupUi279,8787
-    void retranslateUi(QDialog *ConfigTool)retranslateUi1636,65617
-namespace Ui {Ui1792,77263
-    class ConfigTool: public Ui_ConfigTool {};ConfigTool1793,77278
+class Ui_ConfigToolUi_ConfigTool37,1128
+    QVBoxLayout *verticalLayout;verticalLayout40,1158
+    QHBoxLayout *horizontalLayout_35;horizontalLayout_3541,1191
+    QLabel *label;label42,1229
+    QLabel *lblConfigName;lblConfigName43,1248
+    QHBoxLayout *horizontalLayout;horizontalLayout44,1275
+    QVBoxLayout *verticalLayout_2;verticalLayout_245,1310
+    QPushButton *tbtnGeneral;tbtnGeneral46,1345
+    QPushButton *tbtnMachines;tbtnMachines47,1375
+    QPushButton *tbtnProdProc;tbtnProdProc48,1406
+    QPushButton *tbtnOrchestration;tbtnOrchestration49,1437
+    QPushButton *tbtnExtTools;tbtnExtTools50,1473
+    QPushButton *tbtnFlags;tbtnFlags51,1504
+    QSpacerItem *verticalSpacer;verticalSpacer52,1532
+    QStackedWidget *gpboxProc;gpboxProc53,1565
+    QWidget *pageGeneral;pageGeneral54,1596
+    QVBoxLayout *verticalLayout_3;verticalLayout_355,1622
+    QGroupBox *groupBox;groupBox56,1657
+    QVBoxLayout *verticalLayout_4;verticalLayout_457,1682
+    QHBoxLayout *horizontalLayout_3;horizontalLayout_358,1717
+    QLabel *applicationNameLabel;applicationNameLabel59,1754
+    QLineEdit *edAppName;edAppName60,1788
+    QLabel *applicationVersionLabel;applicationVersionLabel61,1814
+    QLineEdit *edAppVersion;edAppVersion62,1851
+    QSpacerItem *horizontalSpacer_3;horizontalSpacer_363,1880
+    QHBoxLayout *horizontalLayout_5;horizontalLayout_564,1917
+    QLabel *lastAccessLabel;lastAccessLabel65,1954
+    QLineEdit *edLastAccess;edLastAccess66,1983
+    QSpacerItem *horizontalSpacer_5;horizontalSpacer_567,2012
+    QGroupBox *groupBox_7;groupBox_768,2049
+    QVBoxLayout *verticalLayout_26;verticalLayout_2669,2076
+    QGridLayout *gridLayout_2;gridLayout_270,2112
+    QToolButton *tbtnSetBasePath;tbtnSetBasePath71,2143
+    QLineEdit *nedInbox;nedInbox72,2177
+    QLabel *label_32;label_3273,2202
+    QLabel *label_33;label_3374,2224
+    QLineEdit *edBasePath;edBasePath75,2246
+    QLabel *label_34;label_3476,2273
+    QLineEdit *nedLocalArchiveFolder;nedLocalArchiveFolder77,2295
+    QLabel *label_35;label_3578,2333
+    QLineEdit *nedOutbox;nedOutbox79,2355
+    QLabel *label_36;label_3680,2381
+    QLineEdit *nedUserReprocArea;nedUserReprocArea81,2403
+    QLabel *label_37;label_3782,2437
+    QLineEdit *nedRunFolder;nedRunFolder83,2459
+    QGroupBox *groupBox_10;groupBox_1084,2488
+    QVBoxLayout *verticalLayout_29;verticalLayout_2985,2516
+    QHBoxLayout *horizontalLayout_33;horizontalLayout_3386,2552
+    QLabel *lblUser;lblUser87,2590
+    QLineEdit *edUser;edUser88,2611
+    QLabel *lblUser_2;lblUser_289,2634
+    QLineEdit *edHost;edHost90,2657
+    QSpacerItem *horizontalSpacer_14;horizontalSpacer_1491,2680
+    QFrame *line;line92,2718
+    QHBoxLayout *horizontalLayout_36;horizontalLayout_3693,2736
+    QLabel *lblExec;lblExec94,2774
+    QLineEdit *edExec;edExec95,2795
+    QSpacerItem *horizontalSpacer_17;horizontalSpacer_1796,2818
+    QHBoxLayout *horizontalLayout_37;horizontalLayout_3797,2856
+    QLabel *lblPATH;lblPATH98,2894
+    QLineEdit *edPATH;edPATH99,2915
+    QSpacerItem *horizontalSpacer_18;horizontalSpacer_18100,2938
+    QHBoxLayout *horizontalLayout_38;horizontalLayout_38101,2976
+    QLabel *lblLDPATH;lblLDPATH102,3014
+    QLineEdit *edLDPATH;edLDPATH103,3037
+    QSpacerItem *horizontalSpacer_19;horizontalSpacer_19104,3062
+    QWidget *pageMachines;pageMachines105,3100
+    QHBoxLayout *horizontalLayout_7;horizontalLayout_7106,3127
+    QVBoxLayout *verticalLayout_10;verticalLayout_10107,3164
+    QGroupBox *gpboxHosts;gpboxHosts108,3200
+    QVBoxLayout *verticalLayout_6;verticalLayout_6109,3227
+    QTableView *tblviewHosts;tblviewHosts110,3262
+    QHBoxLayout *horizontalLayout_18;horizontalLayout_18111,3292
+    QPushButton *btnAddHost;btnAddHost112,3330
+    QPushButton *btnRemoveHost;btnRemoveHost113,3359
+    QSpacerItem *horizontalSpacer_9;horizontalSpacer_9114,3391
+    QWidget *pageProdProc;pageProdProc115,3428
+    QHBoxLayout *horizontalLayout_12;horizontalLayout_12116,3455
+    QGroupBox *gpboxPT;gpboxPT117,3493
+    QVBoxLayout *verticalLayout_9;verticalLayout_9118,3517
+    QListView *listProductTypes;listProductTypes119,3552
+    QHBoxLayout *horizontalLayout_31;horizontalLayout_31120,3585
+    QPushButton *btnAddProduct;btnAddProduct121,3623
+    QPushButton *btnRemoveProduct;btnRemoveProduct122,3655
+    QSpacerItem *horizontalSpacer_12;horizontalSpacer_12123,3690
+    QGroupBox *groupBox_5;groupBox_5124,3728
+    QVBoxLayout *verticalLayout_22;verticalLayout_22125,3755
+    QListView *listProcs;listProcs126,3791
+    QHBoxLayout *horizontalLayout_30;horizontalLayout_30127,3817
+    QPushButton *btnAddProcessor;btnAddProcessor128,3855
+    QPushButton *btnRemoveProcessor;btnRemoveProcessor129,3889
+    QSpacerItem *horizontalSpacer_16;horizontalSpacer_16130,3926
+    QWidget *pageOrchestration;pageOrchestration131,3964
+    QVBoxLayout *verticalLayout_23;verticalLayout_23132,3996
+    QGroupBox *gpboxRules;gpboxRules133,4032
+    QVBoxLayout *verticalLayout_7;verticalLayout_7134,4059
+    QTableView *tblviewRules;tblviewRules135,4094
+    QHBoxLayout *horizontalLayout_17;horizontalLayout_17136,4124
+    QPushButton *btnAddRule;btnAddRule137,4162
+    QPushButton *btnRemoveRule;btnRemoveRule138,4191
+    QSpacerItem *horizontalSpacer_10;horizontalSpacer_10139,4223
+    QWidget *pageExtTools;pageExtTools140,4261
+    QVBoxLayout *verticalLayout_14;verticalLayout_14141,4288
+    QGroupBox *gpboxNet_2;gpboxNet_2142,4324
+    QVBoxLayout *verticalLayout_12;verticalLayout_12143,4351
+    QTableWidget *tblwdgUserDefTools;tblwdgUserDefTools144,4387
+    QHBoxLayout *horizontalLayout_14;horizontalLayout_14145,4425
+    QPushButton *btnAddNewUdefTool;btnAddNewUdefTool146,4463
+    QPushButton *btnRemoveUdefTool;btnRemoveUdefTool147,4499
+    QSpacerItem *horizontalSpacer_21;horizontalSpacer_21148,4535
+    QPushButton *btnEditUdefTool;btnEditUdefTool149,4573
+    QSpacerItem *horizontalSpacer_20;horizontalSpacer_20150,4607
+    QWidget *pageFlags;pageFlags151,4645
+    QVBoxLayout *verticalLayout_21;verticalLayout_21152,4669
+    QGroupBox *groupBox_3;groupBox_3153,4705
+    QHBoxLayout *horizontalLayout_15;horizontalLayout_15154,4732
+    QVBoxLayout *verticalLayout_17;verticalLayout_17155,4770
+    QGroupBox *grpboxWriteMsgsDisk;grpboxWriteMsgsDisk156,4806
+    QVBoxLayout *verticalLayout_15;verticalLayout_15157,4842
+    QCheckBox *chkMsgsINDATAToDisk;chkMsgsINDATAToDisk158,4878
+    QCheckBox *chkMsgsDATARQSTToDisk;chkMsgsDATARQSTToDisk159,4914
+    QCheckBox *chkMsgsDATAINFOToDisk;chkMsgsDATAINFOToDisk160,4952
+    QCheckBox *chkMsgsMONITRQSTToDisk;chkMsgsMONITRQSTToDisk161,4990
+    QCheckBox *chkMsgsMONITINFOToDisk;chkMsgsMONITINFOToDisk162,5029
+    QCheckBox *chkMsgsTASKPROCToDisk;chkMsgsTASKPROCToDisk163,5068
+    QCheckBox *chkMsgsTASKRESToDisk;chkMsgsTASKRESToDisk164,5106
+    QCheckBox *chkMsgsSTARTToDisk;chkMsgsSTARTToDisk165,5143
+    QCheckBox *chkMsgsSTOPToDisk;chkMsgsSTOPToDisk166,5178
+    QCheckBox *chkMsgsCMDToDisk;chkMsgsCMDToDisk167,5212
+    QCheckBox *chkMsgsIncommingInLog;chkMsgsIncommingInLog168,5245
+    QVBoxLayout *verticalLayout_18;verticalLayout_18169,5283
+    QGroupBox *grpboxWriteMsgsDisk_2;grpboxWriteMsgsDisk_2170,5319
+    QVBoxLayout *verticalLayout_16;verticalLayout_16171,5357
+    QCheckBox *chkMsgsINDATAToDisk_2;chkMsgsINDATAToDisk_2172,5393
+    QCheckBox *chkMsgsDATARQSTToDisk_2;chkMsgsDATARQSTToDisk_2173,5431
+    QCheckBox *chkMsgsDATAINFOToDisk_2;chkMsgsDATAINFOToDisk_2174,5471
+    QCheckBox *chkMsgsMONITRQSTToDisk_2;chkMsgsMONITRQSTToDisk_2175,5511
+    QCheckBox *chkMsgsMONITINFOToDisk_2;chkMsgsMONITINFOToDisk_2176,5552
+    QCheckBox *chkMsgsTASKPROCToDisk_2;chkMsgsTASKPROCToDisk_2177,5593
+    QCheckBox *chkMsgsTASKRESToDisk_2;chkMsgsTASKRESToDisk_2178,5633
+    QCheckBox *chkMsgsSTARTToDisk_2;chkMsgsSTARTToDisk_2179,5672
+    QCheckBox *chkMsgsSTOPToDisk_2;chkMsgsSTOPToDisk_2180,5709
+    QCheckBox *chkMsgsCMDToDisk_2;chkMsgsCMDToDisk_2181,5745
+    QCheckBox *chkGroupTskAgentLogs;chkGroupTskAgentLogs182,5780
+    QHBoxLayout *horizontalLayout_16;horizontalLayout_16183,5817
+    QGroupBox *groupBox_4;groupBox_4184,5855
+    QVBoxLayout *verticalLayout_13;verticalLayout_13185,5882
+    QCheckBox *chkAllowReproc;chkAllowReproc186,5918
+    QCheckBox *chkGenerateIntermedProd;chkGenerateIntermedProd187,5949
+    QVBoxLayout *verticalLayout_20;verticalLayout_20188,5989
+    QGroupBox *groupBox_6;groupBox_6189,6025
+    QVBoxLayout *verticalLayout_19;verticalLayout_19190,6052
+    QCheckBox *chkSendOutputsToArchive;chkSendOutputsToArchive191,6088
+    QSpacerItem *verticalSpacer_4;verticalSpacer_4192,6128
+    QSpacerItem *verticalSpacer_5;verticalSpacer_5193,6163
+    QHBoxLayout *horizontalLayout_2;horizontalLayout_2194,6198
+    QSpacerItem *horizontalSpacer_2;horizontalSpacer_2195,6235
+    QPushButton *btnDiscard;btnDiscard196,6272
+    QSpacerItem *horizontalSpacer;horizontalSpacer197,6301
+    QPushButton *btnSaveAs;btnSaveAs198,6336
+    QPushButton *btnSave;btnSave199,6364
+    QPushButton *btnApply;btnApply200,6390
+    QButtonGroup *btngrpSection;btngrpSection201,6417
+    void setupUi(QDialog *ConfigTool)setupUi203,6451
+    void retranslateUi(QDialog *ConfigTool)retranslateUi1184,48685
+namespace Ui {Ui1302,57747
+    class ConfigTool: public Ui_ConfigTool {};ConfigTool1303,57762
 
 build/qpfhmi/ui_browserwidget.h,1414
 #define UI_BROWSERWIDGET_HUI_BROWSERWIDGET_H10,393
@@ -3612,6 +3543,16 @@ int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_icon)()qCleanupResources_icon202
        ~initializer() { QT_RCC_MANGLE_NAMESPACE(qCleanupResources_icon)(); }~initializer20308,1656229
    } dummy;dummy20309,1656306
 
+build/Makefile,396
+SUFFIXES =SUFFIXES15,456
+SHELL = /bin/shSHELL30,811
+CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
+RM = /usr/bin/cmake -E remove -fRM36,916
+EQUALS = =EQUALS39,985
+CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
+CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
+CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
+
 scripts/RunQPF.sh,99
 greetings () {greetings39,973
 usage () {usage48,1323
@@ -3665,25 +3606,25 @@ qpf/main.cpp,46
 int main(int argc, char *argv[])main47,1075
 
 qpf/deployer.cpp,1175
-#define MINOR_SYNC_DELAY_MS MINOR_SYNC_DELAY_MS65,1174
-#define DEFAULT_INITIAL_PORT DEFAULT_INITIAL_PORT67,1210
-void signalCatcher(int s)signalCatcher82,1693
-Deployer::Deployer(int argc, char *argv[])Deployer90,1934
-Deployer::~Deployer()~Deployer112,2607
-int Deployer::run()run120,2851
-bool Deployer::usage(int code)usage145,3379
-bool Deployer::processCmdLineOpts(int argc, char * argv[])processCmdLineOpts169,4560
-void Deployer::setConfigFile(std::string fName)setConfigFile208,5601
-void Deployer::setInitialPort(int port)setInitialPort217,5902
-void Deployer::setCurrentHostName(std::string host)setCurrentHostName226,6185
-void Deployer::setCurrentHostAddr(std::string addr)setCurrentHostAddr235,6490
-void Deployer::readConfiguration()readConfiguration245,6865
-int Deployer::delay(int ms)delay264,7437
-void Deployer::sayHello()sayHello273,7758
-void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)getHostnameAndIp296,8606
-void Deployer::actionOnSigInt()actionOnSigInt356,10722
-void Deployer::installSignalHandlers()installSignalHandlers364,10965
-void Deployer::createElementsNetwork()createElementsNetwork376,11345
+#define MINOR_SYNC_DELAY_MS MINOR_SYNC_DELAY_MS65,1169
+#define DEFAULT_INITIAL_PORT DEFAULT_INITIAL_PORT67,1205
+void signalCatcher(int s)signalCatcher82,1688
+Deployer::Deployer(int argc, char *argv[])Deployer90,1929
+Deployer::~Deployer()~Deployer112,2594
+int Deployer::run()run120,2838
+bool Deployer::usage(int code)usage145,3366
+bool Deployer::processCmdLineOpts(int argc, char * argv[])processCmdLineOpts170,4586
+void Deployer::setConfigFile(std::string fName)setConfigFile209,5623
+void Deployer::setInitialPort(int port)setInitialPort218,5924
+void Deployer::setCurrentHostName(std::string host)setCurrentHostName227,6207
+void Deployer::setCurrentHostAddr(std::string addr)setCurrentHostAddr236,6512
+void Deployer::readConfiguration()readConfiguration246,6887
+int Deployer::delay(int ms)delay265,7459
+void Deployer::sayHello()sayHello274,7780
+void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)getHostnameAndIp297,8602
+void Deployer::actionOnSigInt()actionOnSigInt357,10718
+void Deployer::installSignalHandlers()installSignalHandlers365,10961
+void Deployer::createElementsNetwork()createElementsNetwork377,11341
 
 qpf/deployer.h,1098
 #define DEPLOYER_HDEPLOYER_H42,806
@@ -3707,6 +3648,223 @@ class Deployer {Deployer91,2160
     std::string  	   exeName;exeName217,7224
     std::string  	   masterAddress;masterAddress219,7259
     bool         	   isMasterHost;isMasterHost220,7295
+
+qpfhmi/dlgdataing.h,171
+#define DLGDATAING_HDLGDATAING_H42,818
+namespace Ui {Ui46,860
+class DlgDataIngestion : public QDialogDlgDataIngestion50,902
+    Ui::DlgDataIngestion *ui;ui59,1053
+
+qpfhmi/txtblmodel.h,187
+#define TXTABLEMODEL_HTXTABLEMODEL_H41,839
+namespace QPF {QPF45,888
+class TxTableModel : public DBTableModel {TxTableModel47,905
+    QMap<QString, int> nodeOrder;nodeOrder57,1113
+
+qpfhmi/version.h,524
+#define VERSION_HVERSION_H44,818
+#define APP_SYS_NAME APP_SYS_NAME47,865
+#define APP_NAME APP_NAME50,918
+#define APP_RELEASE APP_RELEASE53,984
+#define APP_DATE APP_DATE56,1045
+#define APP_COMPANY APP_COMPANY59,1116
+#define APP_DOMAIN APP_DOMAIN62,1194
+#define APP_DIVISION APP_DIVISION65,1261
+#define APP_LONG_NAME APP_LONG_NAME68,1316
+#define APP_PURPOSE APP_PURPOSE71,1411
+#define APP_TITLE APP_TITLE74,1513
+#define APP_CREATED_BY APP_CREATED_BY77,1567
+#define APP_COPYRIGHT APP_COPYRIGHT80,1626
+
+qpfhmi/txitemdlg.h,625
+#define TXITEMDLG_HTXITEMDLG_H42,814
+namespace QPF {QPF47,887
+class TxItemDelegate : public QStyledItemDelegateTxItemDelegate49,904
+               const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE57,1090
+                   const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE59,1209
+                          const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE61,1356
+    void setEditorData(QWidget *editor, const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE62,1431
+                      const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE64,1586
+
+qpfhmi/txitem.h,834
+#define TXITEM_HTXITEM_H42,786
+namespace Ui {Ui47,847
+namespace QPF {QPF51,879
+class TxItemTxItem53,896
+    enum Mode { Empty, Line, Source, Target };Mode58,934
+    enum Mode { Empty, Line, Source, Target };Empty58,934
+    enum Mode { Empty, Line, Source, Target };Line58,934
+    enum Mode { Empty, Line, Source, Target };Source58,934
+    enum Mode { Empty, Line, Source, Target };Target58,934
+    enum Orientation { FromLeftToRight, FromRightToLeft };Orientation59,981
+    enum Orientation { FromLeftToRight, FromRightToLeft };FromLeftToRight59,981
+    enum Orientation { FromLeftToRight, FromRightToLeft };FromRightToLeft59,981
+    Ui::TxItem *ui;ui71,1314
+    Mode mode;mode72,1334
+    Orientation orientation;orientation73,1349
+    QString name;name74,1378
+    QJsonObject content;content75,1396
+
+qpfhmi/types.h,630
+#define TYPES_HTYPES_H41,817
+#define TLIST_PROD_BASIC_MDATA_FIELDS TLIST_PROD_BASIC_MDATA_FIELDS46,871
+namespace QPF {QPF60,1521
+#define T(T66,1618
+enum MdataFieldIdx { TLIST_PROD_BASIC_MDATA_FIELDS };MdataFieldIdx67,1650
+enum MdataFieldIdx { TLIST_PROD_BASIC_MDATA_FIELDS };TLIST_PROD_BASIC_MDATA_FIELDS67,1650
+#undef TT68,1704
+struct MdataField {MdataField70,1715
+    MdataField(std::string n, std::string v) :MdataField71,1735
+    std::string name;name73,1811
+    std::string value;value74,1833
+typedef std::vector<MdataField> Mdata;Mdata77,1860
+typedef std::vector<Mdata*>     MdataDB;MdataDB79,1900
+
+qpfhmi/productsmodel.h,138
+#define PRODUCTSMODEL_HPRODUCTSMODEL_H41,849
+namespace QPF {QPF45,900
+class ProductsModel : public DBTreeModel {ProductsModel47,917
+
+qpfhmi/progbardlg.h,191
+#define PROGBARDLG_HPROGBARDLG_H42,822
+namespace QPF {QPF47,894
+class ProgressBarDelegate : public QItemDelegateProgressBarDelegate49,911
+    int progressColumn;progressColumn62,1321
+
+qpfhmi/sysalertmodel.h,139
+#define SYSALERTMODEL_HSYSALERTMODEL_H41,849
+namespace QPF {QPF46,918
+class SysAlertModel : public DBTableModel {SysAlertModel48,935
+
+qpfhmi/taskstatmng.h,106
+#define TASKSTATUSMANAGER_HTASKSTATUSMANAGER_H41,847
+class TaskStatusManager {TaskStatusManager45,895
+
+qpfhmi/textview.h,198
+#define TEXTVIEW_HTEXTVIEW_H42,796
+class TextView : public LogFrameTextView48,901
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE61,1105
+    QString name;name64,1172
+
+qpfhmi/txitem.cpp,397
+namespace QPF {QPF45,826
+TxItem::TxItem()TxItem47,843
+void TxItem::setMode(Mode m)setMode51,865
+void TxItem::setOrientation(Orientation o)setOrientation56,913
+void TxItem::setMsgName(QString n)setMsgName61,982
+void TxItem::setContent(QJsonObject o)setContent66,1036
+QSize TxItem::sizeHint() constsizeHint71,1097
+void TxItem::paint(QPainter *painter, const QRect &rect,paint76,1210
+
+qpfhmi/xmlsyntaxhighlight.h,874
+#define BASIC_XML_SYNTAX_HIGHLIGHTER_HBASIC_XML_SYNTAX_HIGHLIGHTER_H42,870
+class XMLBasicSyntaxHighlighter : public QSyntaxHighlighterXMLBasicSyntaxHighlighter47,962
+    QTextCharFormat     m_xmlKeywordFormat;m_xmlKeywordFormat66,1464
+    QTextCharFormat     m_xmlElementFormat;m_xmlElementFormat67,1508
+    QTextCharFormat     m_xmlAttributeFormat;m_xmlAttributeFormat68,1552
+    QTextCharFormat     m_xmlValueFormat;m_xmlValueFormat69,1598
+    QTextCharFormat     m_xmlCommentFormat;m_xmlCommentFormat70,1640
+    QList<QRegExp>      m_xmlKeywordRegexes;m_xmlKeywordRegexes72,1685
+    QRegExp             m_xmlElementRegex;m_xmlElementRegex73,1730
+    QRegExp             m_xmlAttributeRegex;m_xmlAttributeRegex74,1773
+    QRegExp             m_xmlValueRegex;m_xmlValueRegex75,1818
+    QRegExp             m_xmlCommentRegex;m_xmlCommentRegex76,1859
+
+qpfhmi/hmitypes.h,350
+#define HMITYPES_HHMITYPES_H42,778
+namespace QPF {QPF47,834
+struct QUserDefTool {QUserDefTool49,851
+    QString name;name50,873
+    QString desc;desc51,891
+    QString exe;exe52,909
+    QString args;args53,926
+    QStringList prod_types;prod_types54,944
+typedef QMap<QString, QUserDefTool> MapOfUserDefTools;MapOfUserDefTools57,976
+
+qpfhmi/main.cpp,214
+#define BUILD_ID BUILD_ID44,814
+void usage(int code)usage70,1492
+void sayHello()sayHello96,2679
+void ctrlMsg(QSplashScreen & splash, int k = 0)ctrlMsg121,3559
+int main(int argc, char *argv[])main146,4642
+
+qpfhmi/configtool.cpp,2879
+#define C(C58,1091
+#define QS(QS59,1116
+namespace QPF {QPF67,1380
+Qt::ItemFlags StandardItemModel::flags(const QModelIndex&index) constflags73,1600
+Qt::ItemFlags StringListModel::flags(const QModelIndex&index) constflags88,2179
+ModelView::ModelView(QVector<QStringList> & vdlist,ModelView102,2714
+ModelView::ModelView(QStringList & dlist,ModelView117,3303
+void ModelView::setHeader(QString h)setHeader132,3868
+void ModelView::setHeaders(QStringList & hlist)setHeaders141,4163
+void ModelView::setData(QStringList & dlist)setData152,4528
+void ModelView::setData(QVector<QStringList> & vdlist)setData166,5035
+ConfigTool::ConfigTool(QWidget *parent) :ConfigTool182,5645
+ConfigTool::~ConfigTool()~ConfigTool212,7472
+void ConfigTool::prepare(MapOfUserDefTools & userTools, QStringList pts)prepare221,7750
+void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)initExtTools236,8254
+void ConfigTool::getExtTools(MapOfUserDefTools & userTools)getExtTools268,9906
+void ConfigTool::save()save277,10223
+void ConfigTool::saveAs()saveAs298,10967
+void ConfigTool::saveAsFilename(QString & fName)saveAsFilename315,11499
+void ConfigTool::apply()apply332,12066
+void ConfigTool::closeDoNothing()closeDoNothing342,12362
+void ConfigTool::selectBasePath()selectBasePath351,12609
+void ConfigTool::setWorkingPaths(QString newPath)setWorkingPaths370,13210
+void ConfigTool::addHost()addHost382,13734
+void ConfigTool::removeHost()removeHost392,14091
+void ConfigTool::addProduct()addProduct401,14418
+void ConfigTool::removeProduct()removeProduct411,14792
+void ConfigTool::addProcessor()addProcessor420,15133
+void ConfigTool::removeProcessor()removeProcessor430,15501
+void ConfigTool::addRule()addRule439,15826
+void ConfigTool::removeRule()removeRule449,16183
+void ConfigTool::removeFromTable(QAbstractItemView * vw, QString item)removeFromTable458,16509
+void ConfigTool::addNewTool()addNewTool477,17442
+void ConfigTool::editTool(QModelIndex idx)editTool502,18461
+void ConfigTool::editTool()editTool512,18757
+void ConfigTool::editTool(int row)editTool523,19125
+void ConfigTool::changeToolWithItem(QTableWidgetItem * item)changeToolWithItem548,20087
+void ConfigTool::removeTool()removeTool567,20856
+void ConfigTool::cancelDlg()cancelDlg592,21944
+void ConfigTool::transferCfgToGUI()transferCfgToGUI601,22240
+void ConfigTool::transferGUIToCfg()transferGUIToCfg707,25638
+ModelView * ConfigTool::createListModelView(QAbstractItemView * v,createListModelView718,25964
+ModelView * ConfigTool::createTableModelView(QAbstractItemView * v,createTableModelView733,26481
+void ConfigTool::transferFlagsFromCfgToGUI()transferFlagsFromCfgToGUI747,27030
+void ConfigTool::transferFlagsFromGUIToCfg()transferFlagsFromGUIToCfg775,28210
+QVector<ConfigTool::FlagSt> ConfigTool::monitMsgFlags;monitMsgFlags802,29235
+
+qpfhmi/browser.h,1182
+#define BROWSER_HBROWSER_H37,1645
+class Browser: public QWidget, private Ui::BrowserBrowser49,1912
+    struct DBConnection {DBConnection53,1986
+        QString driverName;driverName54,2012
+        QString databaseName;databaseName55,2040
+        QString userName;userName56,2070
+        QString password;password57,2096
+        QString hostName;hostName58,2122
+        int port;port59,2148
+    void currentChanged() { updateActions(); }currentChanged78,2649
+    void on_insertRowAction_triggered()on_insertRowAction_triggered81,2715
+    void on_deleteRowAction_triggered()on_deleteRowAction_triggered83,2776
+    void on_connectionWidget_tableActivated(const QString &table)on_connectionWidget_tableActivated91,3085
+    void on_connectionWidget_metaDataRequested(const QString &table)on_connectionWidget_metaDataRequested93,3177
+    void on_submitButton_clicked()on_submitButton_clicked95,3275
+    void on_clearButton_clicked()on_clearButton_clicked100,3367
+class CustomModel: public QSqlTableModelCustomModel110,3530
+    explicit CustomModel(QObject *parent = 0, QSqlDatabase db = QSqlDatabase()):QSqlTableModel(parent, db) {}CustomModel114,3594
+
+qpfhmi/logwatcher.h,335
+#define LOGWATCHER_HLOGWATCHER_H42,813
+namespace QPF {QPF48,889
+class LogWatcher : public QObjectLogWatcher50,906
+  TextView * textView;textView67,1163
+  QFileSystemWatcher * fsWatcher;fsWatcher68,1186
+  QString watchedFile;watchedFile69,1220
+  qint64 bytesRead;bytesRead70,1243
+  qint64 maxNumLines;maxNumLines71,1263
 
 qpfhmi/configtool.h,1977
 #define CONFIGTOOL_HCONFIGTOOL_H42,816
@@ -3748,239 +3906,6 @@ class ConfigTool : public QDialogConfigTool121,3228
     QStringList       prodTypes;prodTypes205,5188
     static QVector<FlagSt> monitMsgFlags;monitMsgFlags207,5222
 
-qpfhmi/proctskstatmodel.h,163
-#define PROCTASKSTATUSMODEL_HPROCTASKSTATUSMODEL_H41,864
-namespace QPF {QPF45,920
-class ProcTaskStatusModel : public DBTableModel {ProcTaskStatusModel47,937
-
-qpfhmi/txtblmodel.h,187
-#define TXTABLEMODEL_HTXTABLEMODEL_H41,839
-namespace QPF {QPF45,888
-class TxTableModel : public DBTableModel {TxTableModel47,905
-    QMap<QString, int> nodeOrder;nodeOrder57,1113
-
-qpfhmi/textview.h,198
-#define TEXTVIEW_HTEXTVIEW_H42,796
-class TextView : public LogFrameTextView48,901
-    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE61,1105
-    QString name;name64,1172
-
-qpfhmi/txitemdlg.h,625
-#define TXITEMDLG_HTXITEMDLG_H42,814
-namespace QPF {QPF47,887
-class TxItemDelegate : public QStyledItemDelegateTxItemDelegate49,904
-               const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE57,1090
-                   const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE59,1209
-                          const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE61,1356
-    void setEditorData(QWidget *editor, const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE62,1431
-                      const QModelIndex &index) const Q_DECL_OVERRIDE;Q_DECL_OVERRIDE64,1586
-
-qpfhmi/txitem.h,834
-#define TXITEM_HTXITEM_H42,786
-namespace Ui {Ui47,847
-namespace QPF {QPF51,879
-class TxItemTxItem53,896
-    enum Mode { Empty, Line, Source, Target };Mode58,934
-    enum Mode { Empty, Line, Source, Target };Empty58,934
-    enum Mode { Empty, Line, Source, Target };Line58,934
-    enum Mode { Empty, Line, Source, Target };Source58,934
-    enum Mode { Empty, Line, Source, Target };Target58,934
-    enum Orientation { FromLeftToRight, FromRightToLeft };Orientation59,981
-    enum Orientation { FromLeftToRight, FromRightToLeft };FromLeftToRight59,981
-    enum Orientation { FromLeftToRight, FromRightToLeft };FromRightToLeft59,981
-    Ui::TxItem *ui;ui71,1314
-    Mode mode;mode72,1334
-    Orientation orientation;orientation73,1349
-    QString name;name74,1378
-    QJsonObject content;content75,1396
-
-qpfhmi/proctskmng.h,591
-#define PROCTASKMANAGER_HPROCTASKMANAGER_H41,842
-namespace QPF {QPF45,887
-class ProcTaskManager : public QObject {ProcTaskManager47,904
-    struct DBConnection {DBConnection56,1052
-        QString driverName;driverName57,1078
-        QString databaseName;databaseName58,1106
-        QString userName;userName59,1136
-        QString password;password60,1162
-        QString hostName;hostName61,1188
-        int port;port62,1214
-    QSqlDatabase       db;db79,1670
-    QString            activeDb;activeDb80,1697
-    QMap<QString, int> connections;connections81,1730
-
-qpfhmi/productsmodel.h,138
-#define PRODUCTSMODEL_HPRODUCTSMODEL_H41,849
-namespace QPF {QPF45,900
-class ProductsModel : public DBTreeModel {ProductsModel47,917
-
-qpfhmi/progbardlg.h,191
-#define PROGBARDLG_HPROGBARDLG_H42,822
-namespace QPF {QPF47,894
-class ProgressBarDelegate : public QItemDelegateProgressBarDelegate49,911
-    int progressColumn;progressColumn62,1321
-
-qpfhmi/qjsonmodel.h,309
-#define QJSONMODEL_HQJSONMODEL_H42,806
-class QJsonModel : public QAbstractItemModelQJsonModel49,946
-    QJsonTreeItem * mRootItem;mRootItem68,1686
-    QJsonDocument mDocument;mDocument69,1717
-    QStringList mHeaders;mHeaders70,1746
-    QHash<QJsonValue::Type, QIcon> mTypeIcons;mTypeIcons71,1772
-
-qpfhmi/sysalertmodel.h,139
-#define SYSALERTMODEL_HSYSALERTMODEL_H41,849
-namespace QPF {QPF46,918
-class SysAlertModel : public DBTableModel {SysAlertModel48,935
-
-qpfhmi/taskstatmng.h,106
-#define TASKSTATUSMANAGER_HTASKSTATUSMANAGER_H41,847
-class TaskStatusManager {TaskStatusManager45,895
-
-qpfhmi/hmipxy.cpp,695
-#define PRESERVE_LOG_SYSTEMPRESERVE_LOG_SYSTEM41,786
-namespace QPF {QPF56,1138
-HMIProxy::HMIProxy(const char * name) :HMIProxy63,1352
-int HMIProxy::concurrentRun()concurrentRun74,1762
-void HMIProxy::log(std::string s, Log::LogLevel lvl)log83,2030
-void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd92,2336
-void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel100,2628
-void HMIProxy::sendNewCfgInfo()sendNewCfgInfo108,2910
-void HMIProxy::fromInitialisedToRunning()fromInitialisedToRunning117,3194
-void HMIProxy::execAdditonalLoopTasks()execAdditonalLoopTasks127,3551
-void HMIProxy::processMONIT_INFO()processMONIT_INFO135,3808
-
-qpfhmi/version.h,524
-#define VERSION_HVERSION_H44,818
-#define APP_SYS_NAME APP_SYS_NAME47,865
-#define APP_NAME APP_NAME50,918
-#define APP_RELEASE APP_RELEASE53,984
-#define APP_DATE APP_DATE56,1045
-#define APP_COMPANY APP_COMPANY59,1116
-#define APP_DOMAIN APP_DOMAIN62,1194
-#define APP_DIVISION APP_DIVISION65,1261
-#define APP_LONG_NAME APP_LONG_NAME68,1316
-#define APP_PURPOSE APP_PURPOSE71,1411
-#define APP_TITLE APP_TITLE74,1513
-#define APP_CREATED_BY APP_CREATED_BY77,1567
-#define APP_COPYRIGHT APP_COPYRIGHT80,1626
-
-qpfhmi/hmitypes.h,350
-#define HMITYPES_HHMITYPES_H42,780
-namespace QPF {QPF47,836
-struct QUserDefTool {QUserDefTool49,853
-    QString name;name50,875
-    QString desc;desc51,893
-    QString exe;exe52,911
-    QString args;args53,928
-    QStringList prod_types;prod_types54,946
-typedef QMap<QString, QUserDefTool> MapOfUserDefTools;MapOfUserDefTools57,978
-
-qpfhmi/configtool.cpp,2880
-#define C(C58,1091
-#define QS(QS59,1116
-namespace QPF {QPF67,1380
-Qt::ItemFlags StandardItemModel::flags(const QModelIndex&index) constflags73,1600
-Qt::ItemFlags StringListModel::flags(const QModelIndex&index) constflags88,2179
-ModelView::ModelView(QVector<QStringList> & vdlist,ModelView102,2714
-ModelView::ModelView(QStringList & dlist,ModelView117,3303
-void ModelView::setHeader(QString h)setHeader132,3868
-void ModelView::setHeaders(QStringList & hlist)setHeaders141,4163
-void ModelView::setData(QStringList & dlist)setData152,4528
-void ModelView::setData(QVector<QStringList> & vdlist)setData166,5035
-ConfigTool::ConfigTool(QWidget *parent) :ConfigTool182,5645
-ConfigTool::~ConfigTool()~ConfigTool217,7664
-void ConfigTool::prepare(MapOfUserDefTools & userTools, QStringList pts)prepare226,7942
-void ConfigTool::initExtTools(MapOfUserDefTools & userTools, QStringList pts)initExtTools241,8455
-void ConfigTool::getExtTools(MapOfUserDefTools & userTools)getExtTools273,10107
-void ConfigTool::save()save282,10424
-void ConfigTool::saveAs()saveAs303,11168
-void ConfigTool::saveAsFilename(QString & fName)saveAsFilename320,11704
-void ConfigTool::apply()apply337,12280
-void ConfigTool::closeDoNothing()closeDoNothing347,12576
-void ConfigTool::selectBasePath()selectBasePath356,12823
-void ConfigTool::setWorkingPaths(QString newPath)setWorkingPaths375,13440
-void ConfigTool::addHost()addHost387,13964
-void ConfigTool::removeHost()removeHost397,14321
-void ConfigTool::addProduct()addProduct406,14648
-void ConfigTool::removeProduct()removeProduct416,15022
-void ConfigTool::addProcessor()addProcessor425,15363
-void ConfigTool::removeProcessor()removeProcessor435,15731
-void ConfigTool::addRule()addRule444,16056
-void ConfigTool::removeRule()removeRule454,16413
-void ConfigTool::removeFromTable(QAbstractItemView * vw, QString item)removeFromTable463,16739
-void ConfigTool::addNewTool()addNewTool482,17672
-void ConfigTool::editTool(QModelIndex idx)editTool507,18691
-void ConfigTool::editTool()editTool517,18987
-void ConfigTool::editTool(int row)editTool528,19355
-void ConfigTool::changeToolWithItem(QTableWidgetItem * item)changeToolWithItem553,20317
-void ConfigTool::removeTool()removeTool572,21086
-void ConfigTool::cancelDlg()cancelDlg597,22174
-void ConfigTool::transferCfgToGUI()transferCfgToGUI606,22471
-void ConfigTool::transferGUIToCfg()transferGUIToCfg764,27625
-ModelView * ConfigTool::createListModelView(QAbstractItemView * v,createListModelView775,27951
-ModelView * ConfigTool::createTableModelView(QAbstractItemView * v,createTableModelView790,28468
-void ConfigTool::transferFlagsFromCfgToGUI()transferFlagsFromCfgToGUI804,29017
-void ConfigTool::transferFlagsFromGUIToCfg()transferFlagsFromGUIToCfg832,30189
-QVector<ConfigTool::FlagSt> ConfigTool::monitMsgFlags;monitMsgFlags859,31206
-
-qpfhmi/browser.h,1182
-#define BROWSER_HBROWSER_H37,1645
-class Browser: public QWidget, private Ui::BrowserBrowser49,1912
-    struct DBConnection {DBConnection53,1986
-        QString driverName;driverName54,2012
-        QString databaseName;databaseName55,2040
-        QString userName;userName56,2070
-        QString password;password57,2096
-        QString hostName;hostName58,2122
-        int port;port59,2148
-    void currentChanged() { updateActions(); }currentChanged78,2649
-    void on_insertRowAction_triggered()on_insertRowAction_triggered81,2715
-    void on_deleteRowAction_triggered()on_deleteRowAction_triggered83,2776
-    void on_connectionWidget_tableActivated(const QString &table)on_connectionWidget_tableActivated91,3085
-    void on_connectionWidget_metaDataRequested(const QString &table)on_connectionWidget_metaDataRequested93,3177
-    void on_submitButton_clicked()on_submitButton_clicked95,3275
-    void on_clearButton_clicked()on_clearButton_clicked100,3367
-class CustomModel: public QSqlTableModelCustomModel110,3530
-    explicit CustomModel(QObject *parent = 0, QSqlDatabase db = QSqlDatabase()):QSqlTableModel(parent, db) {}CustomModel114,3594
-
-qpfhmi/logwatcher.h,335
-#define LOGWATCHER_HLOGWATCHER_H42,813
-namespace QPF {QPF48,889
-class LogWatcher : public QObjectLogWatcher50,906
-  TextView * textView;textView67,1163
-  QFileSystemWatcher * fsWatcher;fsWatcher68,1186
-  QString watchedFile;watchedFile69,1220
-  qint64 bytesRead;bytesRead70,1243
-  qint64 maxNumLines;maxNumLines71,1263
-
-qpfhmi/dbmng.cpp,1085
-namespace QPF {QPF43,832
-QSqlDatabase       DBManager::db;db45,849
-QString            DBManager::activeDb;activeDb46,883
-QMap<QString, int> DBManager::connections;connections47,923
-DBManager::DBManager()DBManager49,967
-DBManager::~DBManager()~DBManager58,1225
-void DBManager::close()close63,1267
-void DBManager::checkTaskStatusInfo()checkTaskStatusInfo74,1475
-QSqlError DBManager::addConnection(const QString &driver, const QString &connectionName,addConnection79,1519
-void DBManager::addConnection(const QString &connectionName, DBConnection & conn)addConnection104,2264
-QString DBManager::getState()getState115,2755
-void DBManager::setState(QString newState)setState125,2991
-QMap<QString,QString> DBManager::getCurrentStates(QString session)getCurrentStates142,3551
-int DBManager::numOfRowsInDbTable(QString tableName)numOfRowsInDbTable155,3966
-void DBManager::addICommand(QString cmd)addICommand168,4337
-bool DBManager::getICommand(QString cmd, bool removeCmd)getICommand189,5073
-void DBManager::removeICommands(QString cmd)removeICommands225,6437
-
-qpfhmi/exttooledit.h,230
-#define EXTTOOLEDIT_HEXTTOOLEDIT_H42,811
-namespace Ui {Ui48,877
-namespace QPF {QPF52,914
-class ExtToolEdit : public QDialogExtToolEdit54,931
-    Ui::ExtToolEdit *ui;ui73,1284
-    QStringList prodTypes;prodTypes74,1309
-
 qpfhmi/exttoolsdef.h,350
 #define EXTTOOLSDEF_HEXTTOOLSDEF_H42,811
 namespace Ui {Ui50,931
@@ -3997,6 +3922,21 @@ namespace Ui {Ui47,861
 class LogFrame : public QFrameLogFrame51,895
     Ui::LogFrame *ui;ui69,1186
 
+qpfhmi/proctskmng.h,591
+#define PROCTASKMANAGER_HPROCTASKMANAGER_H41,842
+namespace QPF {QPF45,887
+class ProcTaskManager : public QObject {ProcTaskManager47,904
+    struct DBConnection {DBConnection56,1052
+        QString driverName;driverName57,1078
+        QString databaseName;databaseName58,1106
+        QString userName;userName59,1136
+        QString password;password60,1162
+        QString hostName;hostName61,1188
+        int port;port62,1214
+    QSqlDatabase       db;db79,1670
+    QString            activeDb;activeDb80,1697
+    QMap<QString, int> connections;connections81,1730
+
 qpfhmi/qjsonitem.h,282
 #define JSONITEM_HJSONITEM_H42,808
 class QJsonTreeItemQJsonTreeItem47,912
@@ -4006,34 +3946,13 @@ class QJsonTreeItemQJsonTreeItem47,912
     QList<QJsonTreeItem*> mChilds;mChilds75,1558
     QJsonTreeItem * mParent;mParent76,1593
 
-qpfhmi/types.h,630
-#define TYPES_HTYPES_H41,817
-#define TLIST_PROD_BASIC_MDATA_FIELDS TLIST_PROD_BASIC_MDATA_FIELDS46,871
-namespace QPF {QPF60,1521
-#define T(T66,1618
-enum MdataFieldIdx { TLIST_PROD_BASIC_MDATA_FIELDS };MdataFieldIdx67,1650
-enum MdataFieldIdx { TLIST_PROD_BASIC_MDATA_FIELDS };TLIST_PROD_BASIC_MDATA_FIELDS67,1650
-#undef TT68,1704
-struct MdataField {MdataField70,1715
-    MdataField(std::string n, std::string v) :MdataField71,1735
-    std::string name;name73,1811
-    std::string value;value74,1833
-typedef std::vector<MdataField> Mdata;Mdata77,1860
-typedef std::vector<Mdata*>     MdataDB;MdataDB79,1900
-
-qpfhmi/xmlsyntaxhighlight.h,874
-#define BASIC_XML_SYNTAX_HIGHLIGHTER_HBASIC_XML_SYNTAX_HIGHLIGHTER_H42,870
-class XMLBasicSyntaxHighlighter : public QSyntaxHighlighterXMLBasicSyntaxHighlighter47,962
-    QTextCharFormat     m_xmlKeywordFormat;m_xmlKeywordFormat66,1464
-    QTextCharFormat     m_xmlElementFormat;m_xmlElementFormat67,1508
-    QTextCharFormat     m_xmlAttributeFormat;m_xmlAttributeFormat68,1552
-    QTextCharFormat     m_xmlValueFormat;m_xmlValueFormat69,1598
-    QTextCharFormat     m_xmlCommentFormat;m_xmlCommentFormat70,1640
-    QList<QRegExp>      m_xmlKeywordRegexes;m_xmlKeywordRegexes72,1685
-    QRegExp             m_xmlElementRegex;m_xmlElementRegex73,1730
-    QRegExp             m_xmlAttributeRegex;m_xmlAttributeRegex74,1773
-    QRegExp             m_xmlValueRegex;m_xmlValueRegex75,1818
-    QRegExp             m_xmlCommentRegex;m_xmlCommentRegex76,1859
+qpfhmi/qjsonmodel.h,309
+#define QJSONMODEL_HQJSONMODEL_H42,806
+class QJsonModel : public QAbstractItemModelQJsonModel49,946
+    QJsonTreeItem * mRootItem;mRootItem68,1686
+    QJsonDocument mDocument;mDocument69,1717
+    QStringList mHeaders;mHeaders70,1746
+    QHash<QJsonValue::Type, QIcon> mTypeIcons;mTypeIcons71,1772
 
 qpfhmi/browser.cpp,1205
 #define USE_ACTIONSUSE_ACTIONS41,1688
@@ -4056,15 +3975,17 @@ void Browser::on_submitAction_triggered()on_submitAction_triggered266,9163
 void Browser::on_revertAction_triggered()on_revertAction_triggered273,9321
 void Browser::on_selectAction_triggered()on_selectAction_triggered280,9479
 
-qpfhmi/txitem.cpp,397
-namespace QPF {QPF45,826
-TxItem::TxItem()TxItem47,843
-void TxItem::setMode(Mode m)setMode51,865
-void TxItem::setOrientation(Orientation o)setOrientation56,913
-void TxItem::setMsgName(QString n)setMsgName61,982
-void TxItem::setContent(QJsonObject o)setContent66,1036
-QSize TxItem::sizeHint() constsizeHint71,1097
-void TxItem::paint(QPainter *painter, const QRect &rect,paint76,1210
+qpfhmi/connectionwidget.cpp,795
+ConnectionWidget::ConnectionWidget(QWidget *parent)ConnectionWidget41,1697
+ConnectionWidget::~ConnectionWidget()~ConnectionWidget62,2490
+static QString qDBCaption(const QSqlDatabase &db)qDBCaption66,2533
+void ConnectionWidget::refresh()refresh76,2797
+QSqlDatabase ConnectionWidget::currentDatabase() constcurrentDatabase106,3737
+static void qSetBold(QTreeWidgetItem *item, bool bold)qSetBold111,3842
+void ConnectionWidget::setActive(QTreeWidgetItem *item)setActive118,3986
+void ConnectionWidget::on_tree_itemActivated(QTreeWidgetItem *item, int /* column */)on_tree_itemActivated132,4360
+void ConnectionWidget::showMetaData()showMetaData145,4626
+void ConnectionWidget::on_tree_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *)on_tree_currentItemChanged154,4847
 
 qpfhmi/connectionwidget.h,245
 #define CONNECTIONWIDGET_HCONNECTIONWIDGET_H37,1654
@@ -4073,13 +3994,10 @@ class ConnectionWidget: public QWidgetConnectionWidget46,1854
     QAction *metaDataAction;metaDataAction69,2436
     QString activeDb;activeDb70,2465
 
-qpfhmi/verbleveldlg.cpp,363
-namespace QPF {QPF47,876
-VerbLevelDlg::VerbLevelDlg(QWidget *parent) :VerbLevelDlg49,893
-void VerbLevelDlg::setVerbosityLevel(int lvl)setVerbosityLevel70,1415
-QString VerbLevelDlg::getVerbosityLevelName()getVerbosityLevelName76,1584
-int VerbLevelDlg::getVerbosityLevelIdx()getVerbosityLevelIdx81,1660
-VerbLevelDlg::~VerbLevelDlg()~VerbLevelDlg86,1734
+qpfhmi/proctskstatmodel.h,163
+#define PROCTASKSTATUSMODEL_HPROCTASKSTATUSMODEL_H41,864
+namespace QPF {QPF45,920
+class ProcTaskStatusModel : public DBTableModel {ProcTaskStatusModel47,937
 
 qpfhmi/dbtblmodel.cpp,628
 namespace QPF {QPF45,867
@@ -4113,11 +4031,24 @@ const char * MdataFieldNames[] = { TLIST_PROD_BASIC_MDATA_FIELDS };MdataFieldNa
 #undef TT47,933
 const int NumOfMdataFieldNames = sizeof(MdataFieldNames) / sizeof(char*);NumOfMdataFieldNames49,943
 
-qpfhmi/dlgdataing.h,171
-#define DLGDATAING_HDLGDATAING_H42,818
-namespace Ui {Ui46,860
-class DlgDataIngestion : public QDialogDlgDataIngestion50,902
-    Ui::DlgDataIngestion *ui;ui59,1053
+qpfhmi/verbleveldlg.cpp,363
+namespace QPF {QPF47,876
+VerbLevelDlg::VerbLevelDlg(QWidget *parent) :VerbLevelDlg49,893
+void VerbLevelDlg::setVerbosityLevel(int lvl)setVerbosityLevel70,1415
+QString VerbLevelDlg::getVerbosityLevelName()getVerbosityLevelName76,1584
+int VerbLevelDlg::getVerbosityLevelIdx()getVerbosityLevelIdx81,1660
+VerbLevelDlg::~VerbLevelDlg()~VerbLevelDlg86,1734
+
+qpfhmi/hmipxy.cpp,717
+HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)HMIProxy60,1309
+HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)HMIProxy68,1581
+void HMIProxy::runEachIteration()runEachIteration76,1864
+void HMIProxy::processIncommingMessages()processIncommingMessages103,2797
+void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg120,3472
+void HMIProxy::log(std::string s, Log::LogLevel lvl)log129,3822
+void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd138,4122
+void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel146,4416
+void HMIProxy::sendNewCfgInfo()sendNewCfgInfo154,4700
 
 qpfhmi/verbleveldlg.h,333
 #define VERBLEVELDLG_HVERBLEVELDLG_H42,816
@@ -4138,6 +4069,10 @@ void XMLBasicSyntaxHighlighter::highlightByRegex(const QTextCharFormat & format,
 void XMLBasicSyntaxHighlighter::setRegexes()setRegexes104,2873
 void XMLBasicSyntaxHighlighter::setFormats()setFormats116,3399
 
+qpfhmi/hmipxy.h,86
+#define HMIPXY_HHMIPXY_H42,806
+class HMIProxy : public Component {HMIProxy77,1959
+
 qpfhmi/frmagentstatus.h,199
 #define FRMAGENTSTATUS_HFRMAGENTSTATUS_H42,826
 namespace Ui {Ui47,894
@@ -4145,27 +4080,28 @@ namespace QPF {QPF51,934
 class FrmAgentStatus : public QFrameFrmAgentStatus53,951
     Ui::FrmAgentStatus *ui;ui64,1135
 
-qpfhmi/hmipxy.h,184
-#define HMIPXY_HHMIPXY_H42,805
-namespace QPF {QPF71,1728
-class HMIProxy : public Component {HMIProxy76,1918
-    std::map<std::string, std::string> nodeStates;nodeStates87,2279
-
 qpfhmi/dbbrowser.cpp,100
 DBBrowser::DBBrowser(QWidget *parent) :DBBrowser47,886
 DBBrowser::~DBBrowser()~DBBrowser70,1755
 
-qpfhmi/connectionwidget.cpp,795
-ConnectionWidget::ConnectionWidget(QWidget *parent)ConnectionWidget41,1697
-ConnectionWidget::~ConnectionWidget()~ConnectionWidget62,2490
-static QString qDBCaption(const QSqlDatabase &db)qDBCaption66,2533
-void ConnectionWidget::refresh()refresh76,2797
-QSqlDatabase ConnectionWidget::currentDatabase() constcurrentDatabase106,3737
-static void qSetBold(QTreeWidgetItem *item, bool bold)qSetBold111,3842
-void ConnectionWidget::setActive(QTreeWidgetItem *item)setActive118,3986
-void ConnectionWidget::on_tree_itemActivated(QTreeWidgetItem *item, int /* column */)on_tree_itemActivated132,4360
-void ConnectionWidget::showMetaData()showMetaData145,4626
-void ConnectionWidget::on_tree_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *)on_tree_currentItemChanged154,4847
+qpfhmi/dbmng.cpp,1085
+namespace QPF {QPF43,832
+QSqlDatabase       DBManager::db;db45,849
+QString            DBManager::activeDb;activeDb46,883
+QMap<QString, int> DBManager::connections;connections47,923
+DBManager::DBManager()DBManager49,967
+DBManager::~DBManager()~DBManager58,1225
+void DBManager::close()close63,1267
+void DBManager::checkTaskStatusInfo()checkTaskStatusInfo74,1475
+QSqlError DBManager::addConnection(const QString &driver, const QString &connectionName,addConnection79,1519
+void DBManager::addConnection(const QString &connectionName, DBConnection & conn)addConnection104,2264
+QString DBManager::getState()getState115,2755
+void DBManager::setState(QString newState)setState125,2991
+QMap<QString,QString> DBManager::getCurrentStates(QString session)getCurrentStates142,3551
+int DBManager::numOfRowsInDbTable(QString tableName)numOfRowsInDbTable155,3966
+void DBManager::addICommand(QString cmd)addICommand168,4337
+bool DBManager::getICommand(QString cmd, bool removeCmd)getICommand189,5073
+void DBManager::removeICommands(QString cmd)removeICommands225,6437
 
 qpfhmi/dbbrowser.h,148
 #define DBBROWSER_HDBBROWSER_H42,801
@@ -4195,11 +4131,13 @@ namespace Ui {Ui46,870
 class DlgShowTaskInfo : public QDialogDlgShowTaskInfo50,911
     Ui::DlgShowTaskInfo *ui;ui62,1133
 
-qpfhmi/dlgalert.cpp,176
-namespace QPF {QPF44,833
-DlgAlert::DlgAlert(QWidget *parent) :DlgAlert46,850
-DlgAlert::~DlgAlert()~DlgAlert53,962
-void DlgAlert::setAlert(Alert & alert)setAlert58,1004
+qpfhmi/exttooledit.h,230
+#define EXTTOOLEDIT_HEXTTOOLEDIT_H42,811
+namespace Ui {Ui48,877
+namespace QPF {QPF52,914
+class ExtToolEdit : public QDialogExtToolEdit54,931
+    Ui::ExtToolEdit *ui;ui73,1284
+    QStringList prodTypes;prodTypes74,1309
 
 qpfhmi/dlgdataing.cpp,141
 DlgDataIngestion::DlgDataIngestion(QWidget *parent) :DlgDataIngestion44,857
@@ -4248,8 +4186,8 @@ LogFrame::~LogFrame()~LogFrame55,987
 void LogFrame::setMsg(QString msg)setMsg60,1029
 void LogFrame::clearMsg()clearMsg66,1152
 void LogFrame::displayLed(QString msgType)displayLed71,1208
-void LogFrame::clearLed()clearLed94,2149
-QPlainTextEdit * LogFrame::getTextEditor()getTextEditor102,2335
+void LogFrame::clearLed()clearLed95,2162
+QPlainTextEdit * LogFrame::getTextEditor()getTextEditor103,2348
 
 qpfhmi/logwatcher.cpp,270
 namespace QPF {QPF46,858
@@ -4258,127 +4196,119 @@ void LogWatcher::setFile(QString s)setFile57,1132
 QString LogWatcher::getFile()getFile64,1237
 void LogWatcher::updateLogView(const QString & path)updateLogView69,1294
 
-qpfhmi/main.cpp,243
-#define BUILD_ID BUILD_ID44,814
-#define TIME_LAPSE TIME_LAPSE52,934
-void usage()usage62,1338
-void sayHello()sayHello76,1818
-void ctrlMsg(QSplashScreen & splash, int k = 0)ctrlMsg98,2625
-int main(int argc, char *argv[])main122,3639
-
-qpfhmi/mainwindow.cpp,7359
-namespace QPF {QPF98,1838
-static const int MessageDelay = 2000;MessageDelay100,1855
-static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle101,1893
-const int MainWindow::ERROR        = -1;ERROR104,1990
-const int MainWindow::OFF          =  0;OFF105,2031
-const int MainWindow::INITIALISED  =  1;INITIALISED106,2072
-const int MainWindow::RUNNING      =  2;RUNNING107,2113
-const int MainWindow::OPERATIONAL  =  3;OPERATIONAL108,2154
-#define TMsg(TMsg111,2216
-#define DMsg(DMsg112,2261
-#define IMsg(IMsg113,2306
-#define WMsg(WMsg114,2350
-#define EMsg(EMsg115,2397
-#define FMsg(FMsg116,2442
-MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :MainWindow128,2993
-MainWindow::~MainWindow()~MainWindow178,4616
-void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo188,4906
-void MainWindow::manualSetupUI()manualSetupUI197,5264
-void MainWindow::readConfig(QString dbUrl)readConfig318,9812
-void MainWindow::closeEvent(QCloseEvent *event)closeEvent355,11128
-void MainWindow::saveAs()saveAs370,11547
-void MainWindow::processPath()processPath380,11932
-void MainWindow::cut()cut390,12228
-void MainWindow::copy()copy395,12324
-void MainWindow::paste()paste400,12422
-void MainWindow::about()about410,12720
-#define BUILD_ID BUILD_ID413,12764
-void MainWindow::updateMenus()updateMenus433,13390
-void MainWindow::updateWindowMenu()updateWindowMenu461,14360
-TextView *MainWindow::createTextView()createTextView501,15754
-void MainWindow::createActions()createActions518,16310
-void MainWindow::createMenus()createMenus660,22905
-void MainWindow::createToolBars()createToolBars713,24601
-void MainWindow::createStatusBar()createStatusBar730,25140
-void MainWindow::readSettings()readSettings739,25422
-void MainWindow::writeSettings()writeSettings752,25890
-QVariant MainWindow::getFromSettings(QString name)getFromSettings763,26279
-void MainWindow::putToSettings(QString name, QVariant value)putToSettings773,26635
-void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings783,27018
-void MainWindow::putUserToolsToSettings()putUserToolsToSettings811,27961
-TextView *MainWindow::activeTextView()activeTextView822,28233
-void MainWindow::switchLayoutDirection()switchLayoutDirection833,28639
-void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow844,29018
-void MainWindow::showConfigTool()showConfigTool854,29384
-void MainWindow::showDBBrowser()showDBBrowser872,29866
-void MainWindow::showExtToolsDef()showExtToolsDef883,30154
-void MainWindow::showVerbLevel()showVerbLevel898,30615
-void MainWindow::quitApp()quitApp915,31281
-void MainWindow::quitAllQPF()quitAllQPF936,32071
-void MainWindow::processProductsInPath(QString folder)processProductsInPath962,33146
-void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder997,34296
-void MainWindow::transitToOperational()transitToOperational1020,35168
-void MainWindow::init()init1028,35419
-void MainWindow::setLogWatch()setLogWatch1055,36444
-void MainWindow::processPendingEvents()processPendingEvents1115,38874
-void MainWindow::handleFinishedHMI()handleFinishedHMI1124,39168
-void MainWindow::defineValidTransitions()defineValidTransitions1133,39496
-QString MainWindow::getState()getState1160,40564
-void MainWindow::showState()showState1174,41076
-void MainWindow::updateSystemView()updateSystemView1250,43912
-void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1287,44984
-void MainWindow::selectRowInNav(int row)selectRowInNav1296,45310
-void MainWindow::removeRowInNav(int row)removeRowInNav1304,45565
-void MainWindow::initLocalArchiveView()initLocalArchiveView1316,46006
-void MainWindow::setUToolTasks()setUToolTasks1344,47255
-void MainWindow::localarchViewUpdate()localarchViewUpdate1360,47848
-void MainWindow::updateLocalArchModel()updateLocalArchModel1374,48305
-void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1383,48623
-void MainWindow::openWithDefault()openWithDefault1391,48887
-void MainWindow::openWith()openWith1403,49316
-void MainWindow::reprocessProduct()reprocessProduct1502,53012
-void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1532,54205
-void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1577,55763
-void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1593,56268
-void MainWindow::closeTab(int n)closeTab1720,61367
-void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1730,61699
-void MainWindow::closeTabAction()closeTabAction1747,62245
-void MainWindow::closeAllTabAction()closeAllTabAction1765,62743
-void MainWindow::closeOtherTabAction()closeOtherTabAction1777,63135
-void MainWindow::showTabsListMenu()showTabsListMenu1797,63760
-void MainWindow::selectTabFromList()selectTabFromList1817,64509
-void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu1826,64838
-void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu1837,65310
-void MainWindow::jsontreeExpand()jsontreeExpand1877,66922
-void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree1888,67322
-void MainWindow::jsontreeExpandAll()jsontreeExpandAll1912,68029
-void MainWindow::jsontreeCollapse()jsontreeCollapse1923,68379
-void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree1934,68785
-void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll1949,69304
-void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren1959,69655
-void MainWindow::initTasksMonitView()initTasksMonitView1973,70253
-void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2003,71736
-void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2011,72007
-void MainWindow::showWorkDir()showWorkDir2029,72623
-void MainWindow::displayTaskInfo()displayTaskInfo2047,73330
-void MainWindow::restartTask()restartTask2062,74012
-void MainWindow::stopTask()stopTask2071,74300
-bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2080,74597
-void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2108,75576
-void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2124,76172
-void MainWindow::initAlertsTables()initAlertsTables2166,77749
-void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2188,78786
-void MainWindow::showAlertInfo(QTableView * tblvw)showAlertInfo2210,79602
-void MainWindow::showSysAlertInfo()showSysAlertInfo2224,80060
-void MainWindow::showProcAlertInfo()showProcAlertInfo2233,80360
-void MainWindow::initTxView()initTxView2245,80789
-void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2267,81642
-void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2275,81897
-void MainWindow::displayTxInfo()displayTxInfo2291,82380
-void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2313,83440
-void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2403,86745
-void MainWindow::convertQUTools2UTools(MapOfUserDefTools qutmap,convertQUTools2UTools2484,89521
+qpfhmi/mainwindow.cpp,7331
+namespace QPF {QPF102,1882
+static const int MessageDelay = 2000;MessageDelay104,1899
+static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle105,1937
+const int MainWindow::ERROR        = -1;ERROR108,2034
+const int MainWindow::OFF          =  0;OFF109,2075
+const int MainWindow::INITIALISED  =  1;INITIALISED110,2116
+const int MainWindow::RUNNING      =  2;RUNNING111,2157
+const int MainWindow::OPERATIONAL  =  3;OPERATIONAL112,2198
+#define TMsg(TMsg115,2260
+#define DMsg(DMsg116,2305
+#define IMsg(IMsg117,2350
+#define WMsg(WMsg118,2394
+#define EMsg(EMsg119,2441
+#define FMsg(FMsg120,2486
+MainWindow::MainWindow(QString url, QString sessionName,MainWindow132,3037
+MainWindow::~MainWindow()~MainWindow189,4857
+void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo199,5147
+void MainWindow::manualSetupUI()manualSetupUI208,5505
+void MainWindow::readConfig(QString dbUrl)readConfig329,10053
+void MainWindow::closeEvent(QCloseEvent *event)closeEvent372,11561
+void MainWindow::saveAs()saveAs387,11980
+void MainWindow::processPath()processPath397,12365
+void MainWindow::cut()cut407,12661
+void MainWindow::copy()copy412,12757
+void MainWindow::paste()paste417,12855
+void MainWindow::about()about427,13153
+#define BUILD_ID BUILD_ID430,13197
+void MainWindow::updateMenus()updateMenus450,13823
+void MainWindow::updateWindowMenu()updateWindowMenu478,14793
+TextView *MainWindow::createTextView()createTextView518,16187
+void MainWindow::createActions()createActions535,16743
+void MainWindow::createMenus()createMenus677,23338
+void MainWindow::createToolBars()createToolBars730,25034
+void MainWindow::createStatusBar()createStatusBar747,25573
+void MainWindow::readSettings()readSettings756,25855
+void MainWindow::writeSettings()writeSettings769,26323
+QVariant MainWindow::getFromSettings(QString name)getFromSettings780,26712
+void MainWindow::putToSettings(QString name, QVariant value)putToSettings790,27068
+void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings800,27451
+void MainWindow::putUserToolsToSettings()putUserToolsToSettings827,28482
+TextView *MainWindow::activeTextView()activeTextView838,28754
+void MainWindow::switchLayoutDirection()switchLayoutDirection849,29160
+void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow860,29539
+void MainWindow::showConfigTool()showConfigTool870,29905
+void MainWindow::showDBBrowser()showDBBrowser886,30381
+void MainWindow::showExtToolsDef()showExtToolsDef897,30669
+void MainWindow::showVerbLevel()showVerbLevel912,31099
+void MainWindow::quitApp()quitApp929,31765
+void MainWindow::quitAllQPF()quitAllQPF950,32555
+void MainWindow::processProductsInPath(QString folder)processProductsInPath976,33630
+void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder1011,34767
+void MainWindow::transitToOperational()transitToOperational1034,35639
+void MainWindow::init()init1042,35890
+void MainWindow::setLogWatch()setLogWatch1070,36965
+void MainWindow::processPendingEvents()processPendingEvents1130,39395
+void MainWindow::handleFinishedHMI()handleFinishedHMI1139,39689
+void MainWindow::defineValidTransitions()defineValidTransitions1148,40017
+QString MainWindow::getState()getState1175,41085
+void MainWindow::showState()showState1189,41599
+void MainWindow::updateSystemView()updateSystemView1280,45096
+void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1317,46168
+void MainWindow::selectRowInNav(int row)selectRowInNav1326,46494
+void MainWindow::removeRowInNav(int row)removeRowInNav1334,46749
+void MainWindow::initLocalArchiveView()initLocalArchiveView1346,47190
+void MainWindow::setUToolTasks()setUToolTasks1374,48439
+void MainWindow::localarchViewUpdate()localarchViewUpdate1390,49032
+void MainWindow::updateLocalArchModel()updateLocalArchModel1404,49489
+void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1413,49807
+void MainWindow::openWithDefault()openWithDefault1421,50071
+void MainWindow::openWith()openWith1433,50500
+void MainWindow::reprocessProduct()reprocessProduct1532,54206
+void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1562,55398
+void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1607,56941
+void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1623,57446
+void MainWindow::closeTab(int n)closeTab1750,62545
+void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1760,62877
+void MainWindow::closeTabAction()closeTabAction1777,63423
+void MainWindow::closeAllTabAction()closeAllTabAction1795,63921
+void MainWindow::closeOtherTabAction()closeOtherTabAction1807,64313
+void MainWindow::showTabsListMenu()showTabsListMenu1827,64938
+void MainWindow::selectTabFromList()selectTabFromList1847,65687
+void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu1856,66016
+void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu1867,66488
+void MainWindow::jsontreeExpand()jsontreeExpand1907,68100
+void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree1918,68500
+void MainWindow::jsontreeExpandAll()jsontreeExpandAll1942,69207
+void MainWindow::jsontreeCollapse()jsontreeCollapse1953,69557
+void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree1964,69963
+void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll1979,70482
+void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren1989,70833
+void MainWindow::initTasksMonitView()initTasksMonitView2003,71431
+void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2033,72914
+void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2041,73185
+void MainWindow::showWorkDir()showWorkDir2059,73801
+void MainWindow::displayTaskInfo()displayTaskInfo2077,74508
+void MainWindow::restartTask()restartTask2092,75190
+void MainWindow::stopTask()stopTask2101,75478
+bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2110,75775
+void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2138,76738
+void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2154,77334
+void MainWindow::initAlertsTables()initAlertsTables2196,78911
+void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2218,79948
+void MainWindow::showAlertInfo(QTableView * tblvw)showAlertInfo2240,80764
+void MainWindow::showSysAlertInfo()showSysAlertInfo2254,81222
+void MainWindow::showProcAlertInfo()showProcAlertInfo2263,81522
+void MainWindow::initTxView()initTxView2275,81951
+void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2297,82804
+void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2305,83059
+void MainWindow::displayTxInfo()displayTxInfo2321,83542
+void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2343,84602
+void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2433,88151
+void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)storeQUTools2Cfg2514,90927
 
 qpfhmi/procalertmodel.cpp,82
 namespace QPF {QPF43,859
@@ -4497,98 +4427,101 @@ qpfhmi/init.h,153
 namespace QPF {QPF50,1068
 static const char EvtMngGoFile[] = "/home/eucops/qpf/EventManager.GO.msg";EvtMngGoFile52,1085
 
-qpfhmi/mainwindow.h,4710
+qpfhmi/mainwindow.h,4837
 #define MAINWINDOW_HMAINWINDOW_H42,806
 namespace Ui {Ui71,1349
 namespace QPF {QPF75,1389
-class MainWindow : public QMainWindow, LibComm::StateMachineMainWindow79,1425
-    static const int ERROR;ERROR84,1530
-    static const int OFF;OFF85,1558
-    static const int INITIALISED;INITIALISED86,1584
-    static const int RUNNING;RUNNING87,1618
-    static const int OPERATIONAL;OPERATIONAL88,1648
-    static const std::string ERROR_StateName;ERROR_StateName91,1711
-    static const std::string OFF_StateName;OFF_StateName92,1757
-    static const std::string INITIALISED_StateName;INITIALISED_StateName93,1801
-    static const std::string RUNNING_StateName;RUNNING_StateName94,1853
-    static const std::string OPERATIONAL_StateName;OPERATIONAL_StateName95,1901
-    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE105,2218
-    Ui::MainWindow *ui;ui231,5701
-    QSignalMapper *windowMapper;windowMapper233,5726
-    bool updateProductsModel;updateProductsModel235,5760
-    QMenu *fileMenu;fileMenu237,5791
-    QMenu *editMenu;editMenu238,5812
-    QMenu *windowMenu;windowMenu239,5833
-    QMenu *toolsMenu;toolsMenu240,5856
-    QMenu *sessionInfoMenu;sessionInfoMenu241,5878
-    QMenu *helpMenu;helpMenu242,5906
-    QToolBar *fileToolBar;fileToolBar243,5927
-    QToolBar *editToolBar;editToolBar244,5954
-    QAction *processPathAct;processPathAct246,5982
-    QAction *saveAsAct;saveAsAct247,6011
-    QAction *stopTaskAct;stopTaskAct249,6036
-    QAction *restartTaskAct;restartTaskAct250,6062
-    QAction *restartAct;restartAct252,6092
-    QAction *quitAct;quitAct253,6117
-    QAction *quitAllAct;quitAllAct254,6139
-    QAction *cutAct;cutAct256,6188
-    QAction *copyAct;copyAct257,6209
-    QAction *pasteAct;pasteAct258,6231
-    QAction *configToolAct;configToolAct261,6262
-    QAction *browseDBAct;browseDBAct262,6290
-    QAction *extToolsAct;extToolsAct263,6316
-    QAction *verbosityAct;verbosityAct264,6342
-    QAction *execTestRunAct;execTestRunAct265,6369
-    QAction *acDefault;acDefault267,6399
-    QAction *acReprocess;acReprocess268,6423
-    QAction *navigAct;navigAct270,6450
-    QAction *closeAct;closeAct271,6473
-    QAction *closeAllAct;closeAllAct272,6496
-    QAction *tileAct;tileAct273,6522
-    QAction *cascadeAct;cascadeAct274,6544
-    QAction *nextAct;nextAct275,6569
-    QAction *previousAct;previousAct276,6591
-    QAction *separatorAct;separatorAct277,6617
-    QAction *aboutAct;aboutAct278,6644
-    QAction *aboutQtAct;aboutQtAct279,6667
-    bool isMenuForTabWidget;isMenuForTabWidget281,6693
-    QPoint menuPt;menuPt282,6722
-    QAction * tabCloseAct;tabCloseAct283,6741
-    QAction * tabCloseAllAct;tabCloseAllAct284,6768
-    QAction * tabCloseOtherAct;tabCloseOtherAct285,6798
-    Configuration * cfg;cfg287,6831
-    QVector<LogWatcher*> nodeLogs;nodeLogs289,6857
-    QStringList nodeNames;nodeNames290,6892
-    QVector<QString> activeNodes;activeNodes291,6919
-    bool isThereActiveCores;isThereActiveCores292,6953
-    HMIProxy * hmiNode;hmiNode294,6983
-    QString  fileInDataParams;fileInDataParams296,7012
-    QTimer * taskMonitTimer;taskMonitTimer297,7043
-    QString inboxDirName;inboxDirName299,7073
-    QAction * acWorkDir;acWorkDir301,7100
-    QAction * acShowTaskInfo;acShowTaskInfo302,7125
-    QAction * acRestartTask;acRestartTask303,7155
-    QAction * acStopTask;acStopTask304,7184
-    QAction * acShowMsgInfo;acShowMsgInfo306,7211
-    QAction * acShowAlert;acShowAlert308,7241
-    QAction * acAckAlert;acAckAlert309,7268
-    QAction * acArchiveShow;acArchiveShow311,7295
-    QMenu *   acArchiveOpenExt;acArchiveOpenExt312,7324
-    QList<QAction *> acArchiveOpenExtTools;acArchiveOpenExtTools313,7356
-    QMap<QString, QAction *> acUserTools;acUserTools314,7400
-    QVBoxLayout * vlyFrmAgents;vlyFrmAgents316,7443
-    QSpacerItem * spacerFrmAgents;spacerFrmAgents317,7475
-    std::map<std::string, TaskAgentInfo*> taskAgentsInfo;taskAgentsInfo319,7511
-    std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;taskAgentsInfoPanel320,7569
-    MapOfUserDefTools userDefTools;userDefTools323,7660
-    QStringList       userDefProdTypes;userDefProdTypes324,7696
-    ProcTaskStatusModel * procTaskStatusModel;procTaskStatusModel326,7737
-    SysAlertModel *       sysAlertModel;sysAlertModel327,7784
-    ProcAlertModel *      procAlertModel;procAlertModel328,7825
-    ProductsModel *       productsModel;productsModel329,7867
-    TxTableModel *        txModel;txModel330,7908
-    QMap<QString,QString> nodeStates;nodeStates332,7944
-    QPoint pointOfAction;pointOfAction334,7983
+class MainWindow : public QMainWindow, StateMachineMainWindow79,1425
+    static const int ERROR;ERROR84,1521
+    static const int OFF;OFF85,1549
+    static const int INITIALISED;INITIALISED86,1575
+    static const int RUNNING;RUNNING87,1609
+    static const int OPERATIONAL;OPERATIONAL88,1639
+    static const std::string ERROR_StateName;ERROR_StateName91,1702
+    static const std::string OFF_StateName;OFF_StateName92,1748
+    static const std::string INITIALISED_StateName;INITIALISED_StateName93,1792
+    static const std::string RUNNING_StateName;RUNNING_StateName94,1844
+    static const std::string OPERATIONAL_StateName;OPERATIONAL_StateName95,1892
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE107,2331
+    Ui::MainWindow *ui;ui235,5872
+    QString dbUrl;dbUrl237,5897
+    QString sessionId;sessionId238,5916
+    QString masterAddress;masterAddress239,5939
+    QString startingPort;startingPort240,5966
+    QSignalMapper *windowMapper;windowMapper242,5993
+    bool updateProductsModel;updateProductsModel244,6027
+    QMenu *fileMenu;fileMenu246,6058
+    QMenu *editMenu;editMenu247,6079
+    QMenu *windowMenu;windowMenu248,6100
+    QMenu *toolsMenu;toolsMenu249,6123
+    QMenu *sessionInfoMenu;sessionInfoMenu250,6145
+    QMenu *helpMenu;helpMenu251,6173
+    QToolBar *fileToolBar;fileToolBar252,6194
+    QToolBar *editToolBar;editToolBar253,6221
+    QAction *processPathAct;processPathAct255,6249
+    QAction *saveAsAct;saveAsAct256,6278
+    QAction *stopTaskAct;stopTaskAct258,6303
+    QAction *restartTaskAct;restartTaskAct259,6329
+    QAction *restartAct;restartAct261,6359
+    QAction *quitAct;quitAct262,6384
+    QAction *quitAllAct;quitAllAct263,6406
+    QAction *cutAct;cutAct265,6455
+    QAction *copyAct;copyAct266,6476
+    QAction *pasteAct;pasteAct267,6498
+    QAction *configToolAct;configToolAct270,6529
+    QAction *browseDBAct;browseDBAct271,6557
+    QAction *extToolsAct;extToolsAct272,6583
+    QAction *verbosityAct;verbosityAct273,6609
+    QAction *execTestRunAct;execTestRunAct274,6636
+    QAction *acDefault;acDefault276,6666
+    QAction *acReprocess;acReprocess277,6690
+    QAction *navigAct;navigAct279,6717
+    QAction *closeAct;closeAct280,6740
+    QAction *closeAllAct;closeAllAct281,6763
+    QAction *tileAct;tileAct282,6789
+    QAction *cascadeAct;cascadeAct283,6811
+    QAction *nextAct;nextAct284,6836
+    QAction *previousAct;previousAct285,6858
+    QAction *separatorAct;separatorAct286,6884
+    QAction *aboutAct;aboutAct287,6911
+    QAction *aboutQtAct;aboutQtAct288,6934
+    bool isMenuForTabWidget;isMenuForTabWidget290,6960
+    QPoint menuPt;menuPt291,6989
+    QAction * tabCloseAct;tabCloseAct292,7008
+    QAction * tabCloseAllAct;tabCloseAllAct293,7035
+    QAction * tabCloseOtherAct;tabCloseOtherAct294,7065
+    QVector<LogWatcher*> nodeLogs;nodeLogs296,7098
+    QStringList nodeNames;nodeNames297,7133
+    QVector<QString> activeNodes;activeNodes298,7160
+    bool isThereActiveCores;isThereActiveCores299,7194
+    HMIProxy * hmiNode;hmiNode301,7224
+    QString  fileInDataParams;fileInDataParams303,7249
+    QTimer * taskMonitTimer;taskMonitTimer304,7280
+    QString inboxDirName;inboxDirName306,7310
+    QAction * acWorkDir;acWorkDir308,7337
+    QAction * acShowTaskInfo;acShowTaskInfo309,7362
+    QAction * acRestartTask;acRestartTask310,7392
+    QAction * acStopTask;acStopTask311,7421
+    QAction * acShowMsgInfo;acShowMsgInfo313,7448
+    QAction * acShowAlert;acShowAlert315,7478
+    QAction * acAckAlert;acAckAlert316,7505
+    QAction * acArchiveShow;acArchiveShow318,7532
+    QMenu *   acArchiveOpenExt;acArchiveOpenExt319,7561
+    QList<QAction *> acArchiveOpenExtTools;acArchiveOpenExtTools320,7593
+    QMap<QString, QAction *> acUserTools;acUserTools321,7637
+    QVBoxLayout * vlyFrmAgents;vlyFrmAgents323,7680
+    QSpacerItem * spacerFrmAgents;spacerFrmAgents324,7712
+    std::map<std::string, TaskAgentInfo*> taskAgentsInfo;taskAgentsInfo326,7748
+    std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;taskAgentsInfoPanel327,7806
+    MapOfUserDefTools userDefTools;userDefTools330,7897
+    QStringList       userDefProdTypes;userDefProdTypes331,7933
+    ProcTaskStatusModel * procTaskStatusModel;procTaskStatusModel333,7974
+    SysAlertModel *       sysAlertModel;sysAlertModel334,8021
+    ProcAlertModel *      procAlertModel;procAlertModel335,8062
+    ProductsModel *       productsModel;productsModel336,8104
+    TxTableModel *        txModel;txModel337,8145
+    QMap<QString,QString> nodeStates;nodeStates339,8181
+    QPoint pointOfAction;pointOfAction341,8220
 
 qpfhmi/procalertmodel.h,143
 #define PROCALERTMODEL_HPROCALERTMODEL_H41,853
@@ -4606,6 +4539,12 @@ void DBTreeModel::defineQuery(QString q)defineQuery89,1861
 void DBTreeModel::skipColumns(int n)skipColumns94,1928
 void DBTreeModel::refresh()refresh99,1994
 void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)execQuery106,2120
+
+qpfhmi/dlgalert.cpp,176
+namespace QPF {QPF44,833
+DlgAlert::DlgAlert(QWidget *parent) :DlgAlert46,850
+DlgAlert::~DlgAlert()~DlgAlert53,962
+void DlgAlert::setAlert(Alert & alert)setAlert58,1004
 
 version.h,524
 #define VERSION_HVERSION_H44,811

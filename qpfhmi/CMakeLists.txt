@@ -152,7 +152,7 @@ target_include_directories (qpfgui PUBLIC .
   ${PCRE2LIBDIR}
   ${PSQLLIBDIR})
 target_link_libraries (qpfgui qpfGuiLib
-  json infix str log tools uuid nncomm
+  json infix str log tools uuid fmk nncomm
   nanomsg ${PCRE2LIB} ${PSQLLIB} pthread)
 set_target_properties (qpfgui PROPERTIES LINKER_LANGUAGE CXX)
 

@@ -184,7 +184,7 @@ ConfigTool::ConfigTool(QWidget *parent) :
     ui(new Ui::ConfigTool)
 {
     ui->setupUi(this);
-tramp
+
     monitMsgFlags.append(FlagSt({ "START",       ui->chkMsgsSTARTToDisk     , ui->chkMsgsSTARTToDisk_2 }));
     monitMsgFlags.append(FlagSt({ "INDATA"     , ui->chkMsgsINDATAToDisk    , ui->chkMsgsINDATAToDisk_2 }));
     monitMsgFlags.append(FlagSt({ "DATA_RQST"  , ui->chkMsgsDATARQSTToDisk  , ui->chkMsgsDATARQSTToDisk_2 }));
@@ -198,16 +198,11 @@ tramp
 
 
     // Hide non-yet-implemented widgets
-    ui->gpboxInput->hide();
-    ui->gpboxOutput->hide();
-
     ui->btngrpSection->setId(ui->tbtnGeneral       , PageGeneral);
     ui->btngrpSection->setId(ui->tbtnMachines      , PageMachines);
     ui->btngrpSection->setId(ui->tbtnProdProc      , PageProdProc);
-    ui->btngrpSection->setId(ui->tbtnNetwork       , PageNetwork);
     ui->btngrpSection->setId(ui->tbtnOrchestration , PageOrchestration);
     ui->btngrpSection->setId(ui->tbtnExtTools      , PageExtTools);
-    ui->btngrpSection->setId(ui->tbtnStorage       , PageStorage);
     ui->btngrpSection->setId(ui->tbtnFlags         , PageFlags);
 }
 
@@ -357,13 +352,13 @@ void ConfigTool::selectBasePath()
 {
 
 
-    QString pathName(QString::fromStdString(cfg.storage.base));
+    QString pathName(QS(cfg.general.workArea()));
     pathName = QFileDialog::getExistingDirectory(this,
                                                  tr("Select QPF base path"),
                                                  pathName);
     QFileInfo fs(pathName);
     if (fs.exists()) {
-        ui->edBasePath->setText(pathName);
+        //ui->edBasePath->setText(pathName);
     }
 
 }
@@ -605,8 +600,6 @@ void ConfigTool::cancelDlg()
 //----------------------------------------------------------------------
 void ConfigTool::transferCfgToGUI()
 {
-
-
     // Generate values for Config. display
     QVector<QStringList> netTable;
     QVector<QStringList> hostsTable;
@@ -619,56 +612,19 @@ void ConfigTool::transferCfgToGUI()
     QMap<QString, QString> ipToMachine;
     QMap<QString, int> machineAgents;
 
-    int i = 0;
-    for (std::string & m : cfg.machines) {
-        std::string ip("0.0.0.0");
-        if (cfg.machineNodes.find(m) != cfg.machineNodes.end()) {
-            std::vector<std::string> & mnodes = cfg.machineNodes[m];
-            std::string pname = mnodes.at(0);
-            Peer * peer = cfg.peersCfgByName[pname];
-            ip = peer->clientAddr.substr(6);
-            ip = ip.substr(0, ip.find(':'));
-        }
-        if (m == cfg.masterMachine) { masterIndex = i; }
-        QString machine = QS(m);
-        QString iP = QS(ip);
-        QStringList column;
-        column << machine << iP
-               << ((masterIndex == i) ? tr("Master Host") : tr("Processing Host"));
-        hostsTable.append(column);
-        hostsList << machine;
-        ipToMachine[iP] = machine;
-        ++i;
-    }
-
-    int numNodes = cfg.peersCfg.size();
-    for (i = 0; i < numNodes; ++i) {
-        Peer & peer = cfg.peersCfg.at(i);
-        QString s = QS(peer.clientAddr);
-        s = s.mid(s.lastIndexOf("/") + 1);
-        s = s.left(s.indexOf(":"));
-        if (peer.type == "taskagent") {
-            QString m = ipToMachine[s];
-            if (machineAgents.find(m) == machineAgents.end()) {
-                machineAgents[m] = 1;
-            } else {
-                machineAgents[m] = machineAgents[m] + 1;
-            }
-        }
-
+    // Create Agents table
+    data << QS(cfg.network.masterNode())
+         << tr("Master Host")
+         << tr("0");
+    hostsTable.append(data);
+    for (auto & kv : cfg.network.processingNodes()) {
         data.clear();
-        data << ipToMachine[s] + " (" + s + ")"
-             << QS(peer.name) << QS(peer.type)
-             << QS(peer.clientAddr) << QS(peer.serverAddr);
-
-        netTable.append(data);
+        data << QS(kv.first)
+             << tr("Processing Host")
+             << QString("%1").arg(kv.second);
+        hostsTable.append(data);
     }
-
-    for (i = 0; i < hostsTable.count(); ++i) {
-        QStringList & column = hostsTable[i];
-        column << QString("%1").arg(machineAgents[column.at(0)]);
-    }
-
+    /*
     Peer * peer = cfg.peersCfgByName[std::string("QPFHMI")];
     QString qpfhmiServerAddr = QS(peer->serverAddr);
     int basePort = qpfhmiServerAddr.mid(qpfhmiServerAddr.lastIndexOf(":") + 1).toInt();
@@ -684,17 +640,22 @@ void ConfigTool::transferCfgToGUI()
              << QS(join(rule->outputs, ", "));
         rulesTable.append(data);
     }
-
+    */
     // Now, put data in the GUI
 
     ui->lblConfigName->setText(C("Source: " + cfg.cfgFileName));
 
     // 1. GENERAL
     // 1.1 General
-    ui->edAppName->setText(C(cfg.appName));
-    ui->edAppVersion->setText(C(cfg.appVersion));
-    ui->edLastAccess->setText(C(cfg.lastAccess));
-    ui->edWorkArea->setText(C(cfg.storage.base));
+    ui->edAppName->setText(C(cfg.general.appName()));
+    ui->edAppVersion->setText(C(cfg.general.appVersion()));
+    ui->edLastAccess->setText(C(cfg.general.lastAccess()));
+
+    ui->edBasePath->setText(C(cfg.general.workArea()));
+    ui->nedLocalArchiveFolder->setText(C(cfg.storage.archive));
+    ui->nedInbox->setText(C(cfg.storage.inbox));
+    ui->nedOutbox->setText(C(cfg.storage.gateway));
+
 
     // 1.2 Environment
     ui->edUser->setText(qgetenv("USER"));
@@ -706,16 +667,12 @@ void ConfigTool::transferCfgToGUI()
 
     // 2. MACHINES
     hdr.clear();
-    hdr << "Host name" << "IP" << "Host Type" << "Num.Agents";
+    hdr << "Host IP" << "Host Type" << "Num.Agents";
     ModelView * mvHosts = createTableModelView(ui->tblviewHosts, hostsTable, hdr);
     (void)(mvHosts);
 
-    ui->cboxMasterHost->addItems(hostsList);
-    ui->cboxMasterHost->setCurrentIndex(masterIndex);
-
-    ui->spboxBasePort->setValue(basePort);
-
     // 3. PRODUCTS & PROCESSORS
+    /*
     // 3.1 Products
     data.clear();
     for (auto & s : cfg.orcParams.productTypes) data << QS(s);
@@ -727,15 +684,7 @@ void ConfigTool::transferCfgToGUI()
     for (auto & kv : cfg.orcParams.processors) data << QS(kv.first);
     ModelView * mvProcs = createListModelView(ui->listProcs, data, "Processors");
     (void)(mvProcs);
-
-    // 4. NETWORK
-    hdr.clear();
-    hdr << "Host"
-        << "Node name" << "Node Type"
-        << "Client Addr" << "Server Addr";
-    ModelView * mvNet = createTableModelView(ui->tblviewNet, netTable, hdr);
-    (void)(mvNet);
-
+    */
     // 4. RULES
     hdr.clear();
     hdr << "Rule name" << "Inputs" << "Condition" << "Processor" << "Outputs";
@@ -746,13 +695,7 @@ void ConfigTool::transferCfgToGUI()
 
     // Already set
 
-    // 6. STORAGE
-    ui->edBasePath->setText(C(cfg.storage.base));
-    ui->nedLocalArchiveFolder->setText(C(cfg.storage.local_archive.path));
-    ui->nedInbox->setText(C(cfg.storage.inbox.path));
-    ui->nedOutbox->setText(C(cfg.storage.outbox.path));
-
-    // 7. FLAGS
+    // 6. FLAGS
     transferFlagsFromCfgToGUI();
 
 }
@@ -803,8 +746,7 @@ ModelView * ConfigTool::createTableModelView(QAbstractItemView * v,
 //----------------------------------------------------------------------
 void ConfigTool::transferFlagsFromCfgToGUI()
 {
-
-
+    /*
     std::string msgName;
 
     std::map<std::string, bool> & fmapDsk = cfg.flags.monit.msgsToDisk;
@@ -823,6 +765,7 @@ void ConfigTool::transferFlagsFromCfgToGUI()
     ui->chkGenerateIntermedProd->setChecked(cfg.flags.proc.intermedProducts);
 
     ui->chkSendOutputsToArchive->setChecked(cfg.flags.arch.sendOutputsToMainArchive);
+    */
 }
 
 //----------------------------------------------------------------------
@@ -831,8 +774,7 @@ void ConfigTool::transferFlagsFromCfgToGUI()
 //----------------------------------------------------------------------
 void ConfigTool::transferFlagsFromGUIToCfg()
 {
-
-
+    /*
     std::string msgName;
 
     std::map<std::string, bool> & fmapDsk = cfg.flags.monit.msgsToDisk;
@@ -853,6 +795,7 @@ void ConfigTool::transferFlagsFromGUIToCfg()
     cfg.flags.proc.intermedProducts  = ui->chkGenerateIntermedProd->isChecked();
 
     cfg.flags.arch.sendOutputsToMainArchive = ui->chkSendOutputsToArchive->isChecked();
+    */
 }
 
 // Auxiliary vector with information about config. flags

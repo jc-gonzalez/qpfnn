@@ -394,6 +394,40 @@ struct TaskInfo : public JRecord {
     JSTR(taskData);
 };
 
+struct TaskAgentInfo : public JRecord {
+    TaskAgentInfo() {}
+    TaskAgentInfo(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJINT(total);
+        DUMPJINT(maxnum);
+        DUMPJINT(running);
+        DUMPJINT(waiting);
+        DUMPJINT(paused);
+        DUMPJINT(stopped);
+        DUMPJINT(failed);
+        DUMPJINT(finished);
+        DUMPJINT(load1min);
+        DUMPJINT(load5min);
+        DUMPJINT(load15min);
+        DUMPJINT(uptimesecs);
+    }
+    JSTR(name);
+    JSTR(client);
+    JSTR(server);
+    JINT(total);
+    JINT(maxnum);
+    JINT(running);
+    JINT(waiting);
+    JINT(paused);
+    JINT(stopped);
+    JINT(failed);
+    JINT(finished);
+    JINT(load1min);
+    JINT(load5min);
+    JINT(load15min);
+    JINT(uptimesecs);
+};
+
 #define UNUSED(x) (void)(x)
 
 //}

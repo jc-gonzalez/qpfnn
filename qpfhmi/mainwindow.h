@@ -76,7 +76,7 @@ namespace QPF {
 
 class LogWatcher;
 
-class MainWindow : public QMainWindow, LibComm::StateMachine
+class MainWindow : public QMainWindow, StateMachine
 {
     Q_OBJECT
 
@@ -95,8 +95,10 @@ class MainWindow : public QMainWindow, LibComm::StateMachine
     static const std::string OPERATIONAL_StateName;
 
 public:
-    explicit MainWindow(QString dbUrl = QString("db://eucops:e314clid@localhost:5432/qpfdb"),
+    explicit MainWindow(QString url = QString("db://eucops:e314clid@localhost:5432/qpfdb"),
                         QString sessionName = QString(""),
+                        QString masterAddr = QString("127.0.0.1"),
+                        int port = DEFAULT_INITIAL_PORT,
                         QWidget *parent = 0);
     ~MainWindow();
 
@@ -224,11 +226,18 @@ private:
 
     void getAllChildren(QModelIndex index, QModelIndexList &indices);
 
-    void convertQUTools2UTools(MapOfUserDefTools qutmap,
-                               std::map<std::string, UserDefTool> & utmap);
+    void storeQUTools2Cfg(MapOfUserDefTools qutmap);
+
+    //void convertQUTools2UTools(MapOfUserDefTools qutmap,
+    //                           std::map<std::string, UserDefTool> & utmap);
 
 private:
     Ui::MainWindow *ui;
+
+    QString dbUrl;
+    QString sessionId;
+    QString masterAddress;
+    QString startingPort;
 
     QSignalMapper *windowMapper;
 
@@ -284,15 +293,13 @@ private:
     QAction * tabCloseAllAct;
     QAction * tabCloseOtherAct;
 
-    Configuration * cfg;
-
     QVector<LogWatcher*> nodeLogs;
     QStringList nodeNames;
     QVector<QString> activeNodes;
     bool isThereActiveCores;
 
     HMIProxy * hmiNode;
-    
+
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
 

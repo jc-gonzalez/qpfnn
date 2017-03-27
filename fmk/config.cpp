@@ -46,11 +46,17 @@
 #include "dbg.h"
 #include "str.h"
 #include "tools.h"
+#include "dbhdlpostgre.h"
+#include "except.h"
+#include "log.h"
 
 #include <sys/time.h>
 #include <fstream>
 #include <iostream>
 #include <libgen.h>
+#include <memory>
+
+using Configuration::cfg;
 
 #define WRITE_MESSAGE_FILES
 
@@ -70,36 +76,19 @@ Config & Config::_()
 }
 
 //----------------------------------------------------------------------
-// Constructor
+// Method: init
 //----------------------------------------------------------------------
 void Config::init(json v)
 {
     value = v;
-    {
-        SET_GRP(CfgGrpGeneral,          general);
-        SET_GRP(CfgGrpNetwork,          network);
-        SET_GRP(CfgGrpDB,               db);
-        SET_GRP(CfgGrpProducts,         products);
-        SET_GRP(CfgGrpOrchestration,    orchestration);
-        SET_GRP(CfgGrpUserDefToolsList, userDefTools);
-        SET_GRP(CfgGrpFlags,            flags);
-    }
 
-    DBHost = db.host();
-    DBPort = db.port();
-    DBName = db.name();
-    DBUser = db.user();
-    DBPwd  = db.pwd();
-
-    DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
-
+    fillData();
     isActualFile = false;
-
     processConfig();
 }
 
 //----------------------------------------------------------------------
-// Constructor
+// Method: init
 //----------------------------------------------------------------------
 void Config::init(std::string fName)
 {
@@ -124,13 +113,41 @@ void Config::init(std::string fName)
     }
 
     if (! fName.empty()) {
+	TRC("Configuration is retrieved from file: " << fName);
         setConfigFile(fName);
         readConfigFromFile();
         saveConfigToDB();
+        isActualFile = true;
     } else {
+	TRC("Configuration is retrieved from db: " << fName);
         readConfigFromDB();
+        isActualFile = false;
     }
     isLive = true;
+    processConfig();
+}
+
+//----------------------------------------------------------------------
+// Method: fillData
+//----------------------------------------------------------------------
+void Config::fillData()
+{
+    json & v = value;
+    SET_GRP(CfgGrpGeneral,          general);
+    SET_GRP(CfgGrpNetwork,          network);
+    SET_GRP(CfgGrpDB,               db);
+    SET_GRP(CfgGrpProducts,         products);
+    SET_GRP(CfgGrpOrchestration,    orchestration);
+    SET_GRP(CfgGrpUserDefToolsList, userDefTools);
+    SET_GRP(CfgGrpFlags,            flags);
+
+    DBHost = db.host();
+    DBPort = db.port();
+    DBName = db.name();
+    DBUser = db.user();
+    DBPwd  = db.pwd();
+
+    DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 }
 
 //----------------------------------------------------------------------
@@ -154,6 +171,8 @@ void Config::setConfigFile(std::string fName)
     ptr = realpath(fName.c_str(), actualpath);
     cfgFileName = std::string(ptr);
     cfgFilePath = std::string(dirname(ptr));
+    TRC("cfgFileName set to: " << cfgFileName);
+    TRC("cfgFilePath set to: " << cfgFilePath);
 }
 
 //----------------------------------------------------------------------
@@ -166,20 +185,8 @@ void Config::readConfigFromFile()
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
     fromStr(buffer.str());
-    init(value);
-
-/*    std::ifstream cfgJsonFile(cfgFileName);
-    if (!cfgJsonFile.good()) {
-        cfgJsonFile.close();
-        return;
-    }
-    Json::Reader reader;
-    reader.parse(cfgJsonFile, cfg);
-    cfgJsonFile.close();
-
-    isActualFile = true;
-    processConfig();
-*/}
+    fillData();
+}
 
 //----------------------------------------------------------------------
 // Method: readConfigFromDB
@@ -187,7 +194,7 @@ void Config::readConfigFromFile()
 //----------------------------------------------------------------------
 void Config::readConfigFromDB()
 {
-/*    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     dbHdl->setDbHost(Config::DBHost);
     dbHdl->setDbPort(Config::DBPort);
     dbHdl->setDbName(Config::DBName);
@@ -198,7 +205,8 @@ void Config::readConfigFromDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
+	DBG("ERROR Trying to open connection to DB");
+        Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
 
@@ -207,64 +215,64 @@ void Config::readConfigFromDB()
     std::string dateCreated;
 
     try {
-        dbHdl->getTable("config", config);
-
-        // Transfer DB config info to JSON value
-        cfg.clear();
+        // Get config table and Transfer DB config info to JSON value
+        dbHdl->getTable("configuration", config);
         unsigned int lastConfig = config.size() - 1;
-        Json::Reader reader;
-        reader.parse(config.at(lastConfig).at(1), cfg);
+        //Json::Reader reader;
+	    //reader.parse(config.at(lastConfig).at(1), cfg);
         dateCreated = config.at(lastConfig).at(0);
-        cfgFileName = "<internalDB> " + Config::DBName + "::config";
+	    std::string configData(config.at(lastConfig).at(1));
+	    TRC("Retrieved config. data: " << configData);
+	    cfg.fromStr(configData);
+        cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+	    DBG("ERROR Trying to retrieve configuration table");
+        Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-        LibComm::Log::log("SYSTEM", Log::ERROR,
+	    DBG("ERROR Trying to retrieve configuration table");
+        Log::log("SYSTEM", Log::ERROR,
                           "Unexpected error accessing "
-                          "database for retrieval of system config");
+                          "database for retrieval of system configuration");
         return;
     }
-
+    
     // Modificar fecha de último accesso
-    std::string now = LibComm::timeTag();
-    std::string cmd("UPDATE config SET last_accessed = '" + now + "' "
+    std::string now = timeTag();
+    std::string cmd("UPDATE configuration SET last_accessed = '" + now + "' "
                     "WHERE created='" + dateCreated + "'");
 
     try {
         dbHdl->runCmd(cmd);
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-        LibComm::Log::log("SYSTEM", Log::ERROR,
+        Log::log("SYSTEM", Log::ERROR,
                           "Unexpected error accessing "
-                          "database for retrieval of system config");
+                          "database for retrieval of system configuration");
         return;
     }
 
     // Get session id
-    if (ConfigInfo::data().session.empty()) {
+    if (cfg.sessionId.empty()) {
         try {
             std::pair<std::string, std::string> sessionAndState;
             sessionAndState = dbHdl->getLatestState();
             sessionId = sessionAndState.first;
         } catch (...) {
-            LibComm::Log::log("SYSTEM", Log::ERROR,
+            Log::log("SYSTEM", Log::ERROR,
                               "Unexpected error accessing "
                               "database for retrieval of session name");
             return;
         }
     } else {
-        sessionId = ConfigInfo::data().session;
+        sessionId = cfg.sessionId;
     }
 
     // Close connection
     dbHdl->closeConnection();
-
-    isActualFile = false;
-    processConfig();
-*/}
+}
 
 //----------------------------------------------------------------------
 // Method: saveConfigToDB
@@ -272,7 +280,7 @@ void Config::readConfigFromDB()
 //----------------------------------------------------------------------
 void Config::saveConfigToDB()
 {
-/*    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
     dbHdl->setDbHost(Config::DBHost);
     dbHdl->setDbPort(Config::DBPort);
     dbHdl->setDbName(Config::DBName);
@@ -283,31 +291,32 @@ void Config::saveConfigToDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
+        Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
 
     // Modify cfg to store
-    ConfigInfo & cfgInfo = ConfigInfo::data();
-    Json::Value dbcfg(cfg);
-    dbcfg["products"]["parsing_regex"] = cfgInfo.parsing_regex;
+    //ConfigInfo & cfgInfo = ConfigInfo::data();
+    //Json::Value dbcfg(cfg);
+    json dbcfg = cfg.val();
+    dbcfg["products"]["parsing_regex"] = cfg.products.parsingRegEx();
 
-    // Transfer config from JSON value to DB
+    // Transfer configuration from JSON value to DB
     std::string cmd;
-    std::string now = LibComm::timeTag();
+    std::string now = timeTag();
     Json::FastWriter writer;
     std::string cfgString = writer.write(dbcfg);
 
-    cmd = "INSERT INTO config (created, last_accessed, cfg) VALUES ";
+    cmd = "INSERT INTO configuration (created, last_accessed, cfg) VALUES ";
     cmd += "('" + now + "', '" + now + "', '" + cfgString + "')";
 
     try {
          dbHdl->runCmd(cmd);
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::ERROR, e.what());
+        Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-        LibComm::Log::log("SYSTEM", Log::ERROR,
+        Log::log("SYSTEM", Log::ERROR,
                           "Unexpected error accessing "
                           "database for storage of system config");
         return;
@@ -315,7 +324,7 @@ void Config::saveConfigToDB()
 
     // Close connection
     dbHdl->closeConnection();
-*/}
+}
 
 //----------------------------------------------------------------------
 // Method: getRegExFromCfg
@@ -357,24 +366,25 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
-    PATHBase    = general.workArea();
+    PATHBase         = general.workArea();
 
-    PATHData    = PATHBase + "/data";
+    PATHData         = PATHBase + "/data";
 
-    PATHRun     = PATHBase + "/run";
+    PATHRun          = PATHBase + "/run";
 
-    PATHBin     = PATHRun + "/bin";
-    PATHSession = PATHRun + "/" + sessionId;
+    PATHBin          = PATHRun + "/bin";
+    PATHSession      = PATHRun + "/" + sessionId;
 
-    PATHLog     = PATHSession + "/log";
-    PATHRlog    = PATHSession + "/rlog";
-    PATHTmp     = PATHSession + "/tmp";
-    PATHTsk     = PATHSession + "/tsk";
-    PATHMsg     = PATHSession + "/msg";
+    PATHLog          = PATHSession + "/log";
+    PATHRlog         = PATHSession + "/rlog";
+    PATHTmp          = PATHSession + "/tmp";
+    PATHTsk          = PATHSession + "/tsk";
+    PATHMsg          = PATHSession + "/msg";
 
-    storage.inbox   = PATHData + "/inbox";
-    storage.archive = PATHData + "/archive";
-    storage.gateway = PATHData + "/gateway";
+    storage.inbox    = PATHData + "/inbox";
+    storage.archive  = PATHData + "/archive";
+    storage.gateway  = PATHData + "/gateway";
+    storage.userArea = PATHData + "/user";
 
 /*
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
@@ -433,7 +443,7 @@ void Config::processConfig()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        LibComm::Log::log("SYSTEM", Log::FATAL, e.what());
+        Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
     for (int i = 0; i < getNumProcs(); ++i) {

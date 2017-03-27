@@ -1,6 +1,6 @@
 /******************************************************************************
  * File:    hmitypes.h
- *          Declaration of class 
+ *          Declaration of class
  *
  * Domain:  QPF.qpfgui.hmitypes
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declaration of class 
+ *   Declaration of class
  *
  * Created by:
  *   J C Gonzalez

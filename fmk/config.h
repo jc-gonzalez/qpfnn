@@ -58,6 +58,8 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+#define DEFAULT_INITIAL_PORT   50000
+
 //==========================================================================
 // Class: CfgGrpGeneral
 //==========================================================================
@@ -316,7 +318,15 @@ private:
     std::string getRegExFromCfg(std::string & regexStr);
 
 private:
+    //----------------------------------------------------------------------
+    // Constructor
+    //----------------------------------------------------------------------
     Config() {}
+
+    //----------------------------------------------------------------------
+    // Method: fillData
+    //----------------------------------------------------------------------
+    void fillData();
 
 public:
     std::string           cfgFileName;
@@ -329,6 +339,7 @@ public:
         std::string       inbox;
         std::string       archive;
         std::string       gateway;
+        std::string       userArea;
     } storage;
 
     static std::string    DBHost;
@@ -348,9 +359,9 @@ public:
     static std::string    PATHTsk;
     static std::string    PATHMsg;
 
-    static mode_t      PATHMode;
+    static mode_t         PATHMode;
 
-    static bool isLive;
+    static bool           isLive;
 };
 
 namespace Configuration {

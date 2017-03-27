@@ -34,6 +34,7 @@ set (libfmk_hdr
 
 set (libfmk_src
   config.cpp
+  datatypes.cpp
   filenamespec.cpp
   component.cpp
   dbhdlpostgre.cpp

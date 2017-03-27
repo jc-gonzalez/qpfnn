@@ -25,7 +25,7 @@
  *   Prototype
  *
  * Dependencies:
- *   CommNode
+ *   Component
  *
  * Files read / modified:
  *   none
@@ -47,8 +47,10 @@
 
 //------------------------------------------------------------
 // Topic: System headers
-//   none
+//   - thread
 //------------------------------------------------------------
+#include <thread>
+#include <mutex>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -59,7 +61,6 @@
 // Topic: Project headers
 //   - component.h
 //------------------------------------------------------------
-
 #include "component.h"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -68,7 +69,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+//namespace QPF {
 
 //==========================================================================
 // Class: HMIProxy
@@ -76,25 +77,15 @@ namespace QPF {
 class HMIProxy : public Component {
 
 public:
-    HMIProxy(const char * name = 0);
+    //----------------------------------------------------------------------
+    // Constructor
+    //----------------------------------------------------------------------
+    HMIProxy(const char * name, const char * addr = 0, Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
-    // Method: concurrentRun
-    // Method executed when the thread is created (for QtConcurrent)
+    // Constructor
     //----------------------------------------------------------------------
-    int concurrentRun();
-
-    std::map<std::string, std::string> nodeStates;
-
-    //----------------------------------------------------------------------
-    // Method: sendNewCfgInfo
-    //----------------------------------------------------------------------
-    void sendNewCfgInfo();
-
-    //----------------------------------------------------------------------
-    // Method: sendMinLogLevel
-    //----------------------------------------------------------------------
-    void sendMinLogLevel(std::string lvlStr);
+    HMIProxy(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
     //----------------------------------------------------------------------
     // Method: log
@@ -108,24 +99,31 @@ public:
     //----------------------------------------------------------------------
     void sendCmd(std::string target, std::string what, std::string value);
 
+    //----------------------------------------------------------------------
+    // Method: sendMinLogLevel
+    //----------------------------------------------------------------------
+    void sendMinLogLevel(std::string lvlStr);
+
+    //----------------------------------------------------------------------
+    // Method: sendNewCfgInfo
+    //----------------------------------------------------------------------
+    void sendNewCfgInfo();
+
 protected:
     //----------------------------------------------------------------------
-    // Method: fromInitialisedToRunning
+    // Method: runEachIteration
     //----------------------------------------------------------------------
-    virtual void fromInitialisedToRunning();
-    
-    //----------------------------------------------------------------------
-    // Method: execAdditonalLoopTasks
-    //----------------------------------------------------------------------
-    virtual void execAdditonalLoopTasks();
+    virtual void runEachIteration();
 
-   //----------------------------------------------------------------------
-    // Method: processTASK_RES
+protected:
     //----------------------------------------------------------------------
-    virtual void processMONIT_INFO();
+    // Method: processIncommingMessages
+    //----------------------------------------------------------------------
+    void processIncommingMessages();
 
+    virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
 };
 
-}
+//}
 
-#endif  /* HMIPXY_H */
+#endif  /* TASKAGENT_H */

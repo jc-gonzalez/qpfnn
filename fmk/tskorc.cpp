@@ -87,7 +87,7 @@ void TskOrc::defineOrchestrationParams()
 
     // 1. Product Types
     orcParams.productTypes.clear();
-    orcParams.productTypes = cfg.products.productTypes();
+   orcParams.productTypes = cfg.products.productTypes();
 
     // 2. Rules
     json jobj = cfg.orchestration.rules.val();

@@ -2,7 +2,7 @@
  * File:    hmipxy.cpp
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.hmipxy
+ * Domain:  QPF.libQPF.HMIProxy
  *
  * Version:  1.1
  *
@@ -38,14 +38,13 @@
  *
  ******************************************************************************/
 
-#define PRESERVE_LOG_SYSTEM
 #include "hmipxy.h"
 
 #include "log.h"
-using LibComm::Log;
 #include "tools.h"
-
-#include <sys/time.h>
+#include "channels.h"
+#include "message.h"
+#include "str.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -53,27 +52,74 @@ using LibComm::Log;
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
-
-//#define DUMP_TASK_CONTENT_TO_LOG
+//namespace QPF {
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-HMIProxy::HMIProxy(const char * name) :
-    Component(name)
+HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)
+    : Component(name, addr, s)
 {
-    std::cerr << "Creating MIProxy with name '" << name << "'\n";
-    canProcessMessage(MSG_MONIT_INFO_IDX);
 }
 
 //----------------------------------------------------------------------
-// Method: concurrentRun
-// Method executed when the thread is created (for QtConcurrent)
+// Constructor
 //----------------------------------------------------------------------
-int HMIProxy::concurrentRun()
+HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
+    : Component(name, addr, s)
 {
-    return this->run();
+}
+
+//----------------------------------------------------------------------
+// Method: runEachIteration
+//----------------------------------------------------------------------
+void HMIProxy::runEachIteration()
+{
+    // Request task for processing in case the agent is idle
+    if ((iteration % 100) == 0) {
+        // Create message and send
+        Message<MsgBodyCMD> msg;
+        msg.buildHdr(ChnlHMICmd,
+                     ChnlHMICmd,
+                     "1.0",
+                     compName,
+                     "*",
+                     "", "", "");
+
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        std::string chnl(ChnlHMICmd);
+        it = connections.find(chnl);
+        if (it != connections.end()) {
+            ScalabilityProtocolRole * conn = it->second;
+            conn->setMsgOut(msg.str());
+            InfoMsg("Sending request via channel " + chnl);
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: processIncommingMessages
+//----------------------------------------------------------------------
+void HMIProxy::processIncommingMessages()
+{
+    MessageString m;
+    for (auto & kv: connections) {
+        const ChannelDescriptor & chnl = kv.first;
+        ScalabilityProtocolRole * conn = kv.second;
+        while (conn->next(m)) {
+            DBG(compName << " received the message [" << m << "] through the channel " + chnl);
+            if      (chnl == ChnlHMICmd)  { processHMICmdMsg(conn, m); }
+            else    { WarnMsg("Message from unidentified channel " + chnl); }
+        }
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: processHMICmdMsg
+//----------------------------------------------------------------------
+void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    MessageString ack = "Received info from Core: " + m;
 }
 
 //----------------------------------------------------------------------
@@ -82,7 +128,7 @@ int HMIProxy::concurrentRun()
 //----------------------------------------------------------------------
 void HMIProxy::log(std::string s, Log::LogLevel lvl)
 {
-    logMsg(s, lvl, true);
+    LogMsg(lvl, s);
 }
 
 //----------------------------------------------------------------------
@@ -91,7 +137,7 @@ void HMIProxy::log(std::string s, Log::LogLevel lvl)
 //----------------------------------------------------------------------
 void HMIProxy::sendCmd(std::string target, std::string what, std::string value)
 {
-    sendCMD(target, what, value);
+//    sendCMD(target, what, value);
 }
 
 //----------------------------------------------------------------------
@@ -99,7 +145,7 @@ void HMIProxy::sendCmd(std::string target, std::string what, std::string value)
 //----------------------------------------------------------------------
 void HMIProxy::sendMinLogLevel(std::string lvlStr)
 {
-    sendMONIT_RQST("*", "set_min_log_level", lvlStr);
+//    sendMONIT_RQST("*", "set_min_log_level", lvlStr);
 }
 
 //----------------------------------------------------------------------
@@ -107,39 +153,8 @@ void HMIProxy::sendMinLogLevel(std::string lvlStr)
 //----------------------------------------------------------------------
 void HMIProxy::sendNewCfgInfo()
 {
-    
-    sendMONIT_RQST("*", "set_new_cfg", cfg.str());
+//    sendMONIT_RQST("*", "set_new_cfg", cfg.str());
 }
 
-//----------------------------------------------------------------------
-// Method: fromInitialisedToRunning
-//----------------------------------------------------------------------
-void HMIProxy::fromInitialisedToRunning()
-{
-    // Establish communications with other peer
-    establishCommunications();
-    log("COMMUNICATION ESTABLISHED!!", Log::INFO);
-}
 
-//----------------------------------------------------------------------
-// Method: execAdditonalLoopTasks
-//----------------------------------------------------------------------
-void HMIProxy::execAdditonalLoopTasks()
-{
-    sendMONIT_RQST("*", "state", "?");
-}
-
-//----------------------------------------------------------------------
-// Method: processTASK_RES
-//----------------------------------------------------------------------
-void HMIProxy::processMONIT_INFO()
-{
-    Message_MONIT_RQST * msg = dynamic_cast<Message_MONIT_RQST *>(msgData.msg);
-    
-    std::map<std::string, std::string>::iterator it = msg->variables.paramList.find("state");
-    if (it != msg->variables.paramList.end()) {
-        nodeStates[msg->header.source] = (*it).second;
-    }
-}
-
-}
+//}

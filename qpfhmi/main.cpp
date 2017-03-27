@@ -49,24 +49,44 @@
 #include <QDebug>
 #include <QSplashScreen>
 
-#define TIME_LAPSE 300000
+#include "config.h"
+#include "dbg.h"
 
 static QString appName(APP_NAME " - " APP_LONG_NAME);
 static QString appRev("Release " APP_RELEASE " - " APP_DATE);
 static QString appBld(BUILD_ID);
 
+QString configStr("");
+QString sessionStr("");
+QString masterIpAddress("");
+int initialPort(DEFAULT_INITIAL_PORT);
+
+using Configuration::cfg;
+
 //----------------------------------------------------------------------
 // Function: usage
 // Shows the command line to be used to call this application
 //----------------------------------------------------------------------
-void usage()
+void usage(int code)
 {
-    QString execName = QCoreApplication::arguments().at(0);
-    std::cerr << "Usage: "
-              << execName.toStdString()
-              << " -c db://user:passwd@host:port/dbname"
-              << std::endl;
-    exit(EXIT_FAILURE);
+    Dbg::verbosityLevel = Dbg::INFO_LEVEL;
+
+    QString exeName = QCoreApplication::arguments().at(0);
+
+    INFO("Usage: " << exeName.toStdString() << " -c dbURL [ -s sessionId ] "
+         "[ -p initialPort ] [ -I masterIPAddress ] [ -v ] [ -h ]\n"
+         "where:\n"
+         "\t-c dbURL            URL to access the system database, in the form\n"
+         "\t                        db://user:passwd@host:port/dbnamefile\n"
+         "\t-s sessoinId        Set sessoin identifier\n\n"
+         "\t-p initialPort      Set initial port for system set up (default:"
+         << DEFAULT_INITIAL_PORT << ").\n\n"
+         "\t-I masterIPaddress  Set the host IP address (by default the program takes\n"
+         "\t                    this information from the system).\n"
+         "\t-v                  Increases verbosity (default:silent operation).\n\n"
+         "\t-h                  Shows this help message.\n");
+
+    exit(code);
 }
 
 //----------------------------------------------------------------------
@@ -82,13 +102,16 @@ void sayHello()
         buildId = std::string(buf);
     }
 
-    std::string hline("----------------------------------------"
-                      "--------------------------------------");
-    std::cout << hline << std::endl
-            << " " << APP_NAME << " - " << APP_LONG_NAME << std::endl
-            << " " << APP_DATE << " - "
-            << APP_RELEASE << " Build " << buildId << std::endl
-            << hline << std::endl << std::endl;
+    const std::string hline("----------------------------------------"
+                            "--------------------------------------\n");
+    INFO(hline
+         << " " << APP_NAME << " - " << APP_LONG_NAME << "\n"
+         << " " << APP_DATE << " - "
+         << APP_RELEASE << " Build " << buildId << "\\n"
+         << " Master located at " << masterIpAddress.toStdString() << ":"
+         << initialPort << "\n"
+         << " Database server at " << configStr.toStdString() << "\n"
+         << hline << std::endl);
 }
 
 //----------------------------------------------------------------------
@@ -97,6 +120,7 @@ void sayHello()
 //----------------------------------------------------------------------
 void ctrlMsg(QSplashScreen & splash, int k = 0)
 {
+    const int TimeLapse = 300;
     QString msgs[] = {"Loading system configuration",
                       "Connecting to database",
                       "Checking components running state",
@@ -110,7 +134,7 @@ void ctrlMsg(QSplashScreen & splash, int k = 0)
                         "<font color=\"white\">" + msgs[i] + "</font>";
     splash.showMessage(msgToShow, Qt::AlignLeft, Qt::white);
     qApp->processEvents(QEventLoop::AllEvents);
-    QThread::usleep(TIME_LAPSE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TimeLapse));
     ++i;
 }
 
@@ -123,46 +147,58 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QPixmap pixmap(":/img/EuclidQPF.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-
-    const QStringList & args = QCoreApplication::arguments();
-    const int & numOfArgs = args.count();
-
-    sayHello();
-
-    ctrlMsg(splash);
-
     QString configStr("");
     QString sessionStr("");
+    QString masterIpAddress("");
+    int initialPort(DEFAULT_INITIAL_PORT);
 
-    for (int i = 1; i < numOfArgs; ++i) {
-        const QString & tok = args.at(i);
-        if (tok == "-c") {
-            configStr = args.at(i + 1);
-            ++i;
-        } else if (tok == "-s") {
-            sessionStr = args.at(i + 1);
-            ++i;
+    int exitCode = EXIT_FAILURE;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "hvp:c:s:I:")) != -1) {
+        switch (opt) {
+        case 'v':
+            Dbg::verbosityLevel++;
+            break;
+        case 'c':
+            configStr = QString(optarg);
+            break;
+        case 'p':
+            initialPort = atoi(optarg);
+            break;
+        case 's':
+            sessionStr = QString(optarg);
+            break;
+        case 'I':
+            masterIpAddress = QString(optarg);
+            break;
+        case 'h':
+            exitCode = EXIT_SUCCESS;
+        default: /* '?' */
+            usage(exitCode);
         }
     }
 
-    ctrlMsg(splash);
-    if (configStr.isEmpty()) {
-        usage();
-    }
+    if (configStr.isEmpty()) { usage(EXIT_FAILURE); }
 
+    QPixmap pixmap(":/img/EuclidQPF.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
     ctrlMsg(splash);
-    MainWindow w(configStr, sessionStr);
+
+    sayHello();
+    ctrlMsg(splash);
+
+    QPF::MainWindow w(configStr, sessionStr, masterIpAddress, initialPort);
+    ctrlMsg(splash);
     w.setAppInfo(APP_NAME " - " APP_LONG_NAME,
-                 "V" APP_RELEASE " " APP_DATE,
-                 BUILD_ID);
+                 "V" APP_RELEASE " " APP_DATE, BUILD_ID);
 
     ctrlMsg(splash);
     w.show();
 
     ctrlMsg(splash);
+
     splash.finish(&w);
 
     return a.exec();

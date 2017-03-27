@@ -93,7 +93,11 @@
 #include "xmlsyntaxhighlight.h"
 #include "dlgalert.h"
 
+#include "reqrep.h"
+
 using Configuration::cfg;
+
+Synchronizer synchro;
 
 namespace QPF {
 
@@ -125,19 +129,30 @@ const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
+MainWindow::MainWindow(QString url, QString sessionName,
+                       QString masterAddr, int port,
+                       QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     updateProductsModel(false),
     isThereActiveCores(true)
 {
+    dbUrl         = url;
+    sessionId     = sessionName;
+    masterAddress = masterAddr;
+    startingPort  = port;
+
     if (!sessionName.isEmpty()) {
-        cfg.session = sessionName.toStdString();
-        setSessionTag(cfg.session);
+        cfg.sessionId = sessionName.toStdString();
+        setSessionTag(cfg.sessionId);
     }
 
     // Read QPF Configuration
     readConfig(dbUrl);
+
+    if (masterAddr.isEmpty()) {
+        masterAddress = QString::fromStdString(cfg.network.masterNode());
+    }
 
     // Set-up UI
     ui->setupUi(this);
@@ -167,7 +182,7 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
 
     statusBar()->showMessage(tr("QPF HMI Ready . . ."), MessageDelay);
 
-    DMsg("SessionId: " + cfg.session);
+    DMsg("SessionId: " + cfg.sessionId);
 
     // Launch automatic view update timer
     QTimer * updateSystemViewTimer = new QTimer(this);
@@ -175,6 +190,9 @@ MainWindow::MainWindow(QString dbUrl, QString sessionName, QWidget *parent) :
     updateSystemViewTimer->start(1000);
 }
 
+//----------------------------------------------------------------------
+// Destructor
+//----------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
     DBManager::close();
@@ -318,31 +336,46 @@ void MainWindow::manualSetupUI()
 void MainWindow::readConfig(QString dbUrl)
 {
     // Create configuration object and read configuration from DB
-    cfg = new Configuration(dbUrl.toStdString().c_str());
-    
+    cfg.init(dbUrl.toStdString());
+
+    TRC(cfg.str());
+    TRC(cfg.general.appName());
+    TRC(cfg.network.masterNode());
+    for (auto & kv : cfg.network.processingNodes()) {
+        TRC(kv.first << ": " << kv.second);
+    }
+    //cfg.dump();
+    TRC("Config::PATHBase: " << Config::PATHBase);
+
 
     putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfg.cfgFileName)));
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
-    for (unsigned int i = 0; i < cfg.peersCfg.size(); ++i) {
-        const Peer & peer = cfg.peersCfg.at(i);
-        nodeNames << QString::fromStdString(peer.name);
-        if (peer.type == "taskagent") {
-            TaskAgentInfo * taInfo = new TaskAgentInfo;
-            taInfo->name = peer.name;
-            taInfo->client = peer.clientAddr;
-            taInfo->server = peer.serverAddr;
 
-            // Create task info structure for agent
-            taskAgentsInfo[peer.name] = taInfo;
+    nodeNames << tr("QPFHMI") << tr("EvtMng") << tr("LogMng")
+              << tr("DatMng") << tr("TskOrc") << tr("TskMng");
+    int h = 1;
+    for (auto & kv : cfg.network.processingNodes()) {
+        int numOfTskAgents = kv.second;
+        for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+            QString taName = QString("TskAgent_%1_%2")
+                .arg(h,2,10,QLatin1Char('0'))
+                .arg(i+1,2,10,QLatin1Char('0'));
+            TaskAgentInfo * taInfo = new TaskAgentInfo;
+            (*taInfo)["name"]   = taName.toStdString();
+            (*taInfo)["client"] = kv.first;
+            (*taInfo)["server"] = kv.first;
+            taskAgentsInfo[taName.toStdString()] = taInfo;
         }
+        ++h;
     }
 
-    Log::setLogBaseDir(Configuration::PATHSession);
+
+    Log::setLogBaseDir(Config::PATHSession);
 
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
-    cfg->setLastAccess(lastAccess.toStdString());
+    cfg.general["lastAccess"] = lastAccess.toStdString();
     putToSettings("lastAccess", QVariant(lastAccess));
 
     getUserToolsFromSettings();
@@ -782,24 +815,23 @@ void MainWindow::putToSettings(QString name, QVariant value)
 //----------------------------------------------------------------------
 void MainWindow::getUserToolsFromSettings()
 {
-    
-
     userDefTools.clear();
-    for (auto && kv : cfg.userDefTools) {
-        UserDefTool & udt = kv.second;
+    int numUdefTools = cfg.userDefTools.size();
+    for (int i = 0; i < numUdefTools; ++i) {
+        CfgGrpUserDefToolsList & uts = cfg.userDefTools;
+
         QUserDefTool qudt;
-        qudt.name = QString::fromStdString(udt.name);
-        qudt.desc = QString::fromStdString(udt.desc);
-        qudt.exe  = QString::fromStdString(udt.exe);
-        qudt.args = QString::fromStdString(udt.args);
-        for (auto & s : udt.prod_types) {
-            qudt.prod_types.append(QString::fromStdString(s));
-        }
+        qudt.name       = QString::fromStdString(uts.name(i));
+        qudt.desc       = QString::fromStdString(uts.description(i));
+        qudt.exe        = QString::fromStdString(uts.executable(i));
+        qudt.args       = QString::fromStdString(uts.arguments(i));
+        qudt.prod_types = QString::fromStdString(uts.productTypes(i)).split(",");
+
         userDefTools[qudt.name] = qudt;
     }
 
     userDefProdTypes.clear();
-    for (auto & s : cfg.orcParams.productTypes) {
+    for (auto & s : cfg.products.productTypes()) {
         userDefProdTypes.append(QString::fromStdString(s));
     }
 }
@@ -855,8 +887,6 @@ void MainWindow::showConfigTool()
 {
     static ConfigTool cfgTool;
 
-    
-
     cfgTool.prepare(userDefTools, userDefProdTypes);
     if (cfgTool.exec()) {
         DMsg("Updating user tools!");
@@ -886,8 +916,8 @@ void MainWindow::showExtToolsDef()
     dlg.initialize(userDefTools, userDefProdTypes);
     if (dlg.exec()) {
         dlg.getTools(userDefTools);
-        
-        convertQUTools2UTools(userDefTools, cfg.userDefTools);
+
+        storeQUTools2Cfg(userDefTools);
     }
 }
 
@@ -967,12 +997,12 @@ void MainWindow::processProductsInPath(QString folder)
     getProductsInFolder(folder, files);
 
     // Copy them (hard link, better) to the inbox
-    
-    std::string inbox = cfg.storage.inbox.path + "/";
+
+    std::string inbox = cfg.storage.inbox + "/";
 
     URLHandler uh;
     FileNameSpec fs;
-    ProductMetadata m;    
+    ProductMetadata m;
     foreach (const QString & fi, files) {
         fs.parseFileName(fi.toStdString(), m);
         uh.setProduct(m);
@@ -1027,26 +1057,27 @@ void MainWindow::transitToOperational()
 //----------------------------------------------------------------------
 void MainWindow::init()
 {
-    
+    //-----------------------------------------------------------------
+    // a. Create HMI node element
+    //-----------------------------------------------------------------
+    HMIProxy * hmiNode = new HMIProxy("HMIProxy",
+                                      masterAddress.toStdString(), &synchro);
 
-    // Initialize and create node part as a separate thread
-    Peer * qpfhmiPeer = cfg.peersCfgByName[cfg.qpfhmiCfg.name];
-    Peer * evtmngPeer = cfg.peersCfgByName[cfg.evtMngCfg.name];
+    //-----------------------------------------------------------------
+    // b. Create component connections
+    //-----------------------------------------------------------------
 
-    hmiNode = new HMIProxy(cfg.qpfhmiCfg.name.c_str());
-    hmiNode->addPeer(qpfhmiPeer, true);
-    hmiNode->addPeer(evtmngPeer);
-    hmiNode->initialize();
-    hmiNode->log("QPFHMI node initialized", Log::DEBUG);
+    // CHANNEL HMICMD - REQREP
+    // - Out/In: QPFHMI/EvtMng
+    std::string chnl     = ChnlHMICmd;
+    std::string connAddr =
+        QString("tcp://%1:%2").arg(masterAddress).arg(startingPort)
+        .toStdString();
+    hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 
-    //cfg.peerNodes.push_back(hmiNode);
-
-    hmiNode->log("Trying to concurrentRun QPFHMI...", Log::DEBUG);
-    //QFuture<int> futureHMIRun = QtConcurrent::run(this->hmiNode,
-    //                                              &HMIProxy::concurrentRun);
-    std::thread hmiPxyThread(&HMIProxy::concurrentRun, hmiNode);
-    hmiPxyThread.detach();
-    hmiNode->log("QPFHMI should be concurrentRunning...", Log::DEBUG);
+    // START!
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    synchro.notify();
 }
 
 //----------------------------------------------------------------------
@@ -1159,7 +1190,7 @@ void MainWindow::defineValidTransitions()
 //----------------------------------------------------------------------
 QString MainWindow::getState()
 {
-    QString s = QString::fromStdString(cfg.session);
+    QString s = QString::fromStdString(cfg.sessionId);
     nodeStates.clear();
     nodeStates = DBManager::getCurrentStates(s);
     QString stateName = nodeStates["EvtMng"];
@@ -1215,20 +1246,35 @@ void MainWindow::showState()
     }
 
     if (!mapsAreEqual) {
-        
-        QString h, p;
-        for (auto & s : cfg.machines) {
-            if (! h.isEmpty()) { h += "<br>"; }
-            h += QString("<b>%1</b>").arg(QString::fromStdString(s));
-            if (! p.isEmpty()) { p += "<br>"; }
-            p += ":  ";
-            for (auto & n : cfg.machineNodes[s]) {
-                std::string s = nodeStates[QString::fromStdString(n)].toStdString();
-                int stateId = getStateIdx(s);
-                QString color = QString::fromStdString(stateColors[stateId]);
-                p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(QString::fromStdString(n));
-            }
+
+        // Prepare master host line
+        QString h = QString("<b>%1</b>").arg(masterAddress);
+        QString p;
+        for (auto & n : {"QPFHMI", "EvtMng", "LogMng", "DatMng", "TskOrc", "TskMng"}) {
+            std::string ss = nodeStates[QString::fromStdString(n)].toStdString();
+            int stateId = getStateIdx(ss);
+            QString color = QString::fromStdString(stateColors[stateId]);
+            p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(QString::fromStdString(n));
         }
+
+        // Now processing host lines
+        int j = 1;
+        for (auto & kv : cfg.network.processingNodes()) {
+            h += QString("<br><b>%1</b>").arg(QString::fromStdString(kv.first));
+            p += "<br>";
+            int numOfTskAgents = kv.second;
+            for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+                QString n = QString("TskAgent_%1_%2")
+                    .arg(j,2,10,QLatin1Char('0'))
+                    .arg(i+1,2,10,QLatin1Char('0'));
+                std::string ss = nodeStates[n].toStdString();
+                int stateId = getStateIdx(ss);
+                QString color = QString::fromStdString(stateColors[stateId]);
+                p += QString("<font color=\"%1\">%2</font> ").arg(color).arg(n);
+            }
+            ++j;
+        }
+
         ui->lblHosts->setText(h);
         ui->lblNodes->setText(p);
 
@@ -1433,11 +1479,11 @@ void MainWindow::openWith()
     args.replace("%f", fs.fileName());
     args.replace("%F", fileName);
     args.replace("%p", fs.absolutePath());
-    args.replace("%i", QString::fromStdString(md.productId));
-    args.replace("%o", QString::fromStdString(md.signature));
-    args.replace("%s", QString::fromStdString(md.startTime));
-    args.replace("%e", QString::fromStdString(md.endTime));
-    args.replace("%t", QString::fromStdString(md.productType));
+    args.replace("%i", QString::fromStdString(md.productId()));
+    args.replace("%o", QString::fromStdString(md.signature()));
+    args.replace("%s", QString::fromStdString(md.startTime()));
+    args.replace("%e", QString::fromStdString(md.endTime()));
+    args.replace("%t", QString::fromStdString(md.productType()));
     args.replace("%x", fs.suffix());
 
     // Count how many %n placeholders are
@@ -1519,8 +1565,8 @@ void MainWindow::reprocessProduct()
     FileNameSpec fns;
     ProductMetadata md;
     fns.parseFileName(fileName.toStdString(), md);
-    md.urlSpace = ReprocessingSpace;
-    
+    md["urlSpace"] = ReprocessingSpace;
+
     URLHandler urlh;
     urlh.setProduct(md);
     md = urlh.fromFolder2Inbox();
@@ -1559,8 +1605,8 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
         menu.addMenu(acArchiveOpenExt);
 
         if (! m.parent().isValid()) {
-            
-            acReprocess->setEnabled(cfg.flags.proc.allowReprocessing);
+
+            acReprocess->setEnabled(cfg.flags.allowReprocessing());
             menu.addSeparator();
             menu.addAction(acReprocess);
             acReprocess->setProperty("clickedItem", p);
@@ -2087,10 +2133,10 @@ bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)
 
     QModelIndex dataIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
     QString taskInfoString = procTaskStatusModel->data(dataIdx).toString().trimmed();
-    
+
     QJsonDocument doc = QJsonDocument::fromJson(taskInfoString.toUtf8());
     QJsonObject obj = doc.object();
-            
+
     QString dId = obj["Id"].toString();
     QStringList args;
     args << cmd << dId;
@@ -2317,23 +2363,23 @@ void MainWindow::updateAgentsMonitPanel()
 
     static int numOfRows = 0;
 
-    QVector<double> loadAvgs = QVector<double>::fromStdVector(LibComm::getLoadAvgs());
+    QVector<double> loadAvgs = QVector<double>::fromStdVector(getLoadAvgs());
 
     if (numOfRows == 0) {
         for (auto & kv : taskAgentsInfo) {
             TaskAgentInfo * taInfo = kv.second;
-            taInfo->total      = 0;
-            taInfo->maxnum     = 3;
-            taInfo->running    = 0;
-            taInfo->waiting    = 0;
-            taInfo->paused     = 0;
-            taInfo->stopped    = 0;
-            taInfo->failed     = 0;
-            taInfo->finished   = 0;
-            taInfo->load1min   = loadAvgs.at(0) * 100;
-            taInfo->load5min   = loadAvgs.at(1) * 100;
-            taInfo->load15min  = loadAvgs.at(2) * 100;
-            taInfo->uptimesecs = 0;
+            (*taInfo)["total"]      = 0;
+            (*taInfo)["maxnum"]     = 3;
+            (*taInfo)["running"]    = 0;
+            (*taInfo)["waiting"]    = 0;
+            (*taInfo)["paused"]     = 0;
+            (*taInfo)["stopped"]    = 0;
+            (*taInfo)["failed"]     = 0;
+            (*taInfo)["finished"]   = 0;
+            (*taInfo)["load1min"]   = loadAvgs.at(0) * 100;
+            (*taInfo)["load5min"]   = loadAvgs.at(1) * 100;
+            (*taInfo)["load15min"]  = loadAvgs.at(2) * 100;
+            (*taInfo)["uptimesecs"] = 0;
         }
     }
 
@@ -2349,27 +2395,27 @@ void MainWindow::updateAgentsMonitPanel()
                 TaskStatus st = TaskStatusValue[status];
                 switch (st) {
                 case TASK_RUNNING:
-                    taInfo->running++;
+                    (*taInfo)["running"] = taInfo->running() + 1;;
                     break;
                 case TASK_FINISHED:
-                    taInfo->finished++;
+                    (*taInfo)["finished"] = taInfo->finished() + 1;;
                     break;
                 case TASK_FAILED:
-                    taInfo->failed++;
+                    (*taInfo)["failed"] = taInfo->failed() + 1;;
                     break;
                 case TASK_SCHEDULED:
-                    taInfo->waiting++;
+                    (*taInfo)["waiting"] = taInfo->waiting() + 1;;
                     break;
                 case TASK_PAUSED:
-                    taInfo->paused++;
+                    (*taInfo)["paused"] = taInfo->paused() + 1;;
                     break;
                 case TASK_STOPPED:
-                    taInfo->stopped++;
+                    (*taInfo)["stopped"] = taInfo->stopped() + 1;;
                     break;
                 default:
                     break;
                 }
-                taInfo->total++;
+                (*taInfo)["total"] = taInfo->total() + 1;;
             }
         }
         numOfRows = currentNumOfRows;
@@ -2481,6 +2527,34 @@ void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)
 // Method: convertQUTools2UTools
 // Convert Qt map of user def tools to std map
 //----------------------------------------------------------------------
+void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)
+{
+    json uts;
+
+    QMap<QString, QUserDefTool>::const_iterator it  = qutmap.constBegin();
+    auto end = qutmap.constEnd();
+    int i = 0;
+    while (it != end) {
+        const QUserDefTool & t = it.value();
+
+        uts[i]["name"]         = t.name.toStdString();
+        uts[i]["description"]  = t.desc.toStdString();
+        uts[i]["executable"]   = t.exe.toStdString();
+        uts[i]["arguments"]    = t.args.toStdString();
+        uts[i]["productTypes"] = t.prod_types.join(",").toStdString();
+
+        ++it;
+        ++i;
+    }
+
+    cfg.userDefTools.fromStr(JValue(uts).str());
+}
+
+/*
+//----------------------------------------------------------------------
+// Method: convertQUTools2UTools
+// Convert Qt map of user def tools to std map
+//----------------------------------------------------------------------
 void MainWindow::convertQUTools2UTools(MapOfUserDefTools qutmap,
                                        std::map<std::string, UserDefTool> & utmap)
 {
@@ -2501,5 +2575,5 @@ void MainWindow::convertQUTools2UTools(MapOfUserDefTools qutmap,
         utmap[ut.name] = ut;
     }
 }
-
+*/
 }
