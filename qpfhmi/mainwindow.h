@@ -98,7 +98,7 @@ public:
     explicit MainWindow(QString url = QString("db://eucops:e314clid@localhost:5432/qpfdb"),
                         QString sessionName = QString(""),
                         QString masterAddr = QString("127.0.0.1"),
-                        int port = DEFAULT_INITIAL_PORT,
+                        int conPort = DEFAULT_INITIAL_PORT,
                         QWidget *parent = 0);
     ~MainWindow();
 
@@ -237,7 +237,7 @@ private:
     QString dbUrl;
     QString sessionId;
     QString masterAddress;
-    QString startingPort;
+    int     startingPort;
 
     QSignalMapper *windowMapper;
 

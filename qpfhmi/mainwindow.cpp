@@ -40,6 +40,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -130,7 +131,7 @@ const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
 // Constructor
 //----------------------------------------------------------------------
 MainWindow::MainWindow(QString url, QString sessionName,
-                       QString masterAddr, int port,
+                       QString masterAddr, int conPort,
                        QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -140,7 +141,7 @@ MainWindow::MainWindow(QString url, QString sessionName,
     dbUrl         = url;
     sessionId     = sessionName;
     masterAddress = masterAddr;
-    startingPort  = port;
+    startingPort  = conPort;
 
     if (!sessionName.isEmpty()) {
         cfg.sessionId = sessionName.toStdString();
@@ -158,6 +159,9 @@ MainWindow::MainWindow(QString url, QString sessionName,
     ui->setupUi(this);
     manualSetupUI();
     defineValidTransitions();
+
+    std::string msg = QString("masterAddress: %1    startingPort:  %2").arg(masterAddress).arg(startingPort).toStdString();
+    TRC(msg);
 
     init();
 
@@ -1060,19 +1064,22 @@ void MainWindow::init()
     //-----------------------------------------------------------------
     // a. Create HMI node element
     //-----------------------------------------------------------------
-    HMIProxy * hmiNode = new HMIProxy("HMIProxy",
-                                      masterAddress.toStdString(), &synchro);
+    hmiNode = new HMIProxy("HMIProxy",
+			   masterAddress.toStdString(), &synchro);
 
     //-----------------------------------------------------------------
     // b. Create component connections
     //-----------------------------------------------------------------
 
+    QString msg = QString("Connecting to %1:%2").arg(masterAddress).arg(startingPort);
+    std::string smsg = msg.toStdString();
+    TRC(smsg);
+    
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     std::string chnl     = ChnlHMICmd;
-    std::string connAddr =
-        QString("tcp://%1:%2").arg(masterAddress).arg(startingPort)
-        .toStdString();
+    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort);
+    std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 
     // START!
