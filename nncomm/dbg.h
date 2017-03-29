@@ -39,15 +39,15 @@
 
 #define TRC(x)  \
     do { if (Dbg::verbosityLevel >= Dbg::TRACE_LEVEL) {			\
-	    std::cerr << __FUNCTION__ << ":" << __LINE__ << ' ' << x << '\n'; \
+	    std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
 	} } while (0)
 #define DBG(x)  \
     do { if (Dbg::verbosityLevel >= Dbg::DEBUG_LEVEL) {			\
-	    std::cerr << __FUNCTION__ << ":" << __LINE__ << ' ' << x << '\n'; \
+	    std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
 	} } while (0)
 #define INFO(x)  \
     do { if (Dbg::verbosityLevel >= Dbg::INFO_LEVEL) {			\
-	    std::cerr << x << '\n'; \
+	    std::cerr << x << "\n"; \
 	} } while (0)
 
 namespace Dbg {
