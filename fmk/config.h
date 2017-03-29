@@ -279,6 +279,11 @@ public:
     //----------------------------------------------------------------------
     std::string getEnvVar(std::string const & key) const;
 
+    //----------------------------------------------------------------------
+    // Method: setCurrentHostAddress
+    //----------------------------------------------------------------------
+    void setCurrentHostAddress(std::string & addr);
+
 private:
 
     //----------------------------------------------------------------------
@@ -334,6 +339,8 @@ public:
     std::string           sessionId;
     bool                  hmiPresent;
     bool                  isActualFile;
+    std::string           currentHostAddr;
+    bool                  weAreOnMaster;
 
     struct {
         std::string       inbox;

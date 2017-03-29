@@ -88,6 +88,14 @@ void Config::init(json v)
 }
 
 //----------------------------------------------------------------------
+// Method: setCurrentHostAddress
+//----------------------------------------------------------------------
+void Config::setCurrentHostAddress(std::string & addr)
+{
+    currentHostAddr = addr
+}
+
+//----------------------------------------------------------------------
 // Method: init
 //----------------------------------------------------------------------
 void Config::init(std::string fName)
@@ -116,7 +124,7 @@ void Config::init(std::string fName)
 	TRC("Configuration is retrieved from file: " << fName);
         setConfigFile(fName);
         readConfigFromFile();
-        saveConfigToDB();
+        if (weAreOnMaster) { saveConfigToDB(); }
         isActualFile = true;
     } else {
 	TRC("Configuration is retrieved from db: " << fName);
@@ -148,6 +156,8 @@ void Config::fillData()
     DBPwd  = db.pwd();
 
     DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+    
+    weAreOnMaster = (network.masterNode() == currentHostAddr);
 }
 
 //----------------------------------------------------------------------

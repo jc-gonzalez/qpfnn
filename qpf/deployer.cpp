@@ -43,6 +43,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -152,7 +153,7 @@ bool Deployer::usage(int code)
          "\t-c cfgFile          System is reconfigured with configuration in\n"
          "\t                    file cfgFile (configuration is then saved to DB).\n"
          "\t-p initialPort      Set initial port for system set up (default:"
-	 << DEFAULT_INITIAL_PORT << ").\n\n"
+         << DEFAULT_INITIAL_PORT << ").\n\n"
          "\t-H hostName         Set the host name (by default the program takes\n"
          "\t                    this information from the system).\n"
          "\t-I IPaddress        Set the host IP address (by default the program takes\n"
@@ -178,7 +179,7 @@ bool Deployer::processCmdLineOpts(int argc, char * argv[])
     while ((opt = getopt(argc, argv, "hvp:c:H:I:")) != -1) {
         switch (opt) {
         case 'v':
-	    Dbg::verbosityLevel++;
+            Dbg::verbosityLevel++;
             break;
         case 'c':
             setConfigFile(std::string(optarg));
@@ -246,6 +247,7 @@ void Deployer::setCurrentHostAddr(std::string addr)
 void Deployer::readConfiguration()
 {
     // Initialize configuration
+    cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
 
     TRC(cfg.str());
@@ -281,13 +283,13 @@ void Deployer::sayHello()
     }
 
     const std::string hline("----------------------------------------"
-			    "--------------------------------------");
+                            "--------------------------------------");
     INFO(hline << '\n'
-	 << " " << APP_NAME << " - " << APP_LONG_NAME << '\n'
-	 << " " << APP_DATE << " - "
-	 << APP_RELEASE << " Build " << buildId << '\n'
-	 << " Started at " << currentHostName << " [" << currentHostAddr << "]\n"
-	 << hline << std::endl);
+         << " " << APP_NAME << " - " << APP_LONG_NAME << '\n'
+         << " " << APP_DATE << " - "
+         << APP_RELEASE << " Build " << buildId << '\n'
+         << " Started at " << currentHostName << " [" << currentHostAddr << "]\n"
+         << hline << std::endl);
 }
 
 //----------------------------------------------------------------------
@@ -340,12 +342,12 @@ void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)
     hints.ai_flags = (AI_ADDRCONFIG | AI_V4MAPPED); //AI_DEFAULT;
 
     if (getaddrinfo(hostname, NULL, &hints, &ai)) {
-      printf("getaddrinfo() failed\n");
+        printf("getaddrinfo() failed\n");
     } else {
-      //if (inet_ntop(ai->ai_family, ai->ai_addr, addrString, 512))
-      if (0 == getnameinfo(ai->ai_addr, sizeof(struct sockaddr),
-			   addrString, 512, NULL, 0, NI_NUMERICHOST))
-        ipAddr = std::string(addrString);
+        //if (inet_ntop(ai->ai_family, ai->ai_addr, addrString, 512))
+        if (0 == getnameinfo(ai->ai_addr, sizeof(struct sockaddr),
+                             addrString, 512, NULL, 0, NI_NUMERICHOST))
+            ipAddr = std::string(addrString);
     }
     freeaddrinfo(ai);
 }
@@ -413,7 +415,7 @@ void Deployer::createElementsNetwork()
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
 
-	//-----------------------------------------------------------------
+        //-----------------------------------------------------------------
         // a. Fill agents vector with as agents for this host
         //-----------------------------------------------------------------
         int h = 1;
@@ -445,7 +447,7 @@ void Deployer::createElementsNetwork()
             ++h;
         }
 
-	return;
+        return;
     }
 
     //=== Else, we are running on the master host =========================
@@ -464,12 +466,12 @@ void Deployer::createElementsNetwork()
     //-----------------------------------------------------------------
     int h = 1;
     for (auto & kv : cfg.network.processingNodes()) {
-	for (unsigned int i = 0; i < kv.second; ++i) {
-	    sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
-	    agName.push_back(std::string(sAgName));
-	    agPortTsk.push_back(portnum(startingPort + 1, h, i));
-	}
-	++h;
+        for (unsigned int i = 0; i < kv.second; ++i) {
+            sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+            agName.push_back(std::string(sAgName));
+            agPortTsk.push_back(portnum(startingPort + 1, h, i));
+        }
+        ++h;
     }
 
     //-----------------------------------------------------------------
@@ -484,7 +486,7 @@ void Deployer::createElementsNetwork()
     connAddr = bindAddr;
     m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-	c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
     }
 
     // CHANNEL HMICMD - REQREP
@@ -501,7 +503,7 @@ void Deployer::createElementsNetwork()
     connAddr = bindAddr;
     m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.tskOrc}) {
-	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
     // CHANNEL TASK-SCHEDULING - PUBSUB
@@ -512,17 +514,17 @@ void Deployer::createElementsNetwork()
     connAddr = bindAddr;
     m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.tskMng}) {
-	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
     // CHANNEL TASK-PROCESSING - REQREP
     // - Out/In: TskAge*/TskMng
     h = 0;
     for (auto & p : agPortTsk) {
-	chnl = ChnlTskProc + "_" + agName.at(h);
-	bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-	m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
-	++h;
+        chnl = ChnlTskProc + "_" + agName.at(h);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+        m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+        ++h;
     }
 
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
@@ -533,7 +535,7 @@ void Deployer::createElementsNetwork()
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {
-	c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
 }
