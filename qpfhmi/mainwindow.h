@@ -237,7 +237,7 @@ private:
     QString dbUrl;
     QString sessionId;
     QString masterAddress;
-    QString startingPort;
+    int     startingPort;
 
     QSignalMapper *windowMapper;
 
