@@ -92,7 +92,7 @@ void Config::init(json v)
 //----------------------------------------------------------------------
 void Config::setCurrentHostAddress(std::string & addr)
 {
-    currentHostAddr = addr
+    currentHostAddr = addr;
 }
 
 //----------------------------------------------------------------------
