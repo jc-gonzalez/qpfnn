@@ -31,7 +31,7 @@ void Survey::setMsgOut(MessageString m)
                     numResp++;
                 }
             } catch (nn::exception & e) {
-                DBG("---- Only " << numResp " responses");
+                DBG("---- Only " << numResp << " responses");
             }
         }
     }
