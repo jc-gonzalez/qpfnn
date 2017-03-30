@@ -23,11 +23,15 @@ void Survey::setMsgOut(MessageString m)
             DBG("++ Sending msg. " << m);
             DBG("++ Waiting for answers . . . ");
             int numResp = 1;
-            rc = sck->recv(buf, sizeof(buf), 100);
-            while ((rc > 0) && (numResp < maxRespondents)) {
-                DBG("++ Received answer: " << std::string(buf));
-                rc = sck->recv(buf, sizeof(buf), 100);
-                numResp++;
+            try {
+                rc = sck->recv(buf, sizeof(buf), 0);
+                while ((rc > 0) && (numResp < maxRespondents)) {
+                    DBG("++ Received answer: " << std::string(buf));
+                    rc = sck->recv(buf, sizeof(buf), 0);
+                    numResp++;
+                }
+            } catch (nn::exception & e) {
+                DBG("---- Only " << numResp " responses");
             }
         }
     }
@@ -43,7 +47,7 @@ void Survey::init(int elemCls, const char * addr)
     elemClass = elemCls;
     createSocket(elemClass);
     if (elemClass == NN_SURVEYOR) {
-        int deadline = WAIT_BINDING;
+        //int deadline = WAIT_BINDING;
         //sck->setsockopt(NN_SURVEYOR, NN_SURVEYOR_DEADLINE, &deadline, sizeof(int));
         endPoint = sck->bind(addr);
     } else {

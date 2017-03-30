@@ -492,7 +492,7 @@ void Deployer::createElementsNetwork()
     connAddr = bindAddr;
     Survey * surveyor = new Survey(NN_SURVEYOR, bindAddr);
     surveyor->setNumOfRespondents(4);
-    M.evtMng->addConnection(chnl, surveyor);
+    m.evtMng->addConnection(chnl, surveyor);
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
         c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
     }
