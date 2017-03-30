@@ -259,7 +259,7 @@ void Deployer::readConfiguration()
     for (auto & kv : cfg.network.processingNodes()) {
         TRC(kv.first << ": " << kv.second);
     }
-    cfg.dump();
+    //cfg.dump();
     TRC("Config::PATHBase: " << Config::PATHBase);
 }
 
