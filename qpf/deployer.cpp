@@ -249,6 +249,9 @@ void Deployer::readConfiguration()
     // Initialize configuration
     cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
+    DBG("Master host: " << currentHostAddr << "/"
+        << cfg.currentHostAddr << " master => "
+        << std::string(cfg.weAreOnMaster ? "TRUE" : "FALSE"));
 
     TRC(cfg.str());
     TRC(cfg.general.appName());
