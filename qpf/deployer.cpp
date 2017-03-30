@@ -249,9 +249,12 @@ void Deployer::readConfiguration()
     // Initialize configuration
     cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
-    DBG("Master host: " << currentHostAddr << "/"
-        << cfg.currentHostAddr << " master => "
-        << std::string(cfg.weAreOnMaster ? "TRUE" : "FALSE"));
+    DBG("Master host: " << cfg.network.masterNode());
+    DBG("Current host: " << currentHostAddr << "/"
+        << cfg.currentHostAddr);
+    DBG("Running in a "
+        << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
+        << " Host.");
 
     TRC(cfg.str());
     TRC(cfg.general.appName());
