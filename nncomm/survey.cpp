@@ -23,10 +23,10 @@ void Survey::setMsgOut(MessageString m)
             DBG("++ Sending msg. " << m);
             DBG("++ Waiting for answers . . . ");
             int numResp = 1;
-            rc = sck->recv(buf, sizeof(buf), 10);
+            rc = sck->recv(buf, sizeof(buf), 100);
             while ((rc > 0) && (numResp < maxRespondents)) {
                 DBG("++ Received answer: " << std::string(buf));
-                rc = sck->recv(buf, sizeof(buf), 10);
+                rc = sck->recv(buf, sizeof(buf), 100);
                 numResp++;
             }
         }
