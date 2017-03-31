@@ -188,7 +188,7 @@ public:
     JValue operator()(std::string key) { return JValue(value[key]); }
     json & operator[](std::string key) { return value[key]; }
     std::string str() {
-        if (value.isObject()) {
+        if (value.isObject() || value.isArray()) {
             Json::FastWriter w;
             return w.write(value);
         } else {

@@ -87,15 +87,15 @@ void TskOrc::defineOrchestrationParams()
 
     // 1. Product Types
     orcParams.productTypes.clear();
-   orcParams.productTypes = cfg.products.productTypes();
+    orcParams.productTypes = cfg.products.productTypes();
 
     // 2. Rules
     json jobj = cfg.orchestration.rules.val();
     for (int i = 0; i < jobj.size(); ++i) {
         Rule * rule = new Rule;
-        std::string ipTypes = jobj[i][""].asString();
-        std::string opTypes = jobj[i][""].asString();
-        rule->name              = "";
+        std::string ipTypes = jobj[i]["inputs"].asString();
+        std::string opTypes = jobj[i]["outputs"].asString();
+        rule->name              = "Rule_" + str::toStr<int>(i);
         rule->inputs            = str::split(ipTypes, ',');
         rule->outputs           = str::split(opTypes, ',');
         rule->processingElement = jobj[i]["processing"].asString();

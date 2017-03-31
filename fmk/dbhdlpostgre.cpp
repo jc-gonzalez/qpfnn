@@ -135,6 +135,8 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
 
     for (auto & m : prodList.products) {
         ss.str("");
+        TRC("Building SQL statement");
+        TRC(m.startTime() << ", " << m.endTime() << ", " << timeTag());
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
            << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
@@ -152,9 +154,9 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
            << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
            << str::quoted(str::tagToTimestamp(timeTag())) << ", "
            << str::quoted(m.url()) << ")";
-
+        TRC(ss.str());
         try { result = runCmd(ss.str()); } catch(...) { throw; }
-
+        TRC("Exeecuted.");
         PQclear(res);
         nInsProd++;
     }

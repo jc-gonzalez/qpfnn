@@ -151,7 +151,7 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
     // Define ans set task object
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"].asString());
+    TaskInfo task(body["info"]);
     task.dump();
 }
 
