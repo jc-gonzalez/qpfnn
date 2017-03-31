@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    taskorc.cpp
+ * File:    tskorc.cpp
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.taskorc
