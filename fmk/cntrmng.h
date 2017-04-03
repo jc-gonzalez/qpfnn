@@ -98,9 +98,8 @@ public:
     // Method: createService
     // Creates a service that retrieves data from TskMng & processes them
     //----------------------------------------------------------------------
-    bool createService(std::string srv, std::string img,
-                       std::string exe, std::vector<std::string> args,
-                       int numScale);
+    bool createService(std::string srv, std::string img, int numScale,
+                       std::string exe, std::vector<std::string> args);
 
     //----------------------------------------------------------------------
     // Method: reScaleService

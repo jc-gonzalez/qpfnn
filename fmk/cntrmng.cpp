@@ -43,6 +43,8 @@
 #include "process.h"
 #include "str.h"
 
+#include <cassert>
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -100,7 +102,7 @@ bool ContainerMng::createService(std::string srv, std::string img, int numScale,
     procxx::process srvCreate("docker", "service", "create",
                               "--replicas", str::toStr<int>(numScale),
                               exe);
-    srvCreate.append_arguments(args.begin(), args.end());
+    for (auto & a : args) { srvCreate.add_argument(a); }
     srvCreate.exec();
     srvCreate.wait();
     return (srvCreate.code() == 0);
