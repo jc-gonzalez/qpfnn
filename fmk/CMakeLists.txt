@@ -28,8 +28,6 @@ set (libfmk_hdr
   tskage.h
   tskmng.h
   tskorc.h
-  srvmng.h
-  cntrmng.h
   sync.h
   urlhdl.h
 )
@@ -46,8 +44,6 @@ set (libfmk_src
   tskage.cpp
   tskmng.cpp
   tskorc.cpp
-  srvmng.cpp
-  cntrmng.cpp
   urlhdl.cpp
 )
 

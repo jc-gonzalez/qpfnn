@@ -49,6 +49,7 @@
 // Topic: System headers
 //   none
 //------------------------------------------------------------
+#include <list>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -138,9 +139,10 @@ protected:
 
 private:
     //----------------------------------------------------------------------
-    // Method: exeRule
+    // Method: execTask
+    // Execute the rule requested by Task Orchestrator
     //----------------------------------------------------------------------
-    void exeRule(MessageString & msg);
+    void execContainerTask();
 
     //----------------------------------------------------------------------
     // Method: selectAgent

@@ -331,10 +331,11 @@ void Component::defineValidTransitions()
     defineValidTransition(INITIALISED,  OFF);
     defineValidTransition(INITIALISED,  ERROR);
     defineValidTransition(RUNNING,      OPERATIONAL);
-    defineValidTransition(RUNNING,      OFF);    defineValidTransition(RUNNING,      ERROR);
+    defineValidTransition(RUNNING,      OFF);
+    defineValidTransition(RUNNING,      ERROR);
     defineValidTransition(OPERATIONAL,  RUNNING);
     defineValidTransition(OPERATIONAL,  OFF);
-    defineValidTransition(OPERATIONAL,  ERROR);sw
+    defineValidTransition(OPERATIONAL,  ERROR);
 
     setState(OFF);
 }
@@ -344,6 +345,7 @@ void Component::defineValidTransitions()
 //----------------------------------------------------------------------
 void Component::afterTransition(int fromState, int toState)
 {
+/*
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
@@ -359,6 +361,7 @@ void Component::afterTransition(int fromState, int toState)
 
     // Close connection
     dbHdl->closeConnection();
+*/
 }
 
 //}
