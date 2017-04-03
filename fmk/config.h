@@ -88,10 +88,15 @@ public:
     CfgGrpNetwork(json v) : JRecord(v) {}
     virtual void dump() {
         DUMPJSTR(masterNode);
+        DUMPJINT(startingPort);
         DUMPJSTRINTMAP(processingNodes);
+        DUMPJSTRVEC(serviceNodes);
     }
     JSTR(masterNode);
+    JINT(startingPort);
     JSTRINTMAP(processingNodes);
+    JSTRVEC(serviceNodes);
+    JINT(serviceScale);
 };
 
 //==========================================================================

@@ -166,6 +166,9 @@ private:
 private:
     std::vector<std::string>         agents;
     std::map<std::string, AgentInfo> agentInfo;
+
+    std::list<TaskInfo>              serviceTasks;
+    std::list<TaskInfo>              containerTasks;
 };
 
 //}

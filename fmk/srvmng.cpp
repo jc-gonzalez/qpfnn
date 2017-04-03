@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Implement SrvMng class
+ *   Implement ServiceMng class
  *
  * Created by:
  *   J C Gonzalez
@@ -54,7 +54,7 @@
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-SrvMng::SrvMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
+ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
 {
     managerAddr = mngAddr;
     workerAddrs = wrkAddrs;
@@ -68,7 +68,7 @@ SrvMng::SrvMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
 // Method: initSwarmManager
 // Initializes the swarm manager
 //----------------------------------------------------------------------
-bool SrvMng::initSwarmManager(std::string & addr)
+bool ServiceMng::initSwarmManager(std::string & addr)
 {
     procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
     initSwarm.exec();
@@ -80,7 +80,7 @@ bool SrvMng::initSwarmManager(std::string & addr)
 // Method: initSwarmWorker
 // Initializes a swarm worker
 //----------------------------------------------------------------------
-bool SrvMng::initSwarmWorker(std::string & addr)
+bool ServiceMng::initSwarmWorker(std::string & addr)
 {
     procxx::process initWorker("ssh", "-Y", "-C", "-l", "eucops", addr,
                                "docker", "swarm", "init",
@@ -94,7 +94,7 @@ bool SrvMng::initSwarmWorker(std::string & addr)
 // Method: createService
 // Creates a service that retrieves data from TskMng & processes them
 //----------------------------------------------------------------------
-bool SrvMng::createService(std::string srv, std::string img, int numScale,
+bool ServiceMng::createService(std::string srv, std::string img, int numScale,
                    std::string exe, std::vector<std::string> args)
 {
     procxx::process srvCreate("docker", "service", "create",
@@ -110,7 +110,7 @@ bool SrvMng::createService(std::string srv, std::string img, int numScale,
 // Method: reScaleService
 // Rescales a running service
 //----------------------------------------------------------------------
-bool SrvMng::reScaleService(std::string srv, int newScale)
+bool ServiceMng::reScaleService(std::string srv, int newScale)
 {
     procxx::process srvScale("docker", "service", "scale",
                               srv + "=" + str::toStr<int>(newScale));
@@ -123,7 +123,7 @@ bool SrvMng::reScaleService(std::string srv, int newScale)
 // Method: getServiceInfo
 // Retrieves information about running service
 //----------------------------------------------------------------------
-bool SrvMng::getServiceInfo(std::string srv, std::stringstream & info)
+bool ServiceMng::getServiceInfo(std::string srv, std::stringstream & info)
 {
     procxx::process srvInspect("sdocker", "service", "inspect");
     srvInspect.add_argument(srv);
@@ -148,7 +148,7 @@ bool SrvMng::getServiceInfo(std::string srv, std::stringstream & info)
 // Method: shutdownService
 // Shutdown a given service
 //----------------------------------------------------------------------
-bool SrvMng::shutdownService(std::string srv)
+bool ServiceMng::shutdownService(std::string srv)
 {
     procxx::process srvRm("docker", "service", "rm");
     srvRm.add_argument(srv);
@@ -161,7 +161,7 @@ bool SrvMng::shutdownService(std::string srv)
 // Method: leaveSwarm
 // Make a node leave the swarm
 //----------------------------------------------------------------------
-bool SrvMng::leaveSwarm(std::string & addr)
+bool ServiceMng::leaveSwarm(std::string & addr)
 {
     if (addr == managerAddr) {
         procxx::process swrmLeave("docker", "swarm", "leave");
@@ -181,7 +181,7 @@ bool SrvMng::leaveSwarm(std::string & addr)
 // Method: shutdownSwarm
 //Shutdown entire swarm
 //----------------------------------------------------------------------
-bool SrvMng::shutdownSwarm(std::string srv)
+bool ServiceMng::shutdownSwarm(std::string srv)
 {
     // Initialize Swarm manager and workers
     assert(leaveSwarm(managerAddr));

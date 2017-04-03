@@ -42,7 +42,7 @@ set (libnncomm_src
 #===== Project sections/libraries =======
 
 set (NNMSG_ROOT_DIR /usr/local)
-set (NNCOMM_ROOT_DIR .)
+#set (NNCOMM_ROOT_DIR .)
 
 link_directories ( ${NNMSG_ROOT_DIR}/lib ${NNCOMM_ROOT_DIR} )
 

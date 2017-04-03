@@ -381,6 +381,7 @@ struct TaskInfo : public JRecord {
         outputs.dump();
         DUMPJSTRSTRMAP(params);
         DUMPJSTR(taskData);
+        DUMPJSTR(taskSet);
     }
     JSTR(taskName);
     JSTR(taskPath);
@@ -392,6 +393,7 @@ struct TaskInfo : public JRecord {
     GRP(ProductList,outputs);
     JSTRSTRMAP(params);
     JSTR(taskData);
+    JSTR(taskSet);
 };
 
 struct TaskAgentInfo : public JRecord {

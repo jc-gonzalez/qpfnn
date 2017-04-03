@@ -2,7 +2,7 @@
  * File:    srvmng.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.SrvMng
+ * Domain:  QPF.libQPF.ServiceMng
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare SrvMng class
+ *   Declare ServiceMng class
  *
  * Created by:
  *   J C Gonzalez
@@ -72,15 +72,15 @@
 //namespace QPF {
 
 //==========================================================================
-// Class: SrvMng
+// Class: ServiceMng
 //==========================================================================
-class SrvMng {
+class ServiceMng {
 
 public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    SrvMng(std::string mngAddr, std::vector<std::string> wrkAddrs);
+    ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs);
 
     //----------------------------------------------------------------------
     // Method: initSwarmManager

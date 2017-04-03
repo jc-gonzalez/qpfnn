@@ -148,11 +148,18 @@ void TskMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // Define ans set task object
+    // Define ans set task objecte
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     TaskInfo task(body["info"]);
-    task.dump();
+
+    if (task.taskSet() == "CONTAINER") {
+        containerTasks.push_back(task);
+    } else if (task.taskSet() == "SERVICE") {
+        serviceTasks.push_back(task);
+    } else {
+        WarnMsg("Badly assigned set for task: " + task.taskSet());
+    }
 }
 
 //----------------------------------------------------------------------
@@ -195,10 +202,10 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
-// Method: exeRule
+// Method: execTask
 // Execute the rule requested by Task Orchestrator
 //----------------------------------------------------------------------
-void TskMng::exeRule(MessageString & msg)
+void TskMng::execContainerTask()
 {
 /*
     std::string peName = msg->task.taskPath;

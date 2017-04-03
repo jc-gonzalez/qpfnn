@@ -338,7 +338,7 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
 bool TskOrc::sendTaskSchedMsg(Rule * rule,
                               ProductList & inputs)
 {
-    // Define ans set task object
+    // Define and set task object
     TaskInfo task;
 
     DateTime epoch = timeTag();
@@ -391,5 +391,4 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     } else {
         return false;
     }
-
 }
