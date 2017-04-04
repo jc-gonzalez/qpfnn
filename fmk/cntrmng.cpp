@@ -56,139 +56,81 @@
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-ContainerMng::ContainerMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
+ContainerMng::ContainerMng()
 {
-    managerAddr = mngAddr;
-    workerAddrs = wrkAddrs;
-
-    // Initialize Swarm manager and workers
-    assert(initSwarmManager(managerAddr));
-    for (auto & wrkAddr : workerAddrs) { assert(initSwarmWorker(wrkAddr)); }
 }
 
 //----------------------------------------------------------------------
-// Method: initSwarmManager
-// Initializes the swarm manager
+// Method: createContainer
+// Creates a container that executes the requested application
 //----------------------------------------------------------------------
-bool ContainerMng::initSwarmManager(std::string & addr)
+bool ContainerMng::createContainer(std::string img, std::vector<std::string> opts,
+                                   std::map<std::string, std::string> maps,
+                                   std::string exe, std::vector<std::string> args,
+                                   std::string & containerId)
 {
-    procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
-    initSwarm.exec();
-    initSwarm.wait();
-    return (initSwarm.code() == 0);
+    procxx::process cnt("docker", "run");
+    for (auto & o : opts) { cnt.add_argument(o); }
+    for (auto & kv : maps) {
+        cnt.add_argument("-v");
+        cnt.add_argument(kv.first + ":" + kv.second);
+    }
+
+    std::string tmpFileName(std::tmpnam(nullptr));
+    cnt.add_argument("--cidfile");
+    cnt.add_argument(tmpFileName);
+
+    cnt.add_argument(img);
+
+    cnt.add_argument(exe);
+    for (auto & a : args) { cnt.add_argument(a); }
+
+    cnt.exec();
+    cnt.wait();
+
+    std::ifstream dockerIdFile(tmpFileName);
+    std::string id;
+    std::getline(dockerIdFile, id))
+
+    return (cnt.code() == 0);
 }
 
 //----------------------------------------------------------------------
-// Method: initSwarmWorker
-// Initializes a swarm worker
+// Method: getContainerInfo
+// Retrieves information about running container
 //----------------------------------------------------------------------
-bool ContainerMng::initSwarmWorker(std::string & addr)
+bool ContainerMng::getContainerInfo(std::string id, std::stringstream & info)
 {
-    procxx::process initWorker("ssh", "-Y", "-C", "-l", "eucops", addr,
-                               "docker", "swarm", "init",
-                               "--advertise-addr", addr);
-    initWorker.exec();
-    initWorker.wait();
-    return (initWorker.code() == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: createService
-// Creates a service that retrieves data from TskMng & processes them
-//----------------------------------------------------------------------
-bool ContainerMng::createService(std::string srv, std::string img, int numScale,
-                   std::string exe, std::vector<std::string> args)
-{
-    procxx::process srvCreate("docker", "service", "create",
-                              "--replicas", str::toStr<int>(numScale),
-                              exe);
-    for (auto & a : args) { srvCreate.add_argument(a); }
-    srvCreate.exec();
-    srvCreate.wait();
-    return (srvCreate.code() == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: reScaleService
-// Rescales a running service
-//----------------------------------------------------------------------
-bool ContainerMng::reScaleService(std::string srv, int newScale)
-{
-    procxx::process srvScale("docker", "service", "scale",
-                              srv + "=" + str::toStr<int>(newScale));
-    srvScale.exec();
-    srvScale.wait();
-    return (srvScale.code() == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: getServiceInfo
-// Retrieves information about running service
-//----------------------------------------------------------------------
-bool ContainerMng::getServiceInfo(std::string srv, std::stringstream & info)
-{
-    procxx::process srvInspect("sdocker", "service", "inspect");
-    srvInspect.add_argument(srv);
-    srvInspect.exec();
+    procxx::process cntInspect("docker", "inspect");
+    cntInspect.add_argument(id);
+    cntInspect.exec();
 
     info.str("");
     std::string line;
-    while (std::getline(srvInspect.output(), line)) {
+    while (std::getline(cntInspect.output(), line)) {
         info << line << std::endl;
-        if (!srvInspect.running() ||
-            !procxx::running(srvInspect.id()) ||
-            !running(srvInspect)) {
+        if (!cntInspect.running() ||
+            !procxx::running(cntInspect.id()) ||
+            !running(cntInspect)) {
             break;
         }
     }
 
-    srvInspect.wait();
-    return (srvInspect.code() == 0);
+    cntInspect.wait();
+    return (cntInspect.code() == 0);
 }
 
 //----------------------------------------------------------------------
-// Method: shutdownService
-// Shutdown a given service
+// Method: killContainer
+// Stop a given container
 //----------------------------------------------------------------------
-bool ContainerMng::shutdownService(std::string srv)
+bool ContainerMng::killContainer(std::string id)
 {
-    procxx::process srvRm("docker", "service", "rm");
-    srvRm.add_argument(srv);
+    procxx::process srvRm("docker", "rm");
+    srvRm.add_argument(id);
     srvRm.exec();
     srvRm.wait();
     return (srvRm.code() == 0);
-}
-
-//----------------------------------------------------------------------
-// Method: leaveSwarm
-// Make a node leave the swarm
-//----------------------------------------------------------------------
-bool ContainerMng::leaveSwarm(std::string & addr)
-{
-    if (addr == managerAddr) {
-        procxx::process swrmLeave("docker", "swarm", "leave");
-        swrmLeave.exec();
-        swrmLeave.wait();
-        return (swrmLeave.code() == 0);
-    } else {
-        procxx::process swrmLeave("ssh", "-Y", "-C", "-l", "eucops", addr,
-                                  "docker", "swarm", "leave");
-        swrmLeave.exec();
-        swrmLeave.wait();
-        return (swrmLeave.code() == 0);
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: shutdownSwarm
-//Shutdown entire swarm
-//----------------------------------------------------------------------
-bool ContainerMng::shutdownSwarm(std::string srv)
-{
-    // Initialize Swarm manager and workers
-    assert(leaveSwarm(managerAddr));
-    for (auto & wrkAddr : workerAddrs) { assert(leaveSwarm(wrkAddr)); }
-    return true;
 }
 
 //}

@@ -80,61 +80,29 @@ public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    ContainerMng(std::string mngAddr, std::vector<std::string> wrkAddrs);
+    ContainerMng();
 
     //----------------------------------------------------------------------
-    // Method: initSwarmManager
-    // Initializes the swarm manager
+    // Method: createContainer
+    // Creates a container that executes the requested application
     //----------------------------------------------------------------------
-    bool initSwarmManager(std::string & addr);
+    bool createContainer(std::string img, std::vector<std::string> opts,
+                         std::map<std::string, std::string> maps,
+                         std::string exe, std::vector<std::string> args,
+                         std::string & containerId);
 
     //----------------------------------------------------------------------
-    // Method: initSwarmWorker
-    // Initializes a swarm worker
+    // Method: getContainerInfo
+    // Retrieves information about running container
     //----------------------------------------------------------------------
-    bool initSwarmWorker(std::string & addr);
+    bool getContainerInfo(std::string id, std::stringstream & info);
 
     //----------------------------------------------------------------------
-    // Method: createService
-    // Creates a service that retrieves data from TskMng & processes them
+    // Method: killContainer
+    // Stop a given container
     //----------------------------------------------------------------------
-    bool createService(std::string srv, std::string img, int numScale,
-                       std::string exe, std::vector<std::string> args);
+    bool killContainer(std::string id);
 
-    //----------------------------------------------------------------------
-    // Method: reScaleService
-    // Rescales a running service
-    //----------------------------------------------------------------------
-    bool reScaleService(std::string srv, int newScale);
-
-    //----------------------------------------------------------------------
-    // Method: getServiceInfo
-    // Retrieves information about running service
-    //----------------------------------------------------------------------
-    bool getServiceInfo(std::string srv, std::stringstream & info);
-
-    //----------------------------------------------------------------------
-    // Method: shutdownService
-    // Retrieves information about running service
-    //----------------------------------------------------------------------
-    bool shutdownService(std::string srv);
-
-    //----------------------------------------------------------------------
-    // Method: leaveSwarm
-    // Make a node leave the swarm
-    //----------------------------------------------------------------------
-    bool leaveSwarm(std::string & addr);
-
-    //----------------------------------------------------------------------
-    // Method: shutdownSwarm
-    //Shutdown entire swarm
-    //----------------------------------------------------------------------
-    bool shutdownSwarm(std::string srv);
-
-private:
-    std::string managerAddr;
-    std::vector<std::string> workerAddrs;
-    std::string workerToken;
 };
 
 //}

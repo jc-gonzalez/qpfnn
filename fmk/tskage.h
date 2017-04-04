@@ -76,6 +76,8 @@
 //==========================================================================
 class TskAge : public Component {
 
+    enum AgentMode { CONTAINER, SERVICE };
+
 public:
     //----------------------------------------------------------------------
     // Constructor
@@ -113,6 +115,7 @@ protected:
 
 private:
     ProcStatus pStatus;
+    AgentMode  agentMode;
 };
 
 //}
