@@ -424,6 +424,7 @@ void Deployer::createElementsNetwork()
         //-----------------------------------------------------------------
         // a. Fill agents vector with as agents for this host
         //-----------------------------------------------------------------
+
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
             if (thisHost == kv.first) {
@@ -439,7 +440,21 @@ void Deployer::createElementsNetwork()
         }
 
         //-----------------------------------------------------------------
-        // b. Create agent connections
+        // b. Create Swarm Manager if serviceNodes is not empty and the
+        //    current host is the first in the list (Swam Manager)
+        //-----------------------------------------------------------------
+
+        if (cfg.network.serviceNodes().size() > 0) {
+            if (thisHost == cfg.network.serviceNodes().at(0)) {
+                sprintf(sAgName, "TskAgentSwarm");
+                ag.push_back(new TskAge(sAgName, thisHost, &synchro, SERVICE));
+                agName.push_back(std::string(sAgName));
+                agPortTsk.push_back(portnum(startingPort + 1, h, 0));
+            }
+        }
+
+        //-----------------------------------------------------------------
+        // c. Create agent connections
         //-----------------------------------------------------------------
 
         // CHANNEL TASK-PROCESSING - REQREP
