@@ -447,7 +447,7 @@ void Deployer::createElementsNetwork()
         if (cfg.network.serviceNodes().size() > 0) {
             if (thisHost == cfg.network.serviceNodes().at(0)) {
                 sprintf(sAgName, "TskAgentSwarm");
-                ag.push_back(new TskAge(sAgName, thisHost, &synchro, SERVICE));
+                ag.push_back(new TskAge(sAgName, thisHost, &synchro, TskAge::SERVICE));
                 agName.push_back(std::string(sAgName));
                 agPortTsk.push_back(portnum(startingPort + 1, h, 0));
             }
