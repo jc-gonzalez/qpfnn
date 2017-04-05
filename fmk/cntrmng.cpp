@@ -42,8 +42,10 @@
 
 #include "process.h"
 #include "str.h"
+#include "tools.h"
 
 #include <cassert>
+#include <fstream>
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -69,6 +71,8 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
                                    std::string exe, std::vector<std::string> args,
                                    std::string & containerId)
 {
+    static char fileIdTpl[] = "dockerId_XXXXXX";
+
     procxx::process cnt("docker", "run");
     for (auto & o : opts) { cnt.add_argument(o); }
     for (auto & kv : maps) {
@@ -76,7 +80,9 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
         cnt.add_argument(kv.first + ":" + kv.second);
     }
 
-    std::string tmpFileName(std::tmpnam(nullptr));
+    std::string tmpFileName;
+    (void)mkTmpFileName(fileIdTpl, tmpFileName);
+
     cnt.add_argument("--cidfile");
     cnt.add_argument(tmpFileName);
 
@@ -90,7 +96,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 
     std::ifstream dockerIdFile(tmpFileName);
     std::string id;
-    std::getline(dockerIdFile, id))
+    std::getline(dockerIdFile, id);
 
     return (cnt.code() == 0);
 }

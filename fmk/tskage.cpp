@@ -62,7 +62,7 @@ const std::string TskAge::ProcStatusName[] { TLIST_PSTATUS };
 // Constructor
 //----------------------------------------------------------------------
 TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
-               AgentMode mode = TskAge::CONTAINER)
+               AgentMode mode)
     : Component(name, addr, s), agentMode(mode), pStatus(IDLE)
 {
 }
@@ -71,7 +71,7 @@ TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
 // Constructor
 //----------------------------------------------------------------------
 TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
-               AgentMode mode = TskAge::CONTAINER)
+               AgentMode mode)
     : Component(name, addr, s), agentMode(mode), pStatus(IDLE)
 {
 }

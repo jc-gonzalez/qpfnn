@@ -50,6 +50,7 @@
 //   none
 //------------------------------------------------------------
 #include <vector>
+#include <map>
 #include <string>
 #include <sstream>
 
