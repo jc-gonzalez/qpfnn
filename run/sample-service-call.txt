@@ -1,0 +1,1 @@
+docker run -it -v /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2:/tsk/proc -v /Users/jcgonzalez/ws/QPFnn/run:/tsk devel python /tsk/runService.py address: 134.23.87.67:5432 session_dir: /tmp/qpf/run/SESSIONID/tsk/ processor: /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2/testsrv_driver.py 

@@ -1,8 +1,8 @@
 /******************************************************************************
- * File:    tskage.h
+ * File:    srvmng.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.TskAge
+ * Domain:  QPF.libQPF.ServiceMng
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare Tskage class
+ *   Declare ServiceMng class
  *
  * Created by:
  *   J C Gonzalez
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef TSKAGE_H
-#define TSKAGE_H
+#ifndef SRVMNG_H
+#define SRVMNG_H
 
 //============================================================
 // Group: External Dependencies
@@ -47,10 +47,11 @@
 
 //------------------------------------------------------------
 // Topic: System headers
-//   - thread
+//   none
 //------------------------------------------------------------
-#include <thread>
-#include <mutex>
+#include <vector>
+#include <string>
+#include <sstream>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -59,9 +60,8 @@
 
 //------------------------------------------------------------
 // Topic: Project headers
-//   - component.h
+//   none
 //------------------------------------------------------------
-#include "component.h"
 #include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -73,74 +73,72 @@
 //namespace QPF {
 
 //==========================================================================
-// Class: TskAge
+// Class: ServiceMng
 //==========================================================================
-class TskAge : public Component {
+class ServiceMng : public DockerMng {
 
 public:
-    // Running mode of the agent.  If SERVICE, a Docker Swarm is created
-    enum AgentMode { CONTAINER, SERVICE };
-
-    // Information on the service to be created, in Docker Swarm
-    struct ServiceInfo {
-        std::string              service;
-        std::string              serviceImg;
-        std::string              exe;
-        std::vector<std::string> args;
-        int                      scale;
-    };
-
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+    ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs);
 
     //----------------------------------------------------------------------
-    // Constructor
+    // Method: createService
+    // Creates a service that retrieves data from TskMng & processes them
     //----------------------------------------------------------------------
-    TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
-
-protected:
-    //----------------------------------------------------------------------
-    // Method: fromRunningToOperational
-    //----------------------------------------------------------------------
-    virtual void fromRunningToOperational();
+    virtual bool createService(std::string srv, std::string img, int numScale,
+                               std::string exe, std::vector<std::string> args);
 
     //----------------------------------------------------------------------
-    // Method: runEachIteration
+    // Method: reScaleService
+    // Rescales a running service
     //----------------------------------------------------------------------
-    virtual void runEachIteration();
+    virtual bool reScaleService(std::string id, int newScale);
 
-protected:
-#undef T
-#define TLIST_PSTATUS T(IDLE), T(WAITING), T(PROCESSING), T(FINISHING)
-
-#define T(x) x
-    enum ProcStatus { TLIST_PSTATUS };
-#undef T
-    static const std::string ProcStatusName[];
-
-protected:
     //----------------------------------------------------------------------
-    // Method: processIncommingMessages
+    // Method: getInfo
+    // Retrieves information about running service
     //----------------------------------------------------------------------
-    void processIncommingMessages();
+    virtual bool getInfo(std::string id, std::stringstream & info);
 
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-    virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
+    //----------------------------------------------------------------------
+    // Method: kill
+    // Retrieves information about running service
+    //----------------------------------------------------------------------
+    virtual bool kill(std::string id);
+
+    //----------------------------------------------------------------------
+    // Method: leaveSwarm
+    // Make a node leave the swarm
+    //----------------------------------------------------------------------
+    virtual bool leaveSwarm(std::string & addr);
+
+    //----------------------------------------------------------------------
+    // Method: shutdown
+    //Shutdown entire swarm
+    //----------------------------------------------------------------------
+    virtual bool shutdown(std::string srv);
 
 private:
-    ProcStatus pStatus;
-    AgentMode  agentMode;
-    DockerMng  * dckMng;
+    //----------------------------------------------------------------------
+    // Method: initSwarmManager
+    // Initializes the swarm manager
+    //----------------------------------------------------------------------
+    virtual bool initSwarmManager(std::string & addr);
 
-    ServiceInfo *           serviceInfo;
-    std::string              srvManager;
-    std::vector<std::string> srvWorkers;
+    //----------------------------------------------------------------------
+    // Method: initSwarmWorker
+    // Initializes a swarm worker
+    //----------------------------------------------------------------------
+    virtual bool initSwarmWorker(std::string & addr);
+
+private:
+    std::string managerAddr;
+    std::vector<std::string> workerAddrs;
+    std::string workerToken;
 };
 
 //}
 
-#endif  /* TASKAGENT_H */
+#endif  /* SRVMNG_H */

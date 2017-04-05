@@ -49,6 +49,7 @@
 // Topic: System headers
 //   none
 //------------------------------------------------------------
+#include <list>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -138,9 +139,10 @@ protected:
 
 private:
     //----------------------------------------------------------------------
-    // Method: exeRule
+    // Method: execTask
+    // Execute the rule requested by Task Orchestrator
     //----------------------------------------------------------------------
-    void exeRule(MessageString & msg);
+    void execContainerTask();
 
     //----------------------------------------------------------------------
     // Method: selectAgent
@@ -166,6 +168,16 @@ private:
 private:
     std::vector<std::string>         agents;
     std::map<std::string, AgentInfo> agentInfo;
+
+    std::list<TaskInfo>              serviceTasks;
+    std::list<TaskInfo>              containerTasks;
+
+    std::map<std::string, TaskStatus> taskRegistry;
+
+    std::map<TaskStatus, int> containerTaskStatus;
+    std::map<TaskStatus, int> serviceTaskStatus;
+
+    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;
 };
 
 //}

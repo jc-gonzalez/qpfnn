@@ -88,10 +88,15 @@ public:
     CfgGrpNetwork(json v) : JRecord(v) {}
     virtual void dump() {
         DUMPJSTR(masterNode);
+        DUMPJINT(startingPort);
         DUMPJSTRINTMAP(processingNodes);
+        DUMPJSTRVEC(serviceNodes);
     }
     JSTR(masterNode);
+    JINT(startingPort);
     JSTRINTMAP(processingNodes);
+    JSTRVEC(serviceNodes);
+    JINT(serviceScale);
 };
 
 //==========================================================================
@@ -341,6 +346,8 @@ public:
     bool                  isActualFile;
     std::string           currentHostAddr;
     bool                  weAreOnMaster;
+
+    std::vector<std::string> agentNames;
 
     struct {
         std::string       inbox;

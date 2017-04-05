@@ -44,6 +44,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <cstring>
 #include <sys/time.h>
 #include <iostream>
 #include <fstream>
@@ -188,6 +189,26 @@ void waitUntilNextSecond()
             gettimeofday(&tv, NULL);
         } while ((tv.tv_sec % 60) == 0);
     }
+}
+
+//----------------------------------------------------------------------
+// Function: mkTmpFileName
+// Uses mkstemp to create a temporary file according to template
+//----------------------------------------------------------------------
+int mkTmpFileName(char * tpl, std::string & sfName, bool closeFd)
+{
+    const int PATH_MAX = 200;
+    char fname[PATH_MAX];
+    int fd;
+
+    strcpy(fname, tpl);
+    if (((fd = mkstemp(fname)) != -1) and closeFd) {
+        close(fd);
+        unlink(fname);
+    }
+
+    sfName = std::string(fname);
+    return fd;
 }
 
 //----------------------------------------------------------------------

@@ -228,22 +228,22 @@ bool FileNameSpec::parseFileName(std::string fileName,
                 DBG(k << idx << fld << ' ' << kv.first);
                 switch (kv.first) {
                 case 'M':
-                    m["mission"] = placeIn(m.mission(),      tpl, idx, fld);
+                    m["mission"]          = placeIn(m.mission(),      tpl, idx, fld);
                     break;
                 case 'F':
-                    m["procFunc"] = placeIn(m.procFunc(),     tpl, idx, fld);
+                    m["procFunc"]         = placeIn(m.procFunc(),     tpl, idx, fld);
                     break;
                 case 'P':
-                    m["params"] = placeIn(m.params(),       tpl, idx, fld);
+                    m["params"]           = placeIn(m.params(),       tpl, idx, fld);
                     break;
                 case 'S':
-                    m["signature"] = placeIn(m.signature(),    tpl, idx, fld);
+                    m["signature"]        = placeIn(m.signature(),    tpl, idx, fld);
                     break;
                 case 'I':
-                    m["instrument"] = placeIn(m.instrument(),   tpl, idx, fld);
+                    m["instrument"]       = placeIn(m.instrument(),   tpl, idx, fld);
                     break;
                 case 'T':
-                    m["productType"] = placeIn(m.productType(),  tpl, idx, fld);
+                    m["productType"]      = placeIn(m.productType(),  tpl, idx, fld);
                     break;
                 case 'v':
                     if (fld.length() < 5) {
@@ -252,16 +252,16 @@ bool FileNameSpec::parseFileName(std::string fileName,
                     } else {
                         m["hadNoVersion"] = false;
                     }
-                    m["productVersion"] = placeIn(m.productVersion(), tpl, idx, fld);
+                    m["productVersion"]   = placeIn(m.productVersion(), tpl, idx, fld);
                     break;
                 case 'D':
-                    m["timeInterval"] = placeIn(m.timeInterval(), tpl, idx, fld);
+                    m["timeInterval"]     = placeIn(m.timeInterval(), tpl, idx, fld);
                     break;
                 case 'f':
-                    m["startTime"] = placeIn(m.startTime(),    tpl, idx, fld);
+                    m["startTime"]        = placeIn(m.startTime(),    tpl, idx, fld);
                     break;
                 case 't':
-                    m["endTime"] = placeIn(m.endTime(),      tpl, idx, fld);
+                    m["endTime"]          = placeIn(m.endTime(),      tpl, idx, fld);
                     break;
                 default:
                     break;
@@ -308,32 +308,35 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
     std::string obsId, expos;
 
     if ((m.procFunc() == "SOC") || (m.procFunc() == "HK")) {
-        // Instrument-ObsMode-ObsId-Exposure
+        // Instrument-ObsId-Exposure-ObsMode
         if (nParts < 4) { return; }
-        m["origin"]      = m.procFunc();
         m["instrument"]  = signParts[0];
-        m["productType"] = m.procFunc() + "_" + m.instrument();
         m["obsMode"]     = signParts[1];
         obsId            = signParts[2];
         expos            = signParts[3];
+        m["origin"]      = m.procFunc();
+        m["productType"] = m.procFunc() + "_" + m.instrument();
+        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if ((m.procFunc() == "SIM") || (m.procFunc() == "LE1")) {
         // Instrument-ObsMode-ObsId-Exposure
         if (nParts < 4) { return; }
-        m["origin"]      = m.procFunc();
         m["instrument"]  = signParts[0];
-        m["productType"] = m.procFunc() + "_" + m.instrument();
         m["obsMode"]     = signParts[1];
         obsId            = signParts[2];
         expos            = signParts[3];
+        m["origin"]      = m.procFunc();
+        m["productType"] = m.procFunc() + "_" + m.instrument();
+        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else if (m.procFunc()  == "QLA") {
         // OrigProcFunc-Instrument-ObsMode-ObsId-Exposure
         if (nParts < 5) { return; }
         m["origin"]      = signParts[0];
         m["instrument"]  = signParts[1];
-        m["productType"] = m.procFunc() + "_" + m.origin() + "_" + m.instrument();
         m["obsMode"]     = signParts[2];
         obsId            = signParts[3];
         expos            = signParts[4];
+        m["productType"] = m.procFunc() + "_" + m.origin() + "_" + m.instrument();
+        TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else {
         // TBD
     }
@@ -350,7 +353,8 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
                    obsId + "-" + expos + "-" + m.obsMode() + "_" +
                    m.productVersion());
 
-    m["signature"] = (obsId + "-" + expos + "-" + m.obsMode());
+    m["signature"] = (obsId + "-" + m.obsMode() + "-" + expos);
+    TRC("Final: " << m.productType() << " / " << m.signature());
 }
 
 std::string FileNameSpec::buildProductId(ProductMetadata & m)
@@ -377,6 +381,8 @@ std::string FileNameSpec::buildProductId(ProductMetadata & m)
     str::replaceAll(id, "%f", m.startTime());
     str::replaceAll(id, "%t", m.endTime());
     str::replaceAll(id, "%v", m.productVersion());
+
+    str::replaceAll(id, "__", "_");
 
     return id;
 }
@@ -406,7 +412,7 @@ PCRegEx *                         FileNameSpec::re = 0;
 #endif
 
 std::string                       FileNameSpec::reStr = "([A-Z]+)_([A-Z0-9]+)_([^_]+)_([0-9]+T[\\.0-9]+Z)[_]*([0-9]*\\.*[0-9]*)";
-std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";
+std::string                       FileNameSpec::assignationsStr = "%M=%1;%F=%2;%P=%3;%S=%2+_+%3;%D=%4;%f=%4;%v=%5";
 std::map< char, std::set<int> >   FileNameSpec::assignations;
 std::map< char, std::string >     FileNameSpec::assignationsTpl;
 std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";

@@ -345,7 +345,7 @@ void Component::defineValidTransitions()
 //----------------------------------------------------------------------
 void Component::afterTransition(int fromState, int toState)
 {
-    /*
+/*
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
@@ -361,7 +361,7 @@ void Component::afterTransition(int fromState, int toState)
 
     // Close connection
     dbHdl->closeConnection();
-    */
+*/
 }
 
 //}

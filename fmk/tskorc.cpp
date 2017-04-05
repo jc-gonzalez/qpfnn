@@ -1,5 +1,5 @@
 /******************************************************************************
- * File:    taskorc.cpp
+ * File:    tskorc.cpp
  *          This file is part of QLA Processing Framework
  *
  * Domain:  QPF.libQPF.taskorc
@@ -87,15 +87,15 @@ void TskOrc::defineOrchestrationParams()
 
     // 1. Product Types
     orcParams.productTypes.clear();
-   orcParams.productTypes = cfg.products.productTypes();
+    orcParams.productTypes = cfg.products.productTypes();
 
     // 2. Rules
     json jobj = cfg.orchestration.rules.val();
     for (int i = 0; i < jobj.size(); ++i) {
         Rule * rule = new Rule;
-        std::string ipTypes = jobj[i][""].asString();
-        std::string opTypes = jobj[i][""].asString();
-        rule->name              = "";
+        std::string ipTypes = jobj[i]["inputs"].asString();
+        std::string opTypes = jobj[i]["outputs"].asString();
+        rule->name              = "Rule_" + str::toStr<int>(i);
         rule->inputs            = str::split(ipTypes, ',');
         rule->outputs           = str::split(opTypes, ',');
         rule->processingElement = jobj[i]["processing"].asString();
@@ -338,7 +338,7 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
 bool TskOrc::sendTaskSchedMsg(Rule * rule,
                               ProductList & inputs)
 {
-    // Define ans set task object
+    // Define and set task object
     TaskInfo task;
 
     DateTime epoch = timeTag();
@@ -348,7 +348,8 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     task["taskEnd"]      = "";
     task["taskExitCode"] = 0;
     task["taskStatus"]   = TASK_SCHEDULED;
-    task["params"]       = JValue(std::string("{}")).val();
+    task["taskSet"]      = "CONTAINER";
+    task["params"]       = nullJson;
 
     URLHandler urlh;
     int i = 0;
@@ -391,5 +392,4 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     } else {
         return false;
     }
-
 }

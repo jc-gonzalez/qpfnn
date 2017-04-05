@@ -121,13 +121,13 @@ void Config::init(std::string fName)
     }
 
     if (! fName.empty()) {
-	TRC("Configuration is retrieved from file: " << fName);
+        TRC("Configuration is retrieved from file: " << fName);
         setConfigFile(fName);
         readConfigFromFile();
         if (weAreOnMaster) { saveConfigToDB(); }
         isActualFile = true;
     } else {
-	TRC("Configuration is retrieved from db: " << fName);
+        TRC("Configuration is retrieved from db: " << fName);
         readConfigFromDB();
         isActualFile = false;
     }
@@ -156,7 +156,7 @@ void Config::fillData()
     DBPwd  = db.pwd();
 
     DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
-    
+
     weAreOnMaster = (network.masterNode() == currentHostAddr);
 }
 
@@ -215,7 +215,7 @@ void Config::readConfigFromDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-	DBG("ERROR Trying to open connection to DB");
+        DBG("ERROR Trying to open connection to DB");
         Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
@@ -229,24 +229,24 @@ void Config::readConfigFromDB()
         dbHdl->getTable("configuration", config);
         unsigned int lastConfig = config.size() - 1;
         //Json::Reader reader;
-	    //reader.parse(config.at(lastConfig).at(1), cfg);
+            //reader.parse(config.at(lastConfig).at(1), cfg);
         dateCreated = config.at(lastConfig).at(0);
-	    std::string configData(config.at(lastConfig).at(1));
-	    TRC("Retrieved config. data: " << configData);
-	    cfg.fromStr(configData);
+            std::string configData(config.at(lastConfig).at(1));
+            TRC("Retrieved config. data: " << configData);
+            cfg.fromStr(configData);
         cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
-	    DBG("ERROR Trying to retrieve configuration table");
+            DBG("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-	    DBG("ERROR Trying to retrieve configuration table");
+            DBG("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR,
                           "Unexpected error accessing "
                           "database for retrieval of system configuration");
         return;
     }
-    
+
     // Modificar fecha de último accesso
     std::string now = timeTag();
     std::string cmd("UPDATE configuration SET last_accessed = '" + now + "' "
@@ -395,214 +395,6 @@ void Config::processConfig()
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
-
-/*
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-    dbHdl->setDbHost(Config::DBHost);
-    dbHdl->setDbPort(Config::DBPort);
-    dbHdl->setDbName(Config::DBName);
-    dbHdl->setDbUser(Config::DBUser);
-    dbHdl->setDbPasswd(Config::DBPwd);
-
-    ConfigInfo & cfgInfo = ConfigInfo::data();
-
-    // START OF: Config Reading
-
-    // Now, fill in ConfigInfo structure
-    reset();
-    cfgInfo.clear();
-    cfgInfo.hmiPresent   = false;
-    cfgInfo.isActualFile = isActualFile;
-
-    // Config file name
-    cfgInfo.currentMachine = getEnvVar("HOSTNAME");
-    cfgInfo.currentUser    = getEnvVar("USER");
-    cfgInfo.cfgFileName    = cfgFileName;
-
-    // General
-    getGeneralInfo(cfgInfo.appName, cfgInfo.appVersion, cfgInfo.lastAccess);
-
-    // Product datatypes
-    getProductTypes(cfgInfo.orcParams.productTypes);
-
-    // File name convention parameters
-    const Json::Value & prds = cfg["products"];
-    cfgInfo.parsing_assign   = prds["parsing_assign"].asString();
-    cfgInfo.product_id_tpl   = prds["product_id_tpl"].asString();
-    cfgInfo.data_ext         = prds["data_ext"].asString();
-    cfgInfo.meta_ext         = prds["meta_ext"].asString();
-    cfgInfo.log_ext          = prds["log_ext"].asString();
-
-    std::string parsing_regex_str = prds["parsing_regex"].asString();
-    cfgInfo.parsing_regex    = getRegExFromCfg(parsing_regex_str);
-
-    FileNameSpec fs(cfgInfo.parsing_regex, cfgInfo.parsing_assign);
-    fs.setProductIdTpl(cfgInfo.product_id_tpl);
-
-    // Orchestration rules file
-    for (int i = 0; i < getNumOrchRules(); ++i) {
-        Rule * rule = new Rule;
-        getOrchRule(rule->name, rule->inputs,
-                    rule->outputs, rule->processingElement,
-                    rule->condition);
-        cfgInfo.orcParams.rules.push_back(rule);
-    }
-
-    // Processors
-    // Check that connection with the DB is possible
-    try {
-        dbHdl->openConnection();
-    } catch (RuntimeException & e) {
-        Log::log("SYSTEM", Log::FATAL, e.what());
-        return;
-    }
-    for (int i = 0; i < getNumProcs(); ++i) {
-        Processor * pe = new Processor;
-        getProc(pe->name, pe->exePath, pe->inPath, pe->outPath, pe->version);
-        pe->counter = dbHdl->getVersionCounter(pe->name);
-        cfgInfo.orcParams.processors[pe->name] = pe;
-    }
-    dbHdl->closeConnection();
-
-    // Storage areas information
-    const Json::Value & stge             = cfg["storage"];
-    const Json::Value & stgeBase         = stge["base"];
-    const Json::Value & stgeRun          = stge["run"];
-    const Json::Value & stgeIn           = stge["incoming"];
-    const Json::Value & stgeLocal        = stge["local_archive"];
-    const Json::Value & stgeGatew        = stge["gateway"];
-    const Json::Value & stgeArch         = stge["archive"];
-    const Json::Value & stgeOut          = stge["outgoing"];
-
-    cfgInfo.storage.base                 = stgeBase["path"].asString();
-    cfgInfo.storage.run                  = stgeRun["path"].asString();
-    cfgInfo.storage.local_archive.path   = stgeLocal["path"].asString();
-    cfgInfo.storage.gateway.path         = stgeGatew["path"].asString();
-
-    cfgInfo.storage.tasks                = PATHTsk;
-
-    getExternalStorage(stgeIn,   cfgInfo.storage.inbox);
-    getExternalStorage(stgeOut,  cfgInfo.storage.outbox);
-    getExternalStorage(stgeArch, cfgInfo.storage.archive);
-
-    // User Defined Tools
-    for (int i = 0; i < getNumUserDefTools(); ++i) {
-        UserDefTool udt;
-        getUserDefTool(udt);
-        cfgInfo.userDefTools[udt.name] = udt;
-    }
-
-    // Flags
-    const Json::Value & flags = cfg["flags"];
-    const Json::Value & monitFlags = flags["monitoring"];
-    const Json::Value & procFlags  = flags["processing"];
-    const Json::Value & archFlags  = flags["archiving"];
-
-    Json::Value::iterator it = monitFlags["msgs_to_disk"].begin();
-    while (it != monitFlags["msgs_to_disk"].end()) {
-        Json::Value const & v = (*it);
-        std::string msgName = v.asString();
-        cfgInfo.flags.monit.msgsToDisk[msgName] = true;
-        ++it;
-    }
-    it = monitFlags["msgs_to_db"].begin();
-    while (it != monitFlags["msgs_to_db"].end()) {
-        Json::Value const & v = (*it);
-        std::string msgName = v.asString();
-        cfgInfo.flags.monit.msgsToDB[msgName] = true;
-        ++it;
-    }
-    cfgInfo.flags.monit.notifyMsgArrival         = monitFlags["notify_msg_arrival"].asBool();
-    cfgInfo.flags.monit.groupTaskAgentLogs       = monitFlags["group_task_agent_logs"].asBool();
-
-    cfgInfo.flags.proc.allowReprocessing         = procFlags["allow_reprocessing"].asBool();
-    cfgInfo.flags.proc.intermedProducts          = procFlags["intermediate_products"].asBool();
-
-    cfgInfo.flags.arch.sendOutputsToMainArchive  = archFlags["send_outputs_to_main_archive"].asBool();
-
-    if (isLive) { return; }
-
-    // Nodes
-    for (int i = 0; i < getNumNodes(); ++i) {
-        Peer * peer = new Peer;
-        getNode(peer->name, peer->type, peer->clientAddr, peer->serverAddr);
-        cfgInfo.peersCfg.push_back(*peer);
-        cfgInfo.peerNames.push_back(peer->name);
-        cfgInfo.peersCfgByName[peer->name] = peer;
-        if (peer->type == "evtmng") {
-            cfgInfo.evtMngCfg.name = peer->name;
-            cfgInfo.evtMngCfg.type = peer->type;
-            cfgInfo.evtMngCfg.clientAddr = peer->clientAddr;
-            cfgInfo.evtMngCfg.serverAddr = peer->serverAddr;
-        }
-    }
-
-    // HMI node
-    cfgInfo.qpfhmiCfg.name = getHMINodeName();
-    getNodeByName(cfgInfo.qpfhmiCfg.name,
-                  cfgInfo.qpfhmiCfg.type,
-                  cfgInfo.qpfhmiCfg.clientAddr,
-                  cfgInfo.qpfhmiCfg.serverAddr);
-
-    // Master node
-    cfgInfo.masterMachine = cfg["nodes"]["master_machine"].asString();
-    cfgInfo.isMaster = (cfgInfo.masterMachine == cfgInfo.currentMachine);
-
-    // Machines and connections
-    reset();
-    std::string mname;
-    std::vector<std::string> mnodes;
-    for (int i = 0; i < getNumMachines(); ++i) {
-        mnodes.clear();
-        getMachine(mname, mnodes);
-        cfgInfo.machines.push_back(mname);
-        cfgInfo.machineNodes[mname] = mnodes;
-    }
-
-    for (unsigned int i = 0; i < cfgInfo.peerNames.size(); ++i) {
-        std::vector<std::string> nconn;
-        getConnectionsForNode(cfgInfo.peerNames.at(i), nconn);
-        cfgInfo.connections[cfgInfo.peerNames.at(i)] = nconn;
-    }
-
-    // END OF: Config Reading
-
-    // Create peer commnodes for nodes in current machine
-    std::vector<std::string> & machineNodes =
-            cfgInfo.machineNodes[cfgInfo.currentMachine];
-
-    SHW("Creating connections:\n");
-
-    for (unsigned int i = 0; i < machineNodes.size(); ++i) {
-
-        Peer * peer = cfgInfo.peersCfgByName[machineNodes.at(i)];
-        std::string & peerName = peer->name;
-        std::string & peerType = peer->type;
-
-        Component * component = createNewComponent(cfgInfo, peerType, peerName.c_str());
-        if (component == 0) { continue; }
-
-        component->addPeer(cfgInfo.peersCfgByName[peerName], true);
-        //DBG("Creating connections for " << peerName
-        //    << "  [" << peer->clientAddr
-        //    << " ; " << peer->serverAddr << "]");
-        SHW("* " << peerName << " [" << peer->clientAddr << "] <==>\n");
-
-        std::vector<std::string> & connectNodes = cfgInfo.connections[peerName];
-
-        for (unsigned int j = 0; j < connectNodes.size(); ++j) {
-            Peer * otherPeer = cfgInfo.peersCfgByName[connectNodes.at(j)];
-            component->addPeer(otherPeer);
-            //DBG("  Connecting to " << otherPeer->name
-            //    << "  [" << otherPeer->clientAddr
-            //    << " ; " << otherPeer->serverAddr << "]");
-            SHW("\t\t* " << otherPeer->name << " [" << otherPeer->clientAddr << "]\n");
-        }
-
-        cfgInfo.peerNodes.push_back(component);
-
-    }
-*/
 }
 
 //----------------------------------------------------------------------

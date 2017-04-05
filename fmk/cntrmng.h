@@ -1,8 +1,8 @@
 /******************************************************************************
- * File:    tskage.h
+ * File:    cntrmng.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.TskAge
+ * Domain:  QPF.libQPF.ContainerMng
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare Tskage class
+ *   Declare ContainerMng class
  *
  * Created by:
  *   J C Gonzalez
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef TSKAGE_H
-#define TSKAGE_H
+#ifndef CNTRMNG_H
+#define CNTRMNG_H
 
 //============================================================
 // Group: External Dependencies
@@ -47,10 +47,12 @@
 
 //------------------------------------------------------------
 // Topic: System headers
-//   - thread
+//   none
 //------------------------------------------------------------
-#include <thread>
-#include <mutex>
+#include <vector>
+#include <map>
+#include <string>
+#include <sstream>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -59,9 +61,8 @@
 
 //------------------------------------------------------------
 // Topic: Project headers
-//   - component.h
+//   none
 //------------------------------------------------------------
-#include "component.h"
 #include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
@@ -73,74 +74,39 @@
 //namespace QPF {
 
 //==========================================================================
-// Class: TskAge
+// Class: ContainerMng
 //==========================================================================
-class TskAge : public Component {
+class ContainerMng : public DockerMng {
 
 public:
-    // Running mode of the agent.  If SERVICE, a Docker Swarm is created
-    enum AgentMode { CONTAINER, SERVICE };
-
-    // Information on the service to be created, in Docker Swarm
-    struct ServiceInfo {
-        std::string              service;
-        std::string              serviceImg;
-        std::string              exe;
-        std::vector<std::string> args;
-        int                      scale;
-    };
-
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+    ContainerMng();
 
     //----------------------------------------------------------------------
-    // Constructor
+    // Method: createContainer
+    // Creates a container that executes the requested application
     //----------------------------------------------------------------------
-    TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
-
-protected:
-    //----------------------------------------------------------------------
-    // Method: fromRunningToOperational
-    //----------------------------------------------------------------------
-    virtual void fromRunningToOperational();
+    virtual bool createContainer(std::string img, std::vector<std::string> opts,
+                                 std::map<std::string, std::string> maps,
+                                 std::string exe, std::vector<std::string> args,
+                                 std::string & containerId);
 
     //----------------------------------------------------------------------
-    // Method: runEachIteration
+    // Method: getInfo
+    // Retrieves information about running container
     //----------------------------------------------------------------------
-    virtual void runEachIteration();
+    virtual bool getInfo(std::string id, std::stringstream & info);
 
-protected:
-#undef T
-#define TLIST_PSTATUS T(IDLE), T(WAITING), T(PROCESSING), T(FINISHING)
-
-#define T(x) x
-    enum ProcStatus { TLIST_PSTATUS };
-#undef T
-    static const std::string ProcStatusName[];
-
-protected:
     //----------------------------------------------------------------------
-    // Method: processIncommingMessages
+    // Method: kill
+    // Stop a given container
     //----------------------------------------------------------------------
-    void processIncommingMessages();
+    virtual bool kill(std::string id);
 
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-    virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-private:
-    ProcStatus pStatus;
-    AgentMode  agentMode;
-    DockerMng  * dckMng;
-
-    ServiceInfo *           serviceInfo;
-    std::string              srvManager;
-    std::vector<std::string> srvWorkers;
 };
 
 //}
 
-#endif  /* TASKAGENT_H */
+#endif  /* CNTRMNG_H */

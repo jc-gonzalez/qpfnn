@@ -249,6 +249,12 @@ void Deployer::readConfiguration()
     // Initialize configuration
     cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
+    DBG("Master host: " << cfg.network.masterNode());
+    DBG("Current host: " << currentHostAddr << "/"
+        << cfg.currentHostAddr);
+    DBG("Running in a "
+        << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
+        << " Host.");
 
     TRC(cfg.str());
     TRC(cfg.general.appName());
@@ -256,7 +262,7 @@ void Deployer::readConfiguration()
     for (auto & kv : cfg.network.processingNodes()) {
         TRC(kv.first << ": " << kv.second);
     }
-    cfg.dump();
+    //cfg.dump();
     TRC("Config::PATHBase: " << Config::PATHBase);
 }
 
@@ -418,12 +424,14 @@ void Deployer::createElementsNetwork()
         //-----------------------------------------------------------------
         // a. Fill agents vector with as agents for this host
         //-----------------------------------------------------------------
+
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
             if (thisHost == kv.first) {
                 int numOfTskAgents = kv.second;
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+                    cfg.agentNames.push_back(sAgName);
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro));
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 1, h, i));
@@ -433,11 +441,30 @@ void Deployer::createElementsNetwork()
         }
 
         //-----------------------------------------------------------------
-        // b. Create agent connections
+        // b. Create Swarm Manager if serviceNodes is not empty and the
+        //    current host is the first in the list (Swam Manager)
+        //-----------------------------------------------------------------
+
+        if (cfg.network.serviceNodes().size() > 0) {
+            if (thisHost == cfg.network.serviceNodes().at(0)) {
+                sprintf(sAgName, "TskAgentSwarm");
+                ag.push_back(new TskAge(sAgName, thisHost, &synchro, TskAge::SERVICE));
+                cfg.agentNames.push_back(sAgName);
+                agName.push_back(std::string(sAgName));
+                agPortTsk.push_back(portnum(startingPort + 1, h, 0));
+            }
+        }
+
+        //-----------------------------------------------------------------
+        // c. Create agent connections
         //-----------------------------------------------------------------
 
         // CHANNEL TASK-PROCESSING - REQREP
         // - Out/In: TskAge*/TskMng
+        // Note that this channel is used to send from TskAgents to TskManager:
+        // 1. Processing requests
+        // 2. Processing status reports
+        // 3. Processing completion messages
         h = 0;
         for (auto & a : ag) {
             chnl = ChnlTskProc + "_" + agName.at(h);
@@ -484,7 +511,9 @@ void Deployer::createElementsNetwork()
     chnl     = ChnlCmd;
     bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
-    m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
+    Survey * surveyor = new Survey(NN_SURVEYOR, bindAddr);
+    surveyor->setNumOfRespondents(4);
+    m.evtMng->addConnection(chnl, surveyor);
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
         c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
     }

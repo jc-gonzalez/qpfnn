@@ -50,9 +50,8 @@
 // Topic: System headers
 //   - string
 //   - map
-//   - iostream
+//   - set
 //------------------------------------------------------------
-
 #include <string>
 #include <map>
 #include <set>
@@ -188,7 +187,7 @@ public:
     JValue operator()(std::string key) { return JValue(value[key]); }
     json & operator[](std::string key) { return value[key]; }
     std::string str() {
-        if (value.isObject()) {
+        if (value.isObject() || value.isArray()) {
             Json::FastWriter w;
             return w.write(value);
         } else {
@@ -204,6 +203,8 @@ public:
 protected:
     json value;
 };
+
+extern json nullJson;
 
 class JRecord : public JValue {
 public:
@@ -320,6 +321,9 @@ struct ProductList : public JRecord {
             products.push_back(ProductMetadata(value[i]));
         }
     }
+    ProductMetadata at(int i) {
+        return ProductMetadata(value[i]);
+    }
     virtual void dump() {
         for (auto & v: products) { v.dump(); }
     }
@@ -381,6 +385,7 @@ struct TaskInfo : public JRecord {
         outputs.dump();
         DUMPJSTRSTRMAP(params);
         DUMPJSTR(taskData);
+        DUMPJSTR(taskSet);
     }
     JSTR(taskName);
     JSTR(taskPath);
@@ -392,6 +397,7 @@ struct TaskInfo : public JRecord {
     GRP(ProductList,outputs);
     JSTRSTRMAP(params);
     JSTR(taskData);
+    JSTR(taskSet);
 };
 
 struct TaskAgentInfo : public JRecord {

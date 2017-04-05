@@ -12,6 +12,7 @@ include (../common.cmake)
 project (tools)
 
 set (libtools_hdr
+  process.h
   propdef.h
   alert.h
   dwatcher.h

@@ -137,6 +137,12 @@ std::string tagToTimestamp(std::string tag);
 void waitUntilNextSecond();
 
 //----------------------------------------------------------------------
+// Function: mkTmpFileName
+// Uses mkstemp to create a temporary file according to template
+//----------------------------------------------------------------------
+int mkTmpFileName(char * tpl, std::string & sfName, bool closeFd = true);
+
+//----------------------------------------------------------------------
 // Function: setDebugInfo
 // Sets flag for enabling debug information
 //----------------------------------------------------------------------

@@ -80,26 +80,34 @@ TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void TskMng::fromRunningToOperational()
 {
-    // Create Agents table
-    int numOfTskAgents = 0;
-    for (auto & kv : cfg.network.processingNodes()) {
-        numOfTskAgents += kv.second;
-    }
+    // Create Agents Info. table
     AgentInfo emptyInfo;
-    char sAgName[20];
-    for (unsigned int i = 0; i < numOfTskAgents; ++i) {
-        sprintf(sAgName, "TskAgent%d", i);
-        std::string ag(sAgName);
-        agents.push_back(ag);
+    int i = 0;
+    for (auto & a : cfg.agentNames) {
+        agents.push_back(a);
         emptyInfo.idx           = i;
         emptyInfo.runningTasks  = 0;
         emptyInfo.failedTasks   = 0;
         emptyInfo.finishedTasks = 0;
         emptyInfo.launchedTasks = 0;
         emptyInfo.load          = 0;
-        agentInfo[ag] = emptyInfo;
+        agentInfo[a] = emptyInfo;
+        ++i;
     }
 
+    // Initialize Task Status maps
+    for (int k = TASK_SCHEDULED; k != TASK_UNKNOWN_STATE; ++k) {
+        TaskStatus status = TaskStatus(k);
+        serviceTaskStatus[status]   = 0;
+        containerTaskStatus[status] = 0;
+        for (auto & a : cfg.agentNames) {
+            std::pair<std::string,
+                      TaskStatus> tskPair = std::make_pair(a, status);
+            containerTaskStatusPerAgent[tskPair] = 0;
+        }
+    }
+
+    // Transit to Operational
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 }
@@ -117,7 +125,8 @@ void TskMng::processIncommingMessages()
         while (conn->next(m)) {
             Message<MsgBodyTSK> msg(m);
             std::string type(msg.header.type());
-            DBG(compName << " received the message [" << m << "] through the channel " + chnl);
+            DBG(compName << " received the message [" << m
+                << "] through the channel " + chnl);
             if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
             else if (type == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
@@ -132,6 +141,9 @@ void TskMng::processIncommingMessages()
 //----------------------------------------------------------------------
 void TskMng::runEachIteration()
 {
+    // Each iteration the Task Manager, apart from processing incoming
+    // messages, performs the following actions:
+    // 1. Send Task Status Reports to
 }
 
 //----------------------------------------------------------------------
@@ -148,11 +160,19 @@ void TskMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // Define ans set task object
+    // Define ans set task objecte
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
-    TaskInfo task(body["info"].asString());
-    task.dump();
+    TaskInfo task(body["info"]);
+
+    // Store task in specific container
+    if (task.taskSet() == "CONTAINER") {
+        containerTasks.push_back(task);
+    } else if (task.taskSet() == "SERVICE") {
+        serviceTasks.push_back(task);
+    } else {
+        WarnMsg("Badly assigned set for task: " + task.taskSet());
+    }
 }
 
 //----------------------------------------------------------------------
@@ -160,30 +180,58 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // Define ans set task object
+    // Define and set task object
     Message<MsgBodyTSK> msg(m);
     std::string agName(msg.header.source());
     DBG("TASK REQUEST FROM " << agName << " RECEIVED");
 
-    // Create message and send
-    msg.buildHdr(ChnlTskProc,
-                 ChnlTskProc,
-                 "1.0",
-                 compName,
-                 "*",
-                 "", "", "");
+    // Create message
+    msg.buildHdr(ChnlTskProc, ChnlTskProc, "1.0",
+                 compName, "*", "", "", "");
 
     MsgBodyTSK body;
-    std::string content("{\"name\":\"tsktsk\", \"data\":[1,2,3]}");
-    body["info"] = JValue(content).val();
+
+    // Select task to send
+    bool isSrvRqst = (agName == "TskAgentSwarm");
+    std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
+
+    bool isTaskSent = true;
+    std::string taskName;
+    TaskStatus  taskStatus;
+
+    if (listOfTasks->size() < 1) {
+        body["info"] = nullJson;
+        isTaskSent = false;
+    } else {
+        json taskInfoData = listOfTasks->front().val();
+        taskName = taskInfoData["taskName"].asString();
+        taskStatus = TaskStatus(taskInfoData["taskStatus"].asInt());
+        body["info"] = taskInfoData;
+        listOfTasks->pop_front();
+    }
+
     msg.buildBody(body);
 
+    // Send msg
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
     ChannelDescriptor chnl(ChnlTskProc + "_" + agName);
     it = connections.find(chnl);
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
+    }
+
+    // Task info is sent, register the task and status
+    if (isTaskSent) {
+        taskRegistry[taskName] = taskStatus;
+        if (isSrvRqst) {
+            serviceTaskStatus[taskStatus]++;
+        } else {
+            containerTaskStatus[taskStatus]++;
+            std::pair<std::string, TaskStatus> tskPair =
+                std::make_pair(taskName, taskStatus);
+            containerTaskStatusPerAgent[tskPair]++;
+        }
     }
 }
 
@@ -192,13 +240,38 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    TaskInfo task(body["info"]);
+
+    std::string taskName = task.taskName();
+    TaskStatus  taskStatus = TaskStatus(task.taskStatus());
+
+    // Update registry and status maps if needed
+    TaskStatus oldStatus = taskRegistry[taskName];
+    if (oldStatus != taskStatus) {
+        taskRegistry[taskName] = taskStatus;
+        if (task.taskSet() == "SERVICE") {
+            serviceTaskStatus[oldStatus]--;
+            serviceTaskStatus[taskStatus]++;
+        } else {
+            containerTaskStatus[oldStatus]--;
+            containerTaskStatus[taskStatus]++;
+            std::pair<std::string, TaskStatus> oldPair =
+                std::make_pair(taskName, oldStatus);
+            std::pair<std::string, TaskStatus> tskPair =
+                std::make_pair(taskName, taskStatus);
+            containerTaskStatusPerAgent[oldPair]--;
+            containerTaskStatusPerAgent[tskPair]++;
+        }
+    }
 }
 
 //----------------------------------------------------------------------
-// Method: exeRule
+// Method: execTask
 // Execute the rule requested by Task Orchestrator
 //----------------------------------------------------------------------
-void TskMng::exeRule(MessageString & msg)
+void TskMng::execContainerTask()
 {
 /*
     std::string peName = msg->task.taskPath;

@@ -14,6 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #===== COTS =====
 
 set (NNMSG_ROOT_DIR /usr/local)
+#set (NNMSG_ROOT_DIR /Users/jcgonzalez/ws/nanomsg/cots/nanomsg-1.0.0/src)
 
 set (UUIDINCDIR /usr/include)
 set (UUIDLIBDIR /usr/lib64)
@@ -35,14 +36,17 @@ set (PSQLLIB pq)
 
 #===== Project libraries =====
 
-set (JSON_ROOT_DIR    ../json)
-set (NNCOMM_ROOT_DIR  ../nncomm)
-set (INFIX_ROOT_DIR    ../infix)
-set (TOOLS_ROOT_DIR   ../tools)
-set (LOG_ROOT_DIR     ../log)
-set (STR_ROOT_DIR     ../str)
-set (UUID_ROOT_DIR    ../uuid)
-set (FMK_ROOT_DIR     ../fmk)
+#set (PWD /Users/jcgonzalez/ws/QPFnn)
+set (PWD ..)
+
+set (JSON_ROOT_DIR    ${PWD}/json)
+set (NNCOMM_ROOT_DIR  ${PWD}/nncomm)
+set (INFIX_ROOT_DIR   ${PWD}/infix)
+set (TOOLS_ROOT_DIR   ${PWD}/tools)
+set (LOG_ROOT_DIR     ${PWD}/log)
+set (STR_ROOT_DIR     ${PWD}/str)
+set (UUID_ROOT_DIR    ${PWD}/uuid)
+set (FMK_ROOT_DIR     ${PWD}/fmk)
 
 #==== Common directives
 
@@ -57,4 +61,5 @@ link_directories (
   ${STR_ROOT_DIR}
   ${UUID_ROOT_DIR}
   ${PCRE2LIBDIR}
-  ${PSQLLIBDIR})
+  ${PSQLLIBDIR}
+)

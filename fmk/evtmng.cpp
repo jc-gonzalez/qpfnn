@@ -111,6 +111,7 @@ void EvtMng::runEachIteration()
             FileNameSpec fs;
             ProductMetadata m;
             fs.parseFileName(file, m);
+            /*
             m["productType"] = "LE1_VIS";
             m["instrument"] = "VIS";
             m["mission"] = "EUC";
@@ -124,13 +125,13 @@ void EvtMng::runEachIteration()
             m["signature"] = "00034-W-1";
 
             std::string prodType(m.productType());
-
+            */
             Message<MsgBodyINDATA> msg;
             msg.buildHdr(ChnlInData,
                          ChnlInData,
                          "1.0",
                          compName,
-                         "DataMng",
+                         "*",
                          "", "", "");
 
             MsgBodyINDATA body;
@@ -143,55 +144,9 @@ void EvtMng::runEachIteration()
                 ScalabilityProtocolRole * conn = it->second;
                 conn->setMsgOut(msg.str());
             }
-
-            /*
-            // Create message and send it to appropriate targets
-            std::array<std::string,1> fwdRecip = {"DataMng"};
-            for (std::string & recip : fwdRecip) {
-                MessageHeader hdr;
-                buildMsgHeader(MSG_INDATA_IDX, "EvtMng", recip, hdr);
-
-                Message_INDATA msg;
-                buildMsgINDATA(hdr, products, msg);
-
-                // Send message
-                PeerMessage * pmsg = buildPeerMsg(hdr.destination, msg.getDataString(), MSG_INDATA);
-                registerMsg(selfPeer()->name, *pmsg);
-                setTransmissionToPeer(hdr.destination, pmsg);
-                }*/
-
         }
     }
-/*
-    // 2. Check possible commands in DB
-    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
-    std::string cmdSource;
-    std::string cmdContent;
-    int cmdId;
-    try {
-        // Check that connection with the DB is possible
-        dbHdl->openConnection();
-        // Store new state
-        dbHdl->getICommand(selfPeer()->name, cmdId, cmdSource, cmdContent);
 
-        if (cmdContent == "QUIT") {
-            InfoMsg("Leaving OPERATIONAL state triggered by an iCommand...");
-            transitTo(RUNNING);
-            // Mark command as executed
-            dbHdl->markICommandAsDone(cmdId);
-        } else if (cmdContent == "PING") {
-            InfoMsg("QPFHMI requests answer. . .");
-            dbHdl->removeICommand(cmdId);
-            // Add answer command
-            dbHdl->addICommand(cmdSource, selfPeer()->name, "PONG");
-        }
-    } catch (RuntimeException & e) {
-        ErrMsg(e.what());
-        return;
-    }
-    // Close connection
-    dbHdl->closeConnection();
-*/
     if (((iteration + 1) % 10) == 0) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
@@ -202,18 +157,6 @@ void EvtMng::runEachIteration()
             conn->setMsgOut(msg);
         }
     }
-/*
-    if (((iteration + 1) % 9) == 0) {
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlInData);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            char msg[128];
-            sprintf(msg, "New incoming product at iter.# %d ...", iteration);
-            conn->setMsgOut(msg);
-        }
-    }
-    */
 
     if (iteration > 1000) { transitTo(RUNNING); }
 }

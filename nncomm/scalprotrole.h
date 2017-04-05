@@ -17,14 +17,14 @@
 #include <linux/sockios.h>
 #include <mutex>
 
-#define NN_IN  1
-#define NN_OUT 2
+#define NN_IN             1
+#define NN_OUT            2
 
-#define NN_BUS_MASTER  NN_BUS & 0x8000
+#define NN_BUS_MASTER     NN_BUS & 0x8000
 
-#define MAX_MESSAGE_SIZE 1024
+#define MAX_MESSAGE_SIZE  4096
 
-#define WAIT_BINDING 100000
+#define WAIT_BINDING      100000
 
 typedef std::string                  MessageString;
 typedef nn::socket                   Socket;

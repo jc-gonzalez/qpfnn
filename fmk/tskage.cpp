@@ -45,6 +45,14 @@
 #include "channels.h"
 #include "message.h"
 #include "str.h"
+#include "urlhdl.h"
+
+#include "cntrmng.h"
+#include "srvmng.h"
+
+#include "config.h"
+
+using Configuration::cfg;
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -61,19 +69,51 @@ const std::string TskAge::ProcStatusName[] { TLIST_PSTATUS };
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-TskAge::TskAge(const char * name, const char * addr, Synchronizer * s)
-    : Component(name, addr, s)
+TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
+               AgentMode mode, ServiceInfo * srvInfo)
+    : Component(name, addr, s), agentMode(mode),
+      pStatus(IDLE), serviceInfo(srvInfo)
 {
-    pStatus = IDLE;
 }
 
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
-TskAge::TskAge(std::string name, std::string addr, Synchronizer * s)
-    : Component(name, addr, s)
+TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
+               AgentMode mode, ServiceInfo * srvInfo)
+    : Component(name, addr, s), agentMode(mode),
+      pStatus(IDLE), serviceInfo(srvInfo)
 {
-    pStatus = IDLE;
+}
+
+//----------------------------------------------------------------------
+// Method: fromRunningToOperational
+//----------------------------------------------------------------------
+void TskAge::fromRunningToOperational()
+{
+    if (agentMode == CONTAINER) {
+
+        // Create Container Manager
+        dckMng = new ContainerMng;
+
+    } else {
+
+        // Create list of workers
+        srvWorkers = cfg.network.serviceNodes();
+        srvManager = srvWorkers.at(0);
+        srvWorkers.erase(srvWorkers.begin());
+
+        // Create Service Manager
+        dckMng = new ServiceMng(srvManager, srvWorkers);
+
+        // Create Service
+        dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
+                              serviceInfo->scale,
+                              serviceInfo->exe, serviceInfo->args);
+    }
+
+    transitTo(OPERATIONAL);
+    InfoMsg("New state: " + getStateName(getState()));
 }
 
 //----------------------------------------------------------------------
@@ -158,9 +198,24 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
     if (pStatus == WAITING) {
         // Define ans set task object
         Message<MsgBodyTSK> msg(m);
+        MsgBodyTSK & body = msg.body;
+        TaskInfo task(body["info"]);
+
         std::string agName(msg.header.source());
         DBG(">>>>>>>>>> RECEIVED TASK INFO FOR PROCESSING");
         DBG(">>>>>>>>>> name:" << msg.body("info")["name"].asString());
+
+        // Retrieve the input products
+        URLHandler urlh;
+        int i = 0;
+        for (auto & m : task.inputs.products) {
+            urlh.setProduct(m);
+            ProductMetadata & mg = urlh.fromGateway2Processing();
+
+            task.inputs.products.push_back(mg);
+            task["inputs"][i] = mg.val();
+            ++i;
+        }
 
         pStatus = PROCESSING;
     }

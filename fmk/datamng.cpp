@@ -163,8 +163,10 @@ void DataMng::initializeDB()
 //----------------------------------------------------------------------
 void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
 {
+    if (m.at(m.size() - 1) < 32) { m[m.size() - 1] = 0; }
+
     Message<MsgBodyTSK> msg(m);
-    TaskInfo taskInfo(msg.body.info());
+    TaskInfo taskInfo(msg.body["info"]);
 
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
@@ -255,7 +257,7 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
 
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
-        ErrMsg(prodList.str());
+        for (auto & v: prodList.products) { ErrMsg(v.str()); }
         return;
     }
 
@@ -273,16 +275,13 @@ void DataMng::saveProductsToDB(ProductList & productList)
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
 
     try {
-
         // Check that connection with the DB is possible
         dbHdl->openConnection();
-
         // Try to store the data into the DB
         dbHdl->storeProducts(productList);
-
     } catch (RuntimeException & e) {
         ErrMsg(e.what());
-        ErrMsg(productList.str());
+        for (auto & v: productList.products) { ErrMsg(v.str()); }
         return;
     }
 
