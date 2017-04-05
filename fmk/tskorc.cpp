@@ -348,7 +348,8 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     task["taskEnd"]      = "";
     task["taskExitCode"] = 0;
     task["taskStatus"]   = TASK_SCHEDULED;
-    task["params"]       = JValue(std::string("{}")).val();
+    task["taskSet"]      = "CONTAINER";
+    task["params"]       = nullJson;
 
     URLHandler urlh;
     int i = 0;

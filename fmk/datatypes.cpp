@@ -48,6 +48,8 @@
 ////////////////////////////////////////////////////////////////////////////
 //namespace QPF {
 
+json nullJson = JValue(std::string({})).val();
+
 #define T(a,b) { TASK_ ## a , #a }
 std::map<TaskStatus, std::string> TaskStatusName = { TLIST_TASK_STATUS };
 #undef T

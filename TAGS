@@ -4,84 +4,32 @@ DBHdlPostgreSQL::DBHdlPostgreSQL() : conn(0)DBHdlPostgreSQL67,1460
 bool DBHdlPostgreSQL::openConnection(const char * data)openConnection75,1719
 bool DBHdlPostgreSQL::closeConnection(const char * data)closeConnection118,3318
 int DBHdlPostgreSQL::storeProducts(ProductList & prodList)storeProducts130,3660
-int  DBHdlPostgreSQL::retrieveProducts(ProductList & prodList,retrieveProducts170,5108
-bool DBHdlPostgreSQL::storeTask(TaskInfo & task)storeTask224,7554
-bool DBHdlPostgreSQL::checkTask(std::string taskId)checkTask261,8712
-bool DBHdlPostgreSQL::updateTable<int>(std::string table, std::string cond,updateTable280,9285
-bool DBHdlPostgreSQL::updateTable<double>(std::string table, std::string cond,updateTable291,9740
-bool DBHdlPostgreSQL::updateTable<std::string>(std::string table, std::string cond,updateTable302,10212
-bool DBHdlPostgreSQL::updateTable<Json::Value>(std::string table, std::string cond,updateTable313,10691
-bool DBHdlPostgreSQL::updateTask(TaskInfo & task)updateTask324,11199
-bool DBHdlPostgreSQL::retrieveTask(TaskInfo & task)retrieveTask371,13169
-bool DBHdlPostgreSQL::storeState(std::string session, std::string node, std::string newState)storeState382,13499
-std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(std::string session)getCurrentState404,14325
-std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState()getLatestState427,15092
-void DBHdlPostgreSQL::addICommand(std::string target,addICommand453,15879
-bool DBHdlPostgreSQL::getICommand(std::string target,getICommand480,16823
-bool DBHdlPostgreSQL::markICommandAsDone(int id)markICommandAsDone514,18006
-bool DBHdlPostgreSQL::removeICommand(int id)removeICommand530,18537
-bool DBHdlPostgreSQL::storeMsg(std::string from,storeMsg545,19024
-bool DBHdlPostgreSQL::retrieveMsgs(std::vector<std::pair<std::string,retrieveMsgs573,20119
-bool DBHdlPostgreSQL::getTable(std::string tName,getTable603,21149
-bool DBHdlPostgreSQL::getQuery(std::string qry,getQuery613,21589
-int DBHdlPostgreSQL::getNumRowsInTable(std::string tName)getNumRowsInTable623,22005
-bool DBHdlPostgreSQL::runCmd(std::string cmd)runCmd637,22425
-bool DBHdlPostgreSQL::fillWithResult(std::vector< std::vector<std::string> > & table)fillWithResult657,23159
-bool DBHdlPostgreSQL::updTable(std::string table, std::string cond,updTable679,23855
-int DBHdlPostgreSQL::getVersionCounter(std::string & procName)getVersionCounter693,24395
-bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)checkSignature713,25048
-
-fmk/tskmng.h,519
-#define TSKMNG_HTSKMNG_H42,813
-class TskMng : public Component {TskMng79,2002
-    struct AgentInfo {AgentInfo93,2563
-        int    idx;idx94,2586
-        int    runningTasks;runningTasks95,2606
-        int    failedTasks;failedTasks96,2635
-        int    finishedTasks;finishedTasks97,2663
-        int    launchedTasks;launchedTasks98,2693
-        double load;load99,2723
-    std::vector<std::string>         agents;agents167,5689
-    std::map<std::string, AgentInfo> agentInfo;agentInfo168,5734
-
-fmk/tskmng.cpp,1213
-TskMng::TskMng(const char * name, const char * addr, Synchronizer * s)TskMng65,1373
-TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)TskMng73,1641
-void TskMng::fromRunningToOperational()fromRunningToOperational81,1928
-void TskMng::processIncommingMessages()processIncommingMessages110,2863
-void TskMng::runEachIteration()runEachIteration133,3895
-void TskMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg140,4103
-void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)processTskSchedMsg149,4429
-void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRqstMsg161,4849
-void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg193,5917
-void TskMng::exeRule(MessageString & msg)exeRule201,6215
-inline double weightFunc(double load, double tasks) { return 100 * load + tasks; }weightFunc219,6635
-std::string TskMng::selectAgent()selectAgent226,6975
-bool TskMng::sendTaskAgMsg(MessageString & msg,sendTaskAgMsg264,8144
-bool TskMng::sendTaskRes(MessageString & msg)sendTaskRes284,8940
-bool TskMng::sendMonitInfo(MessageString & msg)sendMonitInfo308,9944
-
-fmk/tskage.h,421
-#define TSKAGE_HTSKAGE_H42,802
-class TskAge : public Component {TskAge77,1953
-#undef TT97,2752
-#define TLIST_PSTATUS TLIST_PSTATUS98,2761
-#define T(T100,2833
-    enum ProcStatus { TLIST_PSTATUS };ProcStatus101,2848
-    enum ProcStatus { TLIST_PSTATUS };TLIST_PSTATUS101,2848
-#undef TT102,2887
-    static const std::string ProcStatusName[];ProcStatusName103,2896
-    ProcStatus pStatus;pStatus115,3359
-
-fmk/tskage.cpp,543
-#define T(T57,1147
-#undef TT59,1225
-TskAge::TskAge(const char * name, const char * addr, Synchronizer * s)TskAge64,1396
-TskAge::TskAge(std::string name, std::string addr, Synchronizer * s)TskAge73,1684
-void TskAge::runEachIteration()runEachIteration82,1983
-void TskAge::processIncommingMessages()processIncommingMessages126,3454
-void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg147,4331
-void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg156,4656
+int  DBHdlPostgreSQL::retrieveProducts(ProductList & prodList,retrieveProducts172,5267
+bool DBHdlPostgreSQL::storeTask(TaskInfo & task)storeTask226,7713
+bool DBHdlPostgreSQL::checkTask(std::string taskId)checkTask263,8871
+bool DBHdlPostgreSQL::updateTable<int>(std::string table, std::string cond,updateTable282,9444
+bool DBHdlPostgreSQL::updateTable<double>(std::string table, std::string cond,updateTable293,9899
+bool DBHdlPostgreSQL::updateTable<std::string>(std::string table, std::string cond,updateTable304,10371
+bool DBHdlPostgreSQL::updateTable<Json::Value>(std::string table, std::string cond,updateTable315,10850
+bool DBHdlPostgreSQL::updateTask(TaskInfo & task)updateTask326,11358
+bool DBHdlPostgreSQL::retrieveTask(TaskInfo & task)retrieveTask373,13328
+bool DBHdlPostgreSQL::storeState(std::string session, std::string node, std::string newState)storeState384,13658
+std::vector< std::vector<std::string> > DBHdlPostgreSQL::getCurrentState(std::string session)getCurrentState406,14484
+std::pair<std::string, std::string> DBHdlPostgreSQL::getLatestState()getLatestState429,15251
+void DBHdlPostgreSQL::addICommand(std::string target,addICommand455,16038
+bool DBHdlPostgreSQL::getICommand(std::string target,getICommand482,16982
+bool DBHdlPostgreSQL::markICommandAsDone(int id)markICommandAsDone516,18165
+bool DBHdlPostgreSQL::removeICommand(int id)removeICommand532,18696
+bool DBHdlPostgreSQL::storeMsg(std::string from,storeMsg547,19183
+bool DBHdlPostgreSQL::retrieveMsgs(std::vector<std::pair<std::string,retrieveMsgs575,20278
+bool DBHdlPostgreSQL::getTable(std::string tName,getTable605,21308
+bool DBHdlPostgreSQL::getQuery(std::string qry,getQuery615,21748
+int DBHdlPostgreSQL::getNumRowsInTable(std::string tName)getNumRowsInTable625,22164
+bool DBHdlPostgreSQL::runCmd(std::string cmd)runCmd639,22584
+bool DBHdlPostgreSQL::fillWithResult(std::vector< std::vector<std::string> > & table)fillWithResult659,23318
+bool DBHdlPostgreSQL::updTable(std::string table, std::string cond,updTable681,24014
+int DBHdlPostgreSQL::getVersionCounter(std::string & procName)getVersionCounter695,24554
+bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)checkSignature715,25207
 
 fmk/channels.h,378
 #define CHANNELS_HCHANNELS_H4,35
@@ -95,133 +43,15 @@ enum ChannelId { TLISTOF_CHANNELS };TLISTOF_CHANNELS21,533
 const ChannelDescriptor ChannelAcronym[] = { TLISTOF_CHANNELS };ChannelAcronym25,611
 #undef TT26,676
 
-fmk/component.cpp,1311
-Component::Component(const char * name, const char * addr, Synchronizer * s)Component68,1462
-Component::Component(std::string name, std::string addr, Synchronizer * s)Component76,1756
-void Component::init(std::string name, std::string addr, Synchronizer * s)init85,2051
-void Component::addConnection(ChannelDescriptor & chnl,addConnection122,3195
-void Component::periodicMsgInChannel(ChannelDescriptor chnl, int period, MessageString msg)periodicMsgInChannel132,3558
-void Component::fromInitialisedToRunning()fromInitialisedToRunning140,3875
-void Component::fromRunningToOperational()fromRunningToOperational155,4454
-void Component::fromOperationalToRunning()fromOperationalToRunning164,4767
-void Component::fromRunningToOff()fromRunningToOff173,5064
-void Component::updateConnections()updateConnections183,5387
-void Component::processIncommingMessages()processIncommingMessages191,5668
-void Component::sendPeriodicMsgs()sendPeriodicMsgs216,6906
-void Component::runEachIteration()runEachIteration238,7709
-void Component::step()step245,7911
-void Component::run()run267,8836
-void Component::setStep(int s)setStep310,9973
-void Component::defineValidTransitions()defineValidTransitions320,10310
-void Component::afterTransition(int fromState, int toState)afterTransition346,11298
-
 fmk/evtmng.cpp,676
 EvtMng::EvtMng(const char * name, const char * addr, Synchronizer * s)EvtMng57,1256
 EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)EvtMng65,1524
 void EvtMng::fromRunningToOperational()fromRunningToOperational73,1811
 void EvtMng::fromOperationalToRunning()fromOperationalToRunning86,2299
 void EvtMng::runEachIteration()runEachIteration99,2645
-void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg224,7112
-void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg231,7362
-void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg255,8166
-
-fmk/datatypes.h,4679
-#define DATATYPES_HDATATYPES_H42,816
-typedef Json::Value  json;json109,2852
-#define JSTR(JSTR111,2880
-#define JINT(JINT112,2949
-#define JDLB(JDLB113,3015
-#define JBOOL(JBOOL114,3084
-#define JSTRIDX(JSTRIDX116,3152
-#define JINTIDX(JINTIDX117,3231
-#define JDLBIDX(JDLBIDX118,3307
-#define JSTRVEC(JSTRVEC120,3387
-#define JSTRINTMAP(JSTRINTMAP126,3777
-#define JSTRSTRMAP(JSTRSTRMAP133,4241
-#define JOBJ(JOBJ141,4701
-#define JRECORD(JRECORD143,4753
-#define SET_GRP(SET_GRP145,4819
-#define GRP(GRP146,4859
-#define DUMPJSTR(DUMPJSTR148,4882
-#define DUMPJINT(DUMPJINT149,4967
-#define DUMPJDLB(DUMPJDLB150,5049
-#define DUMPJBOOL(DUMPJBOOL151,5134
-#define FOREACH(FOREACH153,5236
-#define DUMPJSTRIDX(DUMPJSTRIDX155,5295
-#define DUMPJINTIDX(DUMPJINTIDX156,5387
-#define DUMPJDLBIDX(DUMPJDLBIDX157,5476
-#define DUMPJSTRVEC(DUMPJSTRVEC159,5569
-#define DUMPJSTRINTMAP(DUMPJSTRINTMAP164,5918
-#define DUMPJSTRSTRMAP(DUMPJSTRSTRMAP173,6560
-class JValue {JValue183,7203
-    JValue() {}JValue185,7226
-    JValue(json val) { value = val; }JValue186,7242
-    JValue(std::string s) { fromStr(s); }JValue187,7280
-    JValue operator()(std::string key) { return JValue(value[key]); }operator ()188,7322
-    json & operator[](std::string key) { return value[key]; }operator []189,7392
-    std::string str() {str190,7454
-    void fromStr(std::string content = std::string()) {fromStr198,7647
-    json & val() { return value; }val202,7776
-    int size() { return value.size(); }size203,7811
-    json value;value205,7862
-class JRecord : public JValue {JRecord208,7882
-    JRecord() {}JRecord210,7922
-    JRecord(json v) : JValue(v) {}JRecord211,7939
-    JRecord(std::string s) : JValue(s) {}JRecord212,7974
-    virtual void dump() {}dump213,8016
-typedef std::string   ProductType;ProductType224,8354
-typedef std::string   DateTime;DateTime225,8389
-typedef std::string   DateRange;DateRange226,8421
-typedef std::string   URL;URL227,8454
-typedef std::string   URLSpace;URLSpace228,8481
-typedef unsigned int  ObsId;ObsId229,8513
-typedef std::string   Instrument;Instrument230,8542
-typedef std::string   ObsMode;ObsMode231,8576
-typedef unsigned int  Exposure;Exposure232,8607
-typedef std::string   Creator;Creator233,8639
-typedef std::string   Mission;Mission234,8670
-typedef std::string   Origin;Origin235,8701
-typedef std::string   ProcFunction;ProcFunction236,8731
-typedef std::string   FileType;FileType237,8767
-typedef std::string   ProductParams;ProductParams238,8799
-typedef std::string   ProductId;ProductId239,8836
-typedef std::string   ProductVersion;ProductVersion240,8869
-typedef std::string   ProductStatus;ProductStatus241,8907
-typedef unsigned int  ProductSize;ProductSize242,8944
-typedef std::string   Signature;Signature243,8979
-typedef std::string   FileNamePart;FileNamePart244,9012
-struct ProductMetadata : public JRecord {ProductMetadata250,9197
-    ProductMetadata() {}ProductMetadata251,9239
-    ProductMetadata(json v) : JRecord(v) {}ProductMetadata252,9264
-    virtual void dump() {dump253,9308
-struct ProductList : public JRecord {ProductList315,11004
-    ProductList() {}ProductList316,11042
-    ProductList(json v) : JRecord(v) {ProductList317,11063
-    virtual void dump() {dump323,11252
-    std::vector<ProductMetadata> products;products326,11331
-struct ProductCollection : public JRecord {ProductCollection329,11378
-    ProductCollection() {}ProductCollection330,11422
-    ProductCollection(json v) : JRecord(v) {ProductCollection331,11449
-    virtual void dump() {dump339,11706
-    std::map<ProductType, ProductMetadata> products;products342,11794
-typedef std::string                            TaskName;TaskName345,11851
-typedef std::string                            TaskPath;TaskPath346,11908
-typedef int                                    TaskExitCode;TaskExitCode347,11965
-typedef json                                   TaskData;TaskData348,12026
-#define TLIST_TASK_STATUS TLIST_TASK_STATUS350,12084
-#define T(T360,12641
-enum TaskStatus { TLIST_TASK_STATUS };TaskStatus361,12671
-enum TaskStatus { TLIST_TASK_STATUS };TLIST_TASK_STATUS361,12671
-#undef TT362,12710
-struct TaskInfo : public JRecord {TaskInfo367,12836
-    TaskInfo() {}TaskInfo368,12871
-    TaskInfo(json v) : JRecord(v) {TaskInfo369,12889
-    virtual void dump() {dump373,13006
-struct TaskAgentInfo : public JRecord {TaskAgentInfo397,13552
-    TaskAgentInfo() {}TaskAgentInfo398,13592
-    TaskAgentInfo(json v) : JRecord(v) {}TaskAgentInfo399,13615
-    virtual void dump() {dump400,13657
-#define UNUSED(UNUSED431,14303
+void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg167,5059
+void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg174,5309
+void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg198,6113
 
 fmk/config.cpp,1639
 #define WRITE_MESSAGE_FILESWRITE_MESSAGE_FILES61,1088
@@ -229,32 +59,186 @@ Config & Config::_()_71,1359
 void Config::init(json v)init81,1612
 void Config::setCurrentHostAddress(std::string & addr)setCurrentHostAddress93,1901
 void Config::init(std::string fName)init101,2151
-void Config::fillData()fillData141,3638
-void Config::setLastAccess(std::string last)setLastAccess167,4509
-void Config::setConfigFile(std::string fName)setConfigFile176,4798
-void Config::readConfigFromFile()readConfigFromFile192,5345
-void Config::readConfigFromDB()readConfigFromDB205,5746
-void Config::saveConfigToDB()saveConfigToDB291,8738
-std::string Config::getRegExFromCfg(std::string & regexStr)getRegExFromCfg343,10400
-void Config::processConfig()processConfig377,11651
-std::string Config::getEnvVar(std::string const & key) constgetEnvVar612,20363
-std::string Config::DBHost;DBHost618,20535
-std::string Config::DBPort;DBPort619,20563
-std::string Config::DBName;DBName620,20591
-std::string Config::DBUser;DBUser621,20619
-std::string Config::DBPwd;DBPwd622,20647
-std::string Config::PATHBase;PATHBase624,20675
-std::string Config::PATHData;PATHData625,20705
-std::string Config::PATHRun;PATHRun626,20735
-std::string Config::PATHBin;PATHBin627,20764
-std::string Config::PATHSession;PATHSession628,20793
-std::string Config::PATHLog;PATHLog629,20826
-std::string Config::PATHRlog;PATHRlog630,20855
-std::string Config::PATHTmp;PATHTmp631,20885
-std::string Config::PATHTsk;PATHTsk632,20914
-std::string Config::PATHMsg;PATHMsg633,20943
-mode_t Config::PATHMode = 0755;PATHMode635,20973
-bool Config::isLive = false;isLive637,21006
+void Config::fillData()fillData141,3652
+void Config::setLastAccess(std::string last)setLastAccess167,4519
+void Config::setConfigFile(std::string fName)setConfigFile176,4808
+void Config::readConfigFromFile()readConfigFromFile192,5355
+void Config::readConfigFromDB()readConfigFromDB205,5756
+void Config::saveConfigToDB()saveConfigToDB291,8793
+std::string Config::getRegExFromCfg(std::string & regexStr)getRegExFromCfg343,10455
+void Config::processConfig()processConfig377,11706
+std::string Config::getEnvVar(std::string const & key) constgetEnvVar404,12586
+std::string Config::DBHost;DBHost410,12758
+std::string Config::DBPort;DBPort411,12786
+std::string Config::DBName;DBName412,12814
+std::string Config::DBUser;DBUser413,12842
+std::string Config::DBPwd;DBPwd414,12870
+std::string Config::PATHBase;PATHBase416,12898
+std::string Config::PATHData;PATHData417,12928
+std::string Config::PATHRun;PATHRun418,12958
+std::string Config::PATHBin;PATHBin419,12987
+std::string Config::PATHSession;PATHSession420,13016
+std::string Config::PATHLog;PATHLog421,13049
+std::string Config::PATHRlog;PATHRlog422,13078
+std::string Config::PATHTmp;PATHTmp423,13108
+std::string Config::PATHTsk;PATHTsk424,13137
+std::string Config::PATHMsg;PATHMsg425,13166
+mode_t Config::PATHMode = 0755;PATHMode427,13196
+bool Config::isLive = false;isLive429,13229
+
+fmk/datatypes.h,4679
+#define DATATYPES_HDATATYPES_H42,816
+typedef Json::Value  json;json108,2846
+#define JSTR(JSTR110,2874
+#define JINT(JINT111,2943
+#define JDLB(JDLB112,3009
+#define JBOOL(JBOOL113,3078
+#define JSTRIDX(JSTRIDX115,3146
+#define JINTIDX(JINTIDX116,3225
+#define JDLBIDX(JDLBIDX117,3301
+#define JSTRVEC(JSTRVEC119,3381
+#define JSTRINTMAP(JSTRINTMAP125,3771
+#define JSTRSTRMAP(JSTRSTRMAP132,4235
+#define JOBJ(JOBJ140,4695
+#define JRECORD(JRECORD142,4747
+#define SET_GRP(SET_GRP144,4813
+#define GRP(GRP145,4853
+#define DUMPJSTR(DUMPJSTR147,4876
+#define DUMPJINT(DUMPJINT148,4961
+#define DUMPJDLB(DUMPJDLB149,5043
+#define DUMPJBOOL(DUMPJBOOL150,5128
+#define FOREACH(FOREACH152,5230
+#define DUMPJSTRIDX(DUMPJSTRIDX154,5289
+#define DUMPJINTIDX(DUMPJINTIDX155,5381
+#define DUMPJDLBIDX(DUMPJDLBIDX156,5470
+#define DUMPJSTRVEC(DUMPJSTRVEC158,5563
+#define DUMPJSTRINTMAP(DUMPJSTRINTMAP163,5912
+#define DUMPJSTRSTRMAP(DUMPJSTRSTRMAP172,6554
+class JValue {JValue182,7197
+    JValue() {}JValue184,7220
+    JValue(json val) { value = val; }JValue185,7236
+    JValue(std::string s) { fromStr(s); }JValue186,7274
+    JValue operator()(std::string key) { return JValue(value[key]); }operator ()187,7316
+    json & operator[](std::string key) { return value[key]; }operator []188,7386
+    std::string str() {str189,7448
+    void fromStr(std::string content = std::string()) {fromStr197,7660
+    json & val() { return value; }val201,7789
+    int size() { return value.size(); }size202,7824
+    json value;value204,7875
+class JRecord : public JValue {JRecord209,7918
+    JRecord() {}JRecord211,7958
+    JRecord(json v) : JValue(v) {}JRecord212,7975
+    JRecord(std::string s) : JValue(s) {}JRecord213,8010
+    virtual void dump() {}dump214,8052
+typedef std::string   ProductType;ProductType225,8390
+typedef std::string   DateTime;DateTime226,8425
+typedef std::string   DateRange;DateRange227,8457
+typedef std::string   URL;URL228,8490
+typedef std::string   URLSpace;URLSpace229,8517
+typedef unsigned int  ObsId;ObsId230,8549
+typedef std::string   Instrument;Instrument231,8578
+typedef std::string   ObsMode;ObsMode232,8612
+typedef unsigned int  Exposure;Exposure233,8643
+typedef std::string   Creator;Creator234,8675
+typedef std::string   Mission;Mission235,8706
+typedef std::string   Origin;Origin236,8737
+typedef std::string   ProcFunction;ProcFunction237,8767
+typedef std::string   FileType;FileType238,8803
+typedef std::string   ProductParams;ProductParams239,8835
+typedef std::string   ProductId;ProductId240,8872
+typedef std::string   ProductVersion;ProductVersion241,8905
+typedef std::string   ProductStatus;ProductStatus242,8943
+typedef unsigned int  ProductSize;ProductSize243,8980
+typedef std::string   Signature;Signature244,9015
+typedef std::string   FileNamePart;FileNamePart245,9048
+struct ProductMetadata : public JRecord {ProductMetadata251,9233
+    ProductMetadata() {}ProductMetadata252,9275
+    ProductMetadata(json v) : JRecord(v) {}ProductMetadata253,9300
+    virtual void dump() {dump254,9344
+struct ProductList : public JRecord {ProductList316,11040
+    ProductList() {}ProductList317,11078
+    ProductList(json v) : JRecord(v) {ProductList318,11099
+    virtual void dump() {dump324,11288
+    std::vector<ProductMetadata> products;products327,11367
+struct ProductCollection : public JRecord {ProductCollection330,11414
+    ProductCollection() {}ProductCollection331,11458
+    ProductCollection(json v) : JRecord(v) {ProductCollection332,11485
+    virtual void dump() {dump340,11742
+    std::map<ProductType, ProductMetadata> products;products343,11830
+typedef std::string                            TaskName;TaskName346,11887
+typedef std::string                            TaskPath;TaskPath347,11944
+typedef int                                    TaskExitCode;TaskExitCode348,12001
+typedef json                                   TaskData;TaskData349,12062
+#define TLIST_TASK_STATUS TLIST_TASK_STATUS351,12120
+#define T(T361,12677
+enum TaskStatus { TLIST_TASK_STATUS };TaskStatus362,12707
+enum TaskStatus { TLIST_TASK_STATUS };TLIST_TASK_STATUS362,12707
+#undef TT363,12746
+struct TaskInfo : public JRecord {TaskInfo368,12872
+    TaskInfo() {}TaskInfo369,12907
+    TaskInfo(json v) : JRecord(v) {TaskInfo370,12925
+    virtual void dump() {dump374,13042
+struct TaskAgentInfo : public JRecord {TaskAgentInfo400,13634
+    TaskAgentInfo() {}TaskAgentInfo401,13674
+    TaskAgentInfo(json v) : JRecord(v) {}TaskAgentInfo402,13697
+    virtual void dump() {dump403,13739
+#define UNUSED(UNUSED434,14385
+
+fmk/srvmng.h,234
+#define SRVMNG_HSRVMNG_H42,810
+class ServiceMng {ServiceMng77,1949
+    std::string managerAddr;managerAddr135,4539
+    std::vector<std::string> workerAddrs;workerAddrs136,4568
+    std::string workerToken;workerToken137,4610
+
+fmk/tskmng.cpp,1215
+TskMng::TskMng(const char * name, const char * addr, Synchronizer * s)TskMng65,1373
+TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)TskMng73,1641
+void TskMng::fromRunningToOperational()fromRunningToOperational81,1928
+void TskMng::processIncommingMessages()processIncommingMessages110,2863
+void TskMng::runEachIteration()runEachIteration134,3911
+void TskMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg144,4277
+void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)processTskSchedMsg153,4603
+void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRqstMsg173,5288
+void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg216,6558
+void TskMng::execContainerTask()execContainerTask224,6857
+inline double weightFunc(double load, double tasks) { return 100 * load + tasks; }weightFunc242,7268
+std::string TskMng::selectAgent()selectAgent249,7608
+bool TskMng::sendTaskAgMsg(MessageString & msg,sendTaskAgMsg287,8777
+bool TskMng::sendTaskRes(MessageString & msg)sendTaskRes307,9573
+bool TskMng::sendMonitInfo(MessageString & msg)sendMonitInfo331,10577
+
+fmk/tskorc.cpp,788
+TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s)TskOrc68,1449
+TskOrc::TskOrc(std::string name, std::string addr, Synchronizer * s)TskOrc76,1717
+void TskOrc::defineOrchestrationParams()defineOrchestrationParams84,2005
+void TskOrc::fromRunningToOperational()fromRunningToOperational126,3629
+void TskOrc::runEachIteration()runEachIteration153,4647
+void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg160,4855
+void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)processInDataMsg169,5179
+bool TskOrc::checkRulesForProductType(std::string prodType,checkRulesForProductType206,6595
+#define EVAL_CONDITIONEVAL_CONDITION227,7364
+bool TskOrc::sendTaskSchedMsg(Rule * rule,sendTaskSchedMsg338,11508
+
+fmk/cntrmng.h,77
+#define CNTRMNG_HCNTRMNG_H42,816
+class ContainerMng {ContainerMng78,1973
+
+fmk/tskage.h,649
+#define TSKAGE_HTSKAGE_H42,802
+class TskAge : public Component {TskAge77,1953
+    enum AgentMode { CONTAINER, SERVICE };AgentMode80,1996
+    enum AgentMode { CONTAINER, SERVICE };CONTAINER80,1996
+    enum AgentMode { CONTAINER, SERVICE };SERVICE80,1996
+#undef TT101,2890
+#define TLIST_PSTATUS TLIST_PSTATUS102,2899
+#define T(T104,2971
+    enum ProcStatus { TLIST_PSTATUS };ProcStatus105,2986
+    enum ProcStatus { TLIST_PSTATUS };TLIST_PSTATUS105,2986
+#undef TT106,3025
+    static const std::string ProcStatusName[];ProcStatusName107,3034
+    ProcStatus pStatus;pStatus119,3497
+    AgentMode  agentMode;agentMode120,3521
 
 fmk/euclid.h,889
 #define EUCLID_HEUCLID_H42,813
@@ -337,11 +321,11 @@ void DataMng::processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString &
 void DataMng::processTskRepMsg(ScalabilityProtocolRole * conn, MessageString & m)processTskRepMsg133,3535
 void DataMng::initializeDB()initializeDB144,3894
 void DataMng::saveTaskToDB(MessageString & m, bool initialStore)saveTaskToDB164,4462
-void DataMng::sanitizeProductVersions(ProductList & prodList)sanitizeProductVersions222,6418
-void DataMng::saveProductsToDB(ProductList & productList)saveProductsToDB271,8082
-void DataMng::archiveDSSnEAS(ProductList & productList)archiveDSSnEAS298,8856
-bool DataMng::isProductAvailable(std::string prodType)isProductAvailable389,12197
-bool DataMng::getProductLatest(std::string prodType,getProductLatest401,12604
+void DataMng::sanitizeProductVersions(ProductList & prodList)sanitizeProductVersions224,6478
+void DataMng::saveProductsToDB(ProductList & productList)saveProductsToDB273,8173
+void DataMng::archiveDSSnEAS(ProductList & productList)archiveDSSnEAS297,8975
+bool DataMng::isProductAvailable(std::string prodType)isProductAvailable388,12316
+bool DataMng::getProductLatest(std::string prodType,getProductLatest400,12723
 
 fmk/urlhdl.cpp,1305
 #define showBacktrace(showBacktrace59,1051
@@ -424,7 +408,7 @@ class FileNameSpec {FileNameSpec87,2131
     static std::string                       productIdTpl;productIdTpl126,3336
     static bool                              initialized;initialized128,3396
 
-fmk/filenamespec.cpp,1750
+fmk/filenamespec.cpp,1765
 FileNameSpec::FileNameSpec()FileNameSpec70,1481
 FileNameSpec::FileNameSpec(std::string regexp, std::string assign)FileNameSpec75,1581
 void FileNameSpec::setFileNameSpec(std::string regexp, std::string assign)setFileNameSpec80,1690
@@ -432,19 +416,19 @@ void FileNameSpec::setRegEx(std::string regexp)setRegEx87,1845
 void FileNameSpec::setAssignations(std::string assign)setAssignations99,2034
 void FileNameSpec::setProductIdTpl(std::string tpl)setProductIdTpl141,3370
 bool FileNameSpec::parseFileName(std::string fileName,parseFileName146,3451
-std::string FileNameSpec::placeIn(std::string elem, std::string & tpl, int n,placeIn294,8301
-void FileNameSpec::decodeSignature(ProductMetadata & m)decodeSignature303,8600
-std::string FileNameSpec::buildProductId(ProductMetadata & m)buildProductId356,10610
-std::string FileNameSpec::buildVersion(int major, int minor)buildVersion384,11404
-std::string FileNameSpec::incrMinorVersion(std::string & ver)incrMinorVersion391,11555
-std::regex                        FileNameSpec::re;re403,11829
-PCRegEx *                         FileNameSpec::re = 0;re405,11887
-std::string                       FileNameSpec::reStr = "([A-Z]+)_([A-Z0-9]+)_([^_]+)_([0-9]+T[\\.0-9]+Z)[_]*([0-9]*\\.*[0-9]*)";reStr408,11951
-std::string                       FileNameSpec::assignationsStr = "%T=1+2;%I=1;%S=3;%D=4;%f=4;%v=5";assignationsStr409,12081
-std::map< char, std::set<int> >   FileNameSpec::assignations;assignations410,12182
-std::map< char, std::string >     FileNameSpec::assignationsTpl;assignationsTpl411,12244
-std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";productIdTpl412,12309
-bool                              FileNameSpec::initialized = false;initialized414,12391
+std::string FileNameSpec::placeIn(std::string elem, std::string & tpl, int n,placeIn294,8368
+void FileNameSpec::decodeSignature(ProductMetadata & m)decodeSignature303,8667
+std::string FileNameSpec::buildProductId(ProductMetadata & m)buildProductId360,11030
+std::string FileNameSpec::buildVersion(int major, int minor)buildVersion390,11861
+std::string FileNameSpec::incrMinorVersion(std::string & ver)incrMinorVersion397,12012
+std::regex                        FileNameSpec::re;re409,12286
+PCRegEx *                         FileNameSpec::re = 0;re411,12344
+std::string                       FileNameSpec::reStr = "([A-Z]+)_([A-Z0-9]+)_([^_]+)_([0-9]+T[\\.0-9]+Z)[_]*([0-9]*\\.*[0-9]*)";reStr414,12408
+std::string                       FileNameSpec::assignationsStr = "%M=%1;%F=%2;%P=%3;%S=%2+_+%3;%D=%4;%f=%4;%v=%5";assignationsStr415,12538
+std::map< char, std::set<int> >   FileNameSpec::assignations;assignations416,12654
+std::map< char, std::string >     FileNameSpec::assignationsTpl;assignationsTpl417,12716
+std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";productIdTpl418,12781
+bool                              FileNameSpec::initialized = false;initialized420,12863
 
 fmk/logmng.cpp,270
 LogMng::LogMng(const char * name, const char * addr, Synchronizer * s)LogMng56,1235
@@ -537,25 +521,34 @@ fmk/evtmng.h,115
 class EvtMng : public Component {EvtMng72,1778
     DirWatcher * dw;dw117,3856
 
-fmk/datatypes.cpp,276
-#define T(T51,1059
-std::map<TaskStatus, std::string> TaskStatusName = { TLIST_TASK_STATUS };TaskStatusName52,1094
-#undef TT53,1168
-#define T(T55,1178
-std::map<std::string, TaskStatus> TaskStatusValue = { TLIST_TASK_STATUS };TaskStatusValue56,1213
-#undef TT57,1288
+fmk/datatypes.cpp,340
+json nullJson = JValue(std::string({})).val();nullJson51,1059
+#define T(T53,1107
+std::map<TaskStatus, std::string> TaskStatusName = { TLIST_TASK_STATUS };TaskStatusName54,1142
+#undef TT55,1216
+#define T(T57,1226
+std::map<std::string, TaskStatus> TaskStatusValue = { TLIST_TASK_STATUS };TaskStatusValue58,1261
+#undef TT59,1336
 
-fmk/tskorc.cpp,788
-TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s)TskOrc68,1450
-TskOrc::TskOrc(std::string name, std::string addr, Synchronizer * s)TskOrc76,1718
-void TskOrc::defineOrchestrationParams()defineOrchestrationParams84,2006
-void TskOrc::fromRunningToOperational()fromRunningToOperational126,3590
-void TskOrc::runEachIteration()runEachIteration153,4608
-void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg160,4816
-void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)processInDataMsg169,5140
-bool TskOrc::checkRulesForProductType(std::string prodType,checkRulesForProductType206,6556
-#define EVAL_CONDITIONEVAL_CONDITION227,7325
-bool TskOrc::sendTaskSchedMsg(Rule * rule,sendTaskSchedMsg338,11469
+fmk/component.cpp,1311
+Component::Component(const char * name, const char * addr, Synchronizer * s)Component68,1462
+Component::Component(std::string name, std::string addr, Synchronizer * s)Component76,1756
+void Component::init(std::string name, std::string addr, Synchronizer * s)init85,2051
+void Component::addConnection(ChannelDescriptor & chnl,addConnection122,3195
+void Component::periodicMsgInChannel(ChannelDescriptor chnl, int period, MessageString msg)periodicMsgInChannel132,3558
+void Component::fromInitialisedToRunning()fromInitialisedToRunning140,3875
+void Component::fromRunningToOperational()fromRunningToOperational155,4454
+void Component::fromOperationalToRunning()fromOperationalToRunning164,4767
+void Component::fromRunningToOff()fromRunningToOff173,5064
+void Component::updateConnections()updateConnections183,5387
+void Component::processIncommingMessages()processIncommingMessages191,5668
+void Component::sendPeriodicMsgs()sendPeriodicMsgs216,6906
+void Component::runEachIteration()runEachIteration238,7709
+void Component::step()step245,7911
+void Component::run()run267,8836
+void Component::setStep(int s)setStep310,9973
+void Component::defineValidTransitions()defineValidTransitions320,10310
+void Component::afterTransition(int fromState, int toState)afterTransition346,11298
 
 fmk/config.h,3662
 #define CONFIG_HCONFIG_H42,797
@@ -568,64 +561,107 @@ class CfgGrpNetwork : public JRecord {CfgGrpNetwork85,2135
     CfgGrpNetwork() {}CfgGrpNetwork87,2182
     CfgGrpNetwork(json v) : JRecord(v) {}CfgGrpNetwork88,2205
     virtual void dump() {dump89,2247
-class CfgGrpDB : public JRecord {CfgGrpDB100,2582
-    CfgGrpDB() {}CfgGrpDB102,2624
-    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB103,2642
-    virtual void dump() {dump104,2679
-class CfgGrpProducts : public JRecord {CfgGrpProducts121,3092
-    CfgGrpProducts() {}CfgGrpProducts123,3140
-    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts124,3164
-    virtual void dump() {dump125,3207
-class CfgGrpRulesList : public JRecord {CfgGrpRulesList142,3719
-    CfgGrpRulesList() {}CfgGrpRulesList144,3768
-    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList145,3793
-    virtual void dump() {dump150,3929
-class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration163,4328
-    CfgGrpOrchestration() {}CfgGrpOrchestration165,4381
-    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration166,4410
-    virtual void dump() {dump169,4504
-class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList180,4846
-    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList182,4902
-    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList183,4934
-    virtual void dump() {dump184,4985
-class CfgGrpFlags : public JRecord {CfgGrpFlags203,5540
-    CfgGrpFlags() {}CfgGrpFlags205,5585
-    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags206,5606
-    virtual void dump() {dump207,5646
-class Config : public JRecord {Config228,6325
-    virtual void dump() {dump260,7516
-    Config() {}Config329,10365
-    std::string           cfgFileName;cfgFileName337,10590
-    std::string           cfgFilePath;cfgFilePath338,10629
-    std::string           sessionId;sessionId339,10668
-    bool                  hmiPresent;hmiPresent340,10705
-    bool                  isActualFile;isActualFile341,10743
-    std::string           currentHostAddr;currentHostAddr342,10783
-    bool                  weAreOnMaster;weAreOnMaster343,10826
-        std::string       inbox;inbox346,10881
-        std::string       archive;archive347,10914
-        std::string       gateway;gateway348,10949
-        std::string       userArea;userArea349,10984
-    } storage;storage350,11020
-    static std::string    DBHost;DBHost352,11036
-    static std::string    DBPort;DBPort353,11070
-    static std::string    DBName;DBName354,11104
-    static std::string    DBUser;DBUser355,11138
-    static std::string    DBPwd;DBPwd356,11172
-    static std::string    PATHBase;PATHBase358,11206
-    static std::string    PATHData;PATHData359,11242
-    static std::string    PATHRun;PATHRun360,11278
-    static std::string    PATHBin;PATHBin361,11313
-    static std::string    PATHSession;PATHSession362,11348
-    static std::string    PATHLog;PATHLog363,11387
-    static std::string    PATHRlog;PATHRlog364,11422
-    static std::string    PATHTmp;PATHTmp365,11458
-    static std::string    PATHTsk;PATHTsk366,11493
-    static std::string    PATHMsg;PATHMsg367,11528
-    static mode_t         PATHMode;PATHMode369,11564
-    static bool           isLive;isLive371,11601
-namespace Configuration {Configuration374,11639
-    static ::Config & cfg = ::Config::_();cfg375,11665
+class CfgGrpDB : public JRecord {CfgGrpDB105,2724
+    CfgGrpDB() {}CfgGrpDB107,2766
+    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB108,2784
+    virtual void dump() {dump109,2821
+class CfgGrpProducts : public JRecord {CfgGrpProducts126,3234
+    CfgGrpProducts() {}CfgGrpProducts128,3282
+    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts129,3306
+    virtual void dump() {dump130,3349
+class CfgGrpRulesList : public JRecord {CfgGrpRulesList147,3861
+    CfgGrpRulesList() {}CfgGrpRulesList149,3910
+    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList150,3935
+    virtual void dump() {dump155,4071
+class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration168,4470
+    CfgGrpOrchestration() {}CfgGrpOrchestration170,4523
+    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration171,4552
+    virtual void dump() {dump174,4646
+class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList185,4988
+    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList187,5044
+    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList188,5076
+    virtual void dump() {dump189,5127
+class CfgGrpFlags : public JRecord {CfgGrpFlags208,5682
+    CfgGrpFlags() {}CfgGrpFlags210,5727
+    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags211,5748
+    virtual void dump() {dump212,5788
+class Config : public JRecord {Config233,6467
+    virtual void dump() {dump265,7658
+    Config() {}Config334,10507
+    std::string           cfgFileName;cfgFileName342,10732
+    std::string           cfgFilePath;cfgFilePath343,10771
+    std::string           sessionId;sessionId344,10810
+    bool                  hmiPresent;hmiPresent345,10847
+    bool                  isActualFile;isActualFile346,10885
+    std::string           currentHostAddr;currentHostAddr347,10925
+    bool                  weAreOnMaster;weAreOnMaster348,10968
+        std::string       inbox;inbox351,11023
+        std::string       archive;archive352,11056
+        std::string       gateway;gateway353,11091
+        std::string       userArea;userArea354,11126
+    } storage;storage355,11162
+    static std::string    DBHost;DBHost357,11178
+    static std::string    DBPort;DBPort358,11212
+    static std::string    DBName;DBName359,11246
+    static std::string    DBUser;DBUser360,11280
+    static std::string    DBPwd;DBPwd361,11314
+    static std::string    PATHBase;PATHBase363,11348
+    static std::string    PATHData;PATHData364,11384
+    static std::string    PATHRun;PATHRun365,11420
+    static std::string    PATHBin;PATHBin366,11455
+    static std::string    PATHSession;PATHSession367,11490
+    static std::string    PATHLog;PATHLog368,11529
+    static std::string    PATHRlog;PATHRlog369,11564
+    static std::string    PATHTmp;PATHTmp370,11600
+    static std::string    PATHTsk;PATHTsk371,11635
+    static std::string    PATHMsg;PATHMsg372,11670
+    static mode_t         PATHMode;PATHMode374,11706
+    static bool           isLive;isLive376,11743
+namespace Configuration {Configuration379,11781
+    static ::Config & cfg = ::Config::_();cfg380,11807
+
+fmk/srvmng.cpp,755
+ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)ServiceMng59,1271
+bool ServiceMng::initSwarmManager(std::string & addr)initSwarmManager73,1782
+bool ServiceMng::initSwarmWorker(std::string & addr)initSwarmWorker85,2208
+bool ServiceMng::createService(std::string srv, std::string img, int numScale,createService99,2778
+bool ServiceMng::reScaleService(std::string srv, int newScale)reScaleService115,3436
+bool ServiceMng::getServiceInfo(std::string srv, std::stringstream & info)getServiceInfo128,3929
+bool ServiceMng::shutdownService(std::string srv)shutdownService153,4680
+bool ServiceMng::leaveSwarm(std::string & addr)leaveSwarm166,5085
+bool ServiceMng::shutdownSwarm(std::string srv)shutdownSwarm186,5768
+
+fmk/tskmng.h,670
+#define TSKMNG_HTSKMNG_H42,813
+class TskMng : public Component {TskMng80,2018
+    struct AgentInfo {AgentInfo94,2579
+        int    idx;idx95,2602
+        int    runningTasks;runningTasks96,2622
+        int    failedTasks;failedTasks97,2651
+        int    finishedTasks;finishedTasks98,2679
+        int    launchedTasks;launchedTasks99,2709
+        double load;load100,2739
+    std::vector<std::string>         agents;agents169,5752
+    std::map<std::string, AgentInfo> agentInfo;agentInfo170,5797
+    std::list<TaskInfo>              serviceTasks;serviceTasks172,5846
+    std::list<TaskInfo>              containerTasks;containerTasks173,5897
+
+fmk/cntrmng.cpp,333
+ContainerMng::ContainerMng()ContainerMng61,1314
+bool ContainerMng::createContainer(std::string img, std::vector<std::string> opts,createContainer69,1584
+bool ContainerMng::getContainerInfo(std::string id, std::stringstream & info)getContainerInfo108,2803
+bool ContainerMng::killContainer(std::string id)killContainer133,3540
+
+fmk/tskage.cpp,616
+#define T(T57,1147
+#undef TT59,1225
+TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,TskAge64,1396
+TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,TskAge73,1727
+void TskMng::fromRunningToOperational()fromRunningToOperational82,2077
+void TskAge::runEachIteration()runEachIteration90,2328
+void TskAge::processIncommingMessages()processIncommingMessages134,3799
+void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg155,4676
+void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg164,5001
 
 infix/infixeval.h,2237
 #define INFIXEVAL_HINFIXEVAL_H42,837
@@ -1603,35 +1639,26 @@ int ScalabilityProtocolRole::getevents(int s, int events, int timeout)getevents
 nncomm/scalprotrole.h,1009
 #define SCALPROTROLE_HSCALPROTROLE_H4,39
 #define NN_IN NN_IN20,282
-#define NN_OUT NN_OUT21,299
-#define NN_BUS_MASTER NN_BUS_MASTER23,317
-#define MAX_MESSAGE_SIZE MAX_MESSAGE_SIZE25,357
-#define WAIT_BINDING WAIT_BINDING27,388
-typedef std::string                  MessageString;MessageString29,417
-typedef nn::socket                   Socket;Socket30,469
-typedef std::queue<MessageString>    MsgList;MsgList31,514
-class ScalabilityProtocolRole {ScalabilityProtocolRole33,561
-    Socket *    sck;sck52,1247
-    MsgList     iMsgList;iMsgList53,1268
-    MsgList     oMsgList;oMsgList54,1294
-    bool        readyToGo;readyToGo55,1320
-    int         elemClass;elemClass56,1347
-    std::string elemName;elemName57,1374
-    std::string address;address58,1400
-    char        buf[MAX_MESSAGE_SIZE];buf59,1425
-    int         rc;rc60,1464
-    int         endPoint;endPoint61,1484
-    int         incMsgsMask;incMsgsMask62,1510
-    std::mutex  mtxMsgLists;mtxMsgLists63,1539
-
-nncomm/survey.cpp,466
-Survey::Survey(int elemCls, std::string addr)Survey6,191
-Survey::Survey(int elemCls, const char * addr)Survey11,275
-void Survey::setMsgOut(MessageString m)setMsgOut16,352
-void Survey::setNumOfRespondents(int r)setNumOfRespondents36,984
-void Survey::init(int elemCls, const char * addr)init41,1053
-void Survey::getIncommingMessageStrings()getIncommingMessageStrings56,1480
-void Survey::processMessageString(MessageString & m)processMessageString63,1634
+#define NN_OUT NN_OUT21,310
+#define NN_BUS_MASTER NN_BUS_MASTER23,339
+#define MAX_MESSAGE_SIZE MAX_MESSAGE_SIZE25,382
+#define WAIT_BINDING WAIT_BINDING27,414
+typedef std::string                  MessageString;MessageString29,448
+typedef nn::socket                   Socket;Socket30,500
+typedef std::queue<MessageString>    MsgList;MsgList31,545
+class ScalabilityProtocolRole {ScalabilityProtocolRole33,592
+    Socket *    sck;sck52,1278
+    MsgList     iMsgList;iMsgList53,1299
+    MsgList     oMsgList;oMsgList54,1325
+    bool        readyToGo;readyToGo55,1351
+    int         elemClass;elemClass56,1378
+    std::string elemName;elemName57,1405
+    std::string address;address58,1431
+    char        buf[MAX_MESSAGE_SIZE];buf59,1456
+    int         rc;rc60,1495
+    int         endPoint;endPoint61,1515
+    int         incMsgsMask;incMsgsMask62,1541
+    std::mutex  mtxMsgLists;mtxMsgLists63,1570
 
 nncomm/survey.h,139
 #define SURVEY_HSURVEY_H4,33
@@ -1691,6 +1718,15 @@ namespace Dbg {Dbg53,1455
     const int INFO_LEVEL   = 1;INFO_LEVEL56,1504
     const int DEBUG_LEVEL  = 2;DEBUG_LEVEL57,1536
     const int TRACE_LEVEL  = 3;TRACE_LEVEL58,1568
+
+nncomm/survey.cpp,467
+Survey::Survey(int elemCls, std::string addr)Survey6,191
+Survey::Survey(int elemCls, const char * addr)Survey11,275
+void Survey::setMsgOut(MessageString m)setMsgOut16,352
+void Survey::setNumOfRespondents(int r)setNumOfRespondents40,1142
+void Survey::init(int elemCls, const char * addr)init45,1211
+void Survey::getIncommingMessageStrings()getIncommingMessageStrings60,1640
+void Survey::processMessageString(MessageString & m)processMessageString67,1794
 
 run/old/LE1_VIS_MetadataCollector,23
 usage() {usage13,485
@@ -1823,6 +1859,24 @@ run/qpf/scripts/showProcNodeLogs.sh,0
 
 run/qpfdb.sql,0
 
+run/runContainer.py,792
+from __future__ import print_functionprint_function46,1725
+__author__    = 'J C Gonzalez <JCGonzalez@sciops.esa.int>'__author__49,1765
+__copyright__ = 'Copyright (C) 2015-2017 Euclid SOC Team'__copyright__50,1824
+__license__   = 'LGPL'__license__51,1882
+__vcs_id__    = '$Id$'__vcs_id__52,1905
+__version__   = '0.1.0' #Versioning: http://www.python.org/dev/peps/pep-0386/__version__53,1928
+from datetime import datetimedatetime57,2046
+import errnoerrno59,2077
+import osos60,2090
+import syssys61,2100
+import contextlibcontextlib62,2111
+service_data = {service_data64,2130
+def parse_command_line():parse_command_line72,2265
+def mkdir_p(path):mkdir_p111,3643
+def request_data_and_get_ack(addr, input_path):request_data_and_get_ack123,3919
+def main():main158,5269
+
 str/str.cpp,1030
 #define showBacktrace(showBacktrace50,942
 namespace str {str64,1424
@@ -1924,84 +1978,85 @@ StateMachine() : state(0) {} //, invalidTransit(Log::FATAL) {}StateMachine88,2
     std::map<int, std::string> stateNames;stateNames172,5481
     std::map<std::string, int> stateIdx;stateIdx173,5524
 
-tools/tools.cpp,1065
-inline T max(T a, T b) { return (a > b) ? a : b; }max68,1209
-inline T min(T a, T b) { return (a < b) ? a : b; }min71,1279
-static std::string specificSessionTag = std::string();specificSessionTag73,1331
-void waitForHeartBeat(int speriod, int usperiod)waitForHeartBeat79,1612
-void getYMD(char * dateStr, int & year, int & month, int & day)getYMD94,2213
-std::string timeTag()timeTag105,2606
-std::string sessionTag()sessionTag122,3081
-void setSessionTag(std::string userSessionTag)setSessionTag133,3439
-std::string preciseTimeTag()preciseTimeTag144,3817
-std::string tagToTimestamp(std::string tag)tagToTimestamp167,4474
-void waitUntilNextSecond()waitUntilNextSecond182,5068
-std::vector<double> getLoadAvgs()getLoadAvgs197,5486
-int getUptime()getUptime208,5722
-bool scanMemoryInfo(MemData & memData)scanMemoryInfo220,5942
-double scanCPUTime(SysInfo * sysInfo)scanCPUTime263,7427
-bool SysInfo::update()update349,11359
-#define SYSINFOMETER_MAXNUMITEMS SYSINFOMETER_MAXNUMITEMS397,12498
-void SysInfo::computeStats()computeStats399,12535
+tools/tools.cpp,1154
+inline T max(T a, T b) { return (a > b) ? a : b; }max69,1228
+inline T min(T a, T b) { return (a < b) ? a : b; }min72,1298
+static std::string specificSessionTag = std::string();specificSessionTag74,1350
+void waitForHeartBeat(int speriod, int usperiod)waitForHeartBeat80,1631
+void getYMD(char * dateStr, int & year, int & month, int & day)getYMD95,2232
+std::string timeTag()timeTag106,2625
+std::string sessionTag()sessionTag123,3100
+void setSessionTag(std::string userSessionTag)setSessionTag134,3458
+std::string preciseTimeTag()preciseTimeTag145,3836
+std::string tagToTimestamp(std::string tag)tagToTimestamp168,4493
+void waitUntilNextSecond()waitUntilNextSecond183,5087
+int mkTmpFileName(char * tpl, std::string & sfName, bool closeFd)mkTmpFileName198,5539
+std::vector<double> getLoadAvgs()getLoadAvgs218,6057
+int getUptime()getUptime229,6293
+bool scanMemoryInfo(MemData & memData)scanMemoryInfo241,6513
+double scanCPUTime(SysInfo * sysInfo)scanCPUTime284,7998
+bool SysInfo::update()update370,11930
+#define SYSINFOMETER_MAXNUMITEMS SYSINFOMETER_MAXNUMITEMS418,13069
+void SysInfo::computeStats()computeStats420,13106
 
 tools/tools.h,3049
 #define TOOLS_HTOOLS_H42,813
-struct CPUData {CPUData151,4881
-   unsigned long long int totalTime;totalTime152,4898
-   unsigned long long int userTime;userTime153,4935
-   unsigned long long int systemTime;systemTime154,4971
-   unsigned long long int systemAllTime;systemAllTime155,5009
-   unsigned long long int idleAllTime;idleAllTime156,5050
-   unsigned long long int idleTime;idleTime157,5089
-   unsigned long long int niceTime;niceTime158,5125
-   unsigned long long int ioWaitTime;ioWaitTime159,5161
-   unsigned long long int irqTime;irqTime160,5199
-   unsigned long long int softIrqTime;softIrqTime161,5234
-   unsigned long long int stealTime;stealTime162,5273
-   unsigned long long int guestTime;guestTime163,5310
-   unsigned long long int totalPeriod;totalPeriod165,5348
-   unsigned long long int userPeriod;userPeriod166,5387
-   unsigned long long int systemPeriod;systemPeriod167,5425
-   unsigned long long int systemAllPeriod;systemAllPeriod168,5465
-   unsigned long long int idleAllPeriod;idleAllPeriod169,5508
-   unsigned long long int idlePeriod;idlePeriod170,5549
-   unsigned long long int nicePeriod;nicePeriod171,5587
-   unsigned long long int ioWaitPeriod;ioWaitPeriod172,5625
-   unsigned long long int irqPeriod;irqPeriod173,5665
-   unsigned long long int softIrqPeriod;softIrqPeriod174,5702
-   unsigned long long int stealPeriod;stealPeriod175,5743
-   unsigned long long int guestPeriod;guestPeriod176,5782
-struct MemData {MemData179,5825
-    unsigned long long int totalMem;totalMem180,5842
-    unsigned long long int usedMem;usedMem181,5879
-    unsigned long long int freeMem;freeMem182,5915
-    unsigned long long int sharedMem;sharedMem183,5951
-    unsigned long long int buffersMem;buffersMem184,5989
-    unsigned long long int cachedMem;cachedMem185,6028
-    unsigned long long int totalSwap;totalSwap186,6066
-    unsigned long long int usedSwap;usedSwap187,6104
-    unsigned long long int freeSwap;freeSwap188,6141
-struct SysInfoMeter {SysInfoMeter191,6182
-    double               total;total192,6204
-    std::vector<double>  values;values193,6236
-struct SysInfo {SysInfo196,6273
-    SysInfo() :SysInfo197,6290
-    int                  cpuCount;cpuCount201,6379
-    std::vector<CPUData> cpuData;cpuData202,6414
-    MemData              memData;memData203,6448
-    std::vector<double>  loadAvgs;loadAvgs204,6482
-    int                  upTime;upTime205,6517
-    std::vector<SysInfoMeter> cpuStat;cpuStat207,6551
-    std::vector<double>  cpuPercent;cpuPercent208,6590
-    SysInfoMeter         memStat;memStat209,6627
-    SysInfoMeter         swapStat;swapStat210,6661
-    bool                 detailedCPUinfo;detailedCPUinfo212,6697
-    bool                 accoutGuestInCPUstats;accoutGuestInCPUstats213,6739
-#define PROCDIR PROCDIR220,6852
-#define PROCSTATFILE PROCSTATFILE224,6905
-#define PROCMEMINFOFILE PROCMEMINFOFILE228,6974
-#define PROCUPTIME PROCUPTIME232,7044
-#define PROCLOADAVG PROCLOADAVG236,7109
+struct CPUData {CPUData157,5194
+   unsigned long long int totalTime;totalTime158,5211
+   unsigned long long int userTime;userTime159,5248
+   unsigned long long int systemTime;systemTime160,5284
+   unsigned long long int systemAllTime;systemAllTime161,5322
+   unsigned long long int idleAllTime;idleAllTime162,5363
+   unsigned long long int idleTime;idleTime163,5402
+   unsigned long long int niceTime;niceTime164,5438
+   unsigned long long int ioWaitTime;ioWaitTime165,5474
+   unsigned long long int irqTime;irqTime166,5512
+   unsigned long long int softIrqTime;softIrqTime167,5547
+   unsigned long long int stealTime;stealTime168,5586
+   unsigned long long int guestTime;guestTime169,5623
+   unsigned long long int totalPeriod;totalPeriod171,5661
+   unsigned long long int userPeriod;userPeriod172,5700
+   unsigned long long int systemPeriod;systemPeriod173,5738
+   unsigned long long int systemAllPeriod;systemAllPeriod174,5778
+   unsigned long long int idleAllPeriod;idleAllPeriod175,5821
+   unsigned long long int idlePeriod;idlePeriod176,5862
+   unsigned long long int nicePeriod;nicePeriod177,5900
+   unsigned long long int ioWaitPeriod;ioWaitPeriod178,5938
+   unsigned long long int irqPeriod;irqPeriod179,5978
+   unsigned long long int softIrqPeriod;softIrqPeriod180,6015
+   unsigned long long int stealPeriod;stealPeriod181,6056
+   unsigned long long int guestPeriod;guestPeriod182,6095
+struct MemData {MemData185,6138
+    unsigned long long int totalMem;totalMem186,6155
+    unsigned long long int usedMem;usedMem187,6192
+    unsigned long long int freeMem;freeMem188,6228
+    unsigned long long int sharedMem;sharedMem189,6264
+    unsigned long long int buffersMem;buffersMem190,6302
+    unsigned long long int cachedMem;cachedMem191,6341
+    unsigned long long int totalSwap;totalSwap192,6379
+    unsigned long long int usedSwap;usedSwap193,6417
+    unsigned long long int freeSwap;freeSwap194,6454
+struct SysInfoMeter {SysInfoMeter197,6495
+    double               total;total198,6517
+    std::vector<double>  values;values199,6549
+struct SysInfo {SysInfo202,6586
+    SysInfo() :SysInfo203,6603
+    int                  cpuCount;cpuCount207,6692
+    std::vector<CPUData> cpuData;cpuData208,6727
+    MemData              memData;memData209,6761
+    std::vector<double>  loadAvgs;loadAvgs210,6795
+    int                  upTime;upTime211,6830
+    std::vector<SysInfoMeter> cpuStat;cpuStat213,6864
+    std::vector<double>  cpuPercent;cpuPercent214,6903
+    SysInfoMeter         memStat;memStat215,6940
+    SysInfoMeter         swapStat;swapStat216,6974
+    bool                 detailedCPUinfo;detailedCPUinfo218,7010
+    bool                 accoutGuestInCPUstats;accoutGuestInCPUstats219,7052
+#define PROCDIR PROCDIR226,7165
+#define PROCSTATFILE PROCSTATFILE230,7218
+#define PROCMEMINFOFILE PROCMEMINFOFILE234,7287
+#define PROCUPTIME PROCUPTIME238,7357
+#define PROCLOADAVG PROCLOADAVG242,7422
 
 tools/PCRegEx.h,979
 #define PCREGEX_HPCREGEX_H2,18
@@ -2095,6 +2150,103 @@ class Alert {Alert81,1988
         VarType  type;type121,3119
     typedef Variable * VariableHdl;VariableHdl124,3150
     typedef std::string Origin;Origin126,3187
+
+tools/process.h,4868
+#define PROCXX_PROCESS_H_PROCXX_PROCESS_H_11,206
+#define PROCXX_HAS_PIPE2 PROCXX_HAS_PIPE236,659
+namespace procxxprocxx39,694
+class pipe_tpipe_t45,767
+    static constexpr unsigned int READ_END = 0;READ_END48,792
+    static constexpr unsigned int WRITE_END = 1;WRITE_END49,840
+    class pipe_endpipe_end55,1017
+        pipe_end(unsigned int end)pipe_end63,1264
+        operator unsigned int() constoperator unsigned int73,1531
+        unsigned int end_;end_79,1630
+    static pipe_end read_end()read_end85,1741
+    static pipe_end write_end()write_end94,1923
+    pipe_t()pipe_t103,2078
+    pipe_t(pipe_t&& other)pipe_t126,2692
+    void write(const char* buf, uint64_t length)write144,3116
+    ssize_t read(char* buf, uint64_t length)read167,3903
+    void close()close176,4095
+    void close(pipe_end end)close185,4238
+    bool open(pipe_end end)open197,4463
+    void dup(pipe_end end, int fd)dup208,4753
+    void dup(pipe_end end, pipe_t& other)dup223,5150
+    ~pipe_t()~pipe_t232,5361
+    class exception : public std::runtime_errorexception241,5517
+    std::array<int, 2> pipe_;pipe_248,5653
+class pipe_ostreambuf : public std::streambufpipe_ostreambuf256,5804
+    pipe_ostreambuf(size_t buffer_size = 512, size_t put_back_size = 8)pipe_ostreambuf263,5974
+    class exception : public std::runtime_errorexception315,7610
+    pipe_t& stdout_pipe()stdout_pipe324,7780
+    virtual void close(pipe_t::pipe_end end)close333,7961
+    virtual void flush() { }flush340,8124
+    size_t put_back_size_;put_back_size_342,8154
+    pipe_t stdout_pipe_;stdout_pipe_343,8181
+    std::vector<char> in_buffer_;in_buffer_344,8206
+class pipe_streambuf : public pipe_ostreambufpipe_streambuf347,8244
+    pipe_streambuf(size_t buffer_size = 512, size_t put_back_size = 8)pipe_streambuf351,8303
+    ~pipe_streambuf()~pipe_streambuf364,8693
+    pipe_t& stdin_pipe()stdin_pipe391,9163
+    pipe_t stdin_pipe_;stdin_pipe_416,9721
+    std::vector<char> out_buffer_;out_buffer_417,9745
+class processprocess429,9960
+    process(std::string application, Args&&... args)process437,10148
+    void add_argument(std::string arg) {add_argument449,10465
+    void append_arguments(InputIterator first, InputIterator last) {append_arguments457,10656
+    void read_from(process& other)read_from465,10881
+    void exec()exec473,11003
+    ~process()~process566,14045
+    pid_t id() constid574,14133
+    class limits_tlimits_t583,14329
+        void cpu_time(rlim_t max)cpu_time589,14452
+        void memory(rlim_t max)memory598,14669
+        void set_limits()set_limits607,14879
+        bool lim_cpu_ = false;lim_cpu_623,15349
+        rlimit cpu_;cpu_624,15380
+        bool lim_as_ = false;lim_as_625,15401
+        rlimit as_;as_626,15431
+    void limit(const limits_t& limits)limit632,15516
+    void wait()wait640,15646
+    bool waited() constwaited655,15956
+    bool running() construnning663,16074
+    bool exited() constexited671,16217
+    bool killed() constkilled681,16433
+    bool stopped() conststopped691,16652
+    int code() constcode702,16948
+    void close(pipe_t::pipe_end end)close718,17327
+    friend std::ostream& operator<<(process& proc, T&& input)operator <<728,17498
+    std::ostream& input()input736,17665
+    std::istream& output()output744,17782
+    std::istream& error()error752,17901
+    friend std::istream& operator>>(process& proc, T& output)operator >>761,18029
+    class exception : public std::runtime_errorexception770,18262
+    void recursive_close_stdin()recursive_close_stdin777,18398
+    std::vector<std::string> args_;args_784,18557
+    process* read_from_ = nullptr;read_from_785,18593
+    limits_t limits_;limits_786,18628
+    pid_t pid_ = -1;pid_787,18650
+    pipe_streambuf pipe_buf_;pipe_buf_788,18671
+    pipe_ostreambuf err_buf_;err_buf_789,18701
+    std::ostream in_stream_;in_stream_790,18731
+    std::istream out_stream_;out_stream_791,18760
+    std::istream err_stream_;err_stream_792,18790
+    bool waited_ = false;waited_793,18820
+    int status_;status_794,18846
+class pipelinepipeline803,19113
+    pipeline& operator|(process& tail)operator |811,19290
+    pipeline& limit(process::limits_t limits)limit821,19516
+    void exec() constexec833,19776
+    process& head() consthead844,19992
+    process& tail() consttail852,20138
+    void wait() constwait860,20285
+    void for_each(Function&& function) constfor_each872,20537
+    explicit pipeline(process& head) : processes_{std::ref(head)}pipeline879,20678
+    std::vector<std::reference_wrapper<process>> processes_;processes_884,20776
+inline pipeline operator|(process& first, process& second)operator |890,20903
+inline bool running(pid_t pid)running899,21088
+inline bool running(const process & pr)running931,21995
 
 uuid/uuidxx.cpp,975
 UUID::UUID()UUID51,1075
@@ -3648,12 +3800,12 @@ void Deployer::setInitialPort(int port)setInitialPort219,5956
 void Deployer::setCurrentHostName(std::string host)setCurrentHostName228,6239
 void Deployer::setCurrentHostAddr(std::string addr)setCurrentHostAddr237,6544
 void Deployer::readConfiguration()readConfiguration247,6919
-int Deployer::delay(int ms)delay270,7699
-void Deployer::sayHello()sayHello279,8020
-void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)getHostnameAndIp302,8898
-void Deployer::actionOnSigInt()actionOnSigInt362,11047
-void Deployer::installSignalHandlers()installSignalHandlers370,11290
-void Deployer::createElementsNetwork()createElementsNetwork382,11670
+int Deployer::delay(int ms)delay273,7790
+void Deployer::sayHello()sayHello282,8111
+void Deployer::getHostnameAndIp(std::string & hName, std::string & ipAddr)getHostnameAndIp305,8989
+void Deployer::actionOnSigInt()actionOnSigInt365,11138
+void Deployer::installSignalHandlers()installSignalHandlers373,11381
+void Deployer::createElementsNetwork()createElementsNetwork385,11761
 
 qpfhmi/browser.cpp,1205
 #define USE_ACTIONSUSE_ACTIONS41,1688

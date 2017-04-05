@@ -204,6 +204,8 @@ protected:
     json value;
 };
 
+extern json nullJson;
+
 class JRecord : public JValue {
 public:
     JRecord() {}
@@ -318,6 +320,9 @@ struct ProductList : public JRecord {
         for (int i = 0; i < value.size(); ++i) {
             products.push_back(ProductMetadata(value[i]));
         }
+    }
+    ProductMetadata at(int i) {
+        return ProductMetadata(value[i]);
     }
     virtual void dump() {
         for (auto & v: products) { v.dump(); }

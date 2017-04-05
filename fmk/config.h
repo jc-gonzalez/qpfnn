@@ -347,6 +347,8 @@ public:
     std::string           currentHostAddr;
     bool                  weAreOnMaster;
 
+    std::vector<std::string> agentNames;
+
     struct {
         std::string       inbox;
         std::string       archive;

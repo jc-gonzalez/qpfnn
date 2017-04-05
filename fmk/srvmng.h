@@ -62,6 +62,7 @@
 // Topic: Project headers
 //   none
 //------------------------------------------------------------
+#include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -74,7 +75,7 @@
 //==========================================================================
 // Class: ServiceMng
 //==========================================================================
-class ServiceMng {
+class ServiceMng : public DockerMng {
 
 public:
     //----------------------------------------------------------------------
@@ -83,53 +84,54 @@ public:
     ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs);
 
     //----------------------------------------------------------------------
-    // Method: initSwarmManager
-    // Initializes the swarm manager
-    //----------------------------------------------------------------------
-    bool initSwarmManager(std::string & addr);
-
-    //----------------------------------------------------------------------
-    // Method: initSwarmWorker
-    // Initializes a swarm worker
-    //----------------------------------------------------------------------
-    bool initSwarmWorker(std::string & addr);
-
-    //----------------------------------------------------------------------
     // Method: createService
     // Creates a service that retrieves data from TskMng & processes them
     //----------------------------------------------------------------------
-    bool createService(std::string srv, std::string img, int numScale,
-                       std::string exe, std::vector<std::string> args);
+    virtual bool createService(std::string srv, std::string img, int numScale,
+                               std::string exe, std::vector<std::string> args);
 
     //----------------------------------------------------------------------
     // Method: reScaleService
     // Rescales a running service
     //----------------------------------------------------------------------
-    bool reScaleService(std::string srv, int newScale);
+    virtual bool reScaleService(std::string id, int newScale);
 
     //----------------------------------------------------------------------
-    // Method: getServiceInfo
+    // Method: getInfo
     // Retrieves information about running service
     //----------------------------------------------------------------------
-    bool getServiceInfo(std::string srv, std::stringstream & info);
+    virtual bool getInfo(std::string id, std::stringstream & info);
 
     //----------------------------------------------------------------------
-    // Method: shutdownService
+    // Method: kill
     // Retrieves information about running service
     //----------------------------------------------------------------------
-    bool shutdownService(std::string srv);
+    virtual bool kill(std::string id);
 
     //----------------------------------------------------------------------
     // Method: leaveSwarm
     // Make a node leave the swarm
     //----------------------------------------------------------------------
-    bool leaveSwarm(std::string & addr);
+    virtual bool leaveSwarm(std::string & addr);
 
     //----------------------------------------------------------------------
-    // Method: shutdownSwarm
+    // Method: shutdown
     //Shutdown entire swarm
     //----------------------------------------------------------------------
-    bool shutdownSwarm(std::string srv);
+    virtual bool shutdown(std::string srv);
+
+private:
+    //----------------------------------------------------------------------
+    // Method: initSwarmManager
+    // Initializes the swarm manager
+    //----------------------------------------------------------------------
+    virtual bool initSwarmManager(std::string & addr);
+
+    //----------------------------------------------------------------------
+    // Method: initSwarmWorker
+    // Initializes a swarm worker
+    //----------------------------------------------------------------------
+    virtual bool initSwarmWorker(std::string & addr);
 
 private:
     std::string managerAddr;
@@ -139,4 +141,4 @@ private:
 
 //}
 
-#endif  /* TASKAGENT_H */
+#endif  /* SRVMNG_H */

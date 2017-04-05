@@ -171,6 +171,13 @@ private:
 
     std::list<TaskInfo>              serviceTasks;
     std::list<TaskInfo>              containerTasks;
+
+    std::map<std::string, TaskStatus> taskRegistry;
+
+    std::map<TaskStatus, int> containerTaskStatus;
+    std::map<TaskStatus, int> serviceTaskStatus;
+
+    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;
 };
 
 //}

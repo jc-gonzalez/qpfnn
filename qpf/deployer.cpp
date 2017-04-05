@@ -431,6 +431,7 @@ void Deployer::createElementsNetwork()
                 int numOfTskAgents = kv.second;
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+                    cfg.agentNames.push_back(sAgName);
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro));
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 1, h, i));
@@ -448,6 +449,7 @@ void Deployer::createElementsNetwork()
             if (thisHost == cfg.network.serviceNodes().at(0)) {
                 sprintf(sAgName, "TskAgentSwarm");
                 ag.push_back(new TskAge(sAgName, thisHost, &synchro, TskAge::SERVICE));
+                cfg.agentNames.push_back(sAgName);
                 agName.push_back(std::string(sAgName));
                 agPortTsk.push_back(portnum(startingPort + 1, h, 0));
             }
@@ -459,6 +461,10 @@ void Deployer::createElementsNetwork()
 
         // CHANNEL TASK-PROCESSING - REQREP
         // - Out/In: TskAge*/TskMng
+        // Note that this channel is used to send from TskAgents to TskManager:
+        // 1. Processing requests
+        // 2. Processing status reports
+        // 3. Processing completion messages
         h = 0;
         for (auto & a : ag) {
             chnl = ChnlTskProc + "_" + agName.at(h);

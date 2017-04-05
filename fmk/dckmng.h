@@ -1,8 +1,8 @@
 /******************************************************************************
- * File:    cntrmng.h
+ * File:    dckmng.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.ContainerMng
+ * Domain:  QPF.libQPF.DockerMng
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare ContainerMng class
+ *   Declare DockerMng class
  *
  * Created by:
  *   J C Gonzalez
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef CNTRMNG_H
-#define CNTRMNG_H
+#ifndef DCKMNG_H
+#define DCKMNG_H
 
 //============================================================
 // Group: External Dependencies
@@ -63,7 +63,6 @@
 // Topic: Project headers
 //   none
 //------------------------------------------------------------
-#include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -74,15 +73,27 @@
 //namespace QPF {
 
 //==========================================================================
-// Class: ContainerMng
+// Class: DockerMng
 //==========================================================================
-class ContainerMng : public DockerMng {
+class DockerMng {
 
 public:
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    ContainerMng();
+    DockerMng() {}
+
+    //----------------------------------------------------------------------
+    // Destructor
+    //----------------------------------------------------------------------
+    virtual ~DockerMng() {}
+
+    //----------------------------------------------------------------------
+    // Method: createService
+    // Creates a service that retrieves data from TskMng & processes them
+    //----------------------------------------------------------------------
+    virtual bool createService(std::string srv, std::string img, int numScale,
+                               std::string exe, std::vector<std::string> args) {}
 
     //----------------------------------------------------------------------
     // Method: createContainer
@@ -91,22 +102,40 @@ public:
     virtual bool createContainer(std::string img, std::vector<std::string> opts,
                                  std::map<std::string, std::string> maps,
                                  std::string exe, std::vector<std::string> args,
-                                 std::string & containerId);
+                                 std::string & containerId) {}
+
+    //----------------------------------------------------------------------
+    // Method: reScaleService
+    // Rescales a running service
+    //----------------------------------------------------------------------
+    virtual bool reScaleService(std::string srv, int newScale) {}
 
     //----------------------------------------------------------------------
     // Method: getInfo
-    // Retrieves information about running container
+    // Retrieves information about running service
     //----------------------------------------------------------------------
-    virtual bool getInfo(std::string id, std::stringstream & info);
+    virtual bool getInfo(std::string id, std::stringstream & info) {}
 
     //----------------------------------------------------------------------
     // Method: kill
-    // Stop a given container
+    // Retrieves information about running service
     //----------------------------------------------------------------------
-    virtual bool kill(std::string id);
+    virtual bool kill(std::string id) {}
+
+    //----------------------------------------------------------------------
+    // Method: leaveSwarm
+    // Make a node leave the swarm
+    //----------------------------------------------------------------------
+    virtual bool leaveSwarm(std::string & addr) {}
+
+    //----------------------------------------------------------------------
+    // Method: shutdown
+    //Shutdown entire swarm
+    //----------------------------------------------------------------------
+    virtual bool shutdown(std::string srv) {}
 
 };
 
 //}
 
-#endif  /* CNTRMNG_H */
+#endif  /* DCKMNG_H */

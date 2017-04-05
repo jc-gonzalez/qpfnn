@@ -62,6 +62,7 @@
 //   - component.h
 //------------------------------------------------------------
 #include "component.h"
+#include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -77,21 +78,36 @@
 class TskAge : public Component {
 
 public:
+    // Running mode of the agent.  If SERVICE, a Docker Swarm is created
     enum AgentMode { CONTAINER, SERVICE };
+
+    // Information on the service to be created, in Docker Swarm
+    struct ServiceInfo {
+        std::string              service;
+        std::string              serviceImg;
+        std::string              exe;
+        std::vector<std::string> args;
+        int                      scale;
+    };
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
     TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER);
+           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
     TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER);
+           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
 
 protected:
+    //----------------------------------------------------------------------
+    // Method: fromRunningToOperational
+    //----------------------------------------------------------------------
+    virtual void fromRunningToOperational();
+
     //----------------------------------------------------------------------
     // Method: runEachIteration
     //----------------------------------------------------------------------
@@ -118,6 +134,11 @@ protected:
 private:
     ProcStatus pStatus;
     AgentMode  agentMode;
+    DockerMng  * dckMng;
+
+    ServiceInfo *           serviceInfo;
+    std::string              srvManager;
+    std::vector<std::string> srvWorkers;
 };
 
 //}

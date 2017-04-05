@@ -102,10 +102,10 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 }
 
 //----------------------------------------------------------------------
-// Method: getContainerInfo
+// Method: getInfo
 // Retrieves information about running container
 //----------------------------------------------------------------------
-bool ContainerMng::getContainerInfo(std::string id, std::stringstream & info)
+bool ContainerMng::getInfo(std::string id, std::stringstream & info)
 {
     procxx::process cntInspect("docker", "inspect");
     cntInspect.add_argument(id);
@@ -127,10 +127,10 @@ bool ContainerMng::getContainerInfo(std::string id, std::stringstream & info)
 }
 
 //----------------------------------------------------------------------
-// Method: killContainer
+// Method: kill
 // Stop a given container
 //----------------------------------------------------------------------
-bool ContainerMng::killContainer(std::string id)
+bool ContainerMng::kill(std::string id)
 {
     procxx::process srvRm("docker", "rm");
     srvRm.add_argument(id);

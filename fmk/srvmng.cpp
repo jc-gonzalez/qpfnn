@@ -97,7 +97,7 @@ bool ServiceMng::initSwarmWorker(std::string & addr)
 // Creates a service that retrieves data from TskMng & processes them
 //----------------------------------------------------------------------
 bool ServiceMng::createService(std::string srv, std::string img, int numScale,
-                   std::string exe, std::vector<std::string> args)
+                               std::string exe, std::vector<std::string> args)
 {
     procxx::process srvCreate("docker", "service", "create",
                               "--replicas", str::toStr<int>(numScale),
@@ -122,10 +122,10 @@ bool ServiceMng::reScaleService(std::string srv, int newScale)
 }
 
 //----------------------------------------------------------------------
-// Method: getServiceInfo
+// Method: getInfo
 // Retrieves information about running service
 //----------------------------------------------------------------------
-bool ServiceMng::getServiceInfo(std::string srv, std::stringstream & info)
+bool ServiceMng::getInfo(std::string srv, std::stringstream & info)
 {
     procxx::process srvInspect("sdocker", "service", "inspect");
     srvInspect.add_argument(srv);
@@ -147,10 +147,10 @@ bool ServiceMng::getServiceInfo(std::string srv, std::stringstream & info)
 }
 
 //----------------------------------------------------------------------
-// Method: shutdownService
+// Method: kill
 // Shutdown a given service
 //----------------------------------------------------------------------
-bool ServiceMng::shutdownService(std::string srv)
+bool ServiceMng::kill(std::string srv)
 {
     procxx::process srvRm("docker", "service", "rm");
     srvRm.add_argument(srv);
@@ -180,10 +180,10 @@ bool ServiceMng::leaveSwarm(std::string & addr)
 }
 
 //----------------------------------------------------------------------
-// Method: shutdownSwarm
+// Method: shutdown
 //Shutdown entire swarm
 //----------------------------------------------------------------------
-bool ServiceMng::shutdownSwarm(std::string srv)
+bool ServiceMng::shutdown(std::string srv)
 {
     // Initialize Swarm manager and workers
     assert(leaveSwarm(managerAddr));
