@@ -84,6 +84,29 @@ TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
     : Component(name, addr, s), agentMode(mode),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
+    if (agentMode == CONTAINER) {
+
+        // Create Container Manager
+        dckMng = new ContainerMng;
+
+    } else {
+
+        // Create list of workers
+        srvWorkers = cfg.network.serviceNodes();
+        srvManager = srvWorkers.at(0);
+        srvWorkers.erase(srvWorkers.begin());
+
+        // Create Service Manager
+        dckMng = new ServiceMng(srvManager, srvWorkers);
+
+        // Create Service
+        dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
+                              serviceInfo->scale,
+                              serviceInfo->exe, serviceInfo->args);
+    }
+
+    transitTo(OPERATIONAL);
+    InfoMsg("New state: " + getStateName(getState()));
 }
 
 //----------------------------------------------------------------------
