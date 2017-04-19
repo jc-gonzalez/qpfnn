@@ -195,6 +195,21 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     bool isSrvRqst = (agName == "TskAgentSwarm");
     std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
 
+<<<<<<< HEAD
+    // Put input products in the appropriate place
+    URLHandler urlh;
+    int i = 0;
+    for (auto & m : task.inputs.products) {
+        urlh.setProduct(m);
+        ProductMetadata & mg = urlh.fromGateway2Processing();
+
+        task.inputs.products.push_back(mg);
+        task["inputs"][i] = mg.val();
+        ++i;
+    }
+
+=======
+>>>>>>> 94a5dd1... Towards closing the loop with TskAgents
     bool isTaskSent = true;
     std::string taskName;
     TaskStatus  taskStatus;
