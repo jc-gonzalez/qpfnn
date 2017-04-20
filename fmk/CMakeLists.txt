@@ -30,6 +30,7 @@ set (libfmk_hdr
   tskorc.h
   srvmng.h
   cntrmng.h
+  httpserver.h
   sync.h
   urlhdl.h
 )
@@ -48,6 +49,7 @@ set (libfmk_src
   tskorc.cpp
   srvmng.cpp
   cntrmng.cpp
+  httpserver.cpp
   urlhdl.cpp
 )
 
@@ -66,10 +68,11 @@ target_include_directories (fmk PUBLIC .
   ${UUID_ROOT_DIR}
   ${FMK_ROOT_DIR}
   ${PCRE2LIBDIR}
-  ${PSQLLIBDIR})
+  ${PSQLLIBDIR}
+  ${MONGOOSEDIR})
 target_link_libraries (fmk
   json infix str log tools uuid nncomm
-  nanomsg ${PCRE2LIB} ${PSQLLIB} pthread)
+  nanomsg mongoose ${PCRE2LIB} ${PSQLLIB} pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmk
          RUNTIME DESTINATION bin

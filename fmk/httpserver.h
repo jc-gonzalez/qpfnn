@@ -1,8 +1,8 @@
 /******************************************************************************
- * File:    tskage.h
+ * File:    httpserver.h
  *          This file is part of QLA Processing Framework
  *
- * Domain:  QPF.libQPF.TskAge
+ * Domain:  QPF.libQPF.HttpServer
  *
  * Version:  1.1
  *
@@ -16,7 +16,7 @@
  * Topic: General Information
  *
  * Purpose:
- *   Declare Tskage class
+ *   Declare Httpserver class
  *
  * Created by:
  *   J C Gonzalez
@@ -38,8 +38,8 @@
  *
  ******************************************************************************/
 
-#ifndef TSKAGE_H
-#define TSKAGE_H
+#ifndef HTTPSERVER_H
+#define HTTPSERVER_H
 
 //============================================================
 // Group: External Dependencies
@@ -51,6 +51,13 @@
 //------------------------------------------------------------
 #include <thread>
 #include <mutex>
+#include <unistd.h>
+#include <stdlib.h>
+
+#include <mongoose/Server.h>
+#include <mongoose/WebController.h>
+
+using namespace Mongoose;
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -62,7 +69,6 @@
 //   - component.h
 //------------------------------------------------------------
 #include "component.h"
-#include "dckmng.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -73,34 +79,71 @@
 //namespace QPF {
 
 //==========================================================================
-// Class: TskAge
+// Class: HttpServer
 //==========================================================================
-class TskAge : public Component {
+class HttpServer : public Component, public WebController {
 
 public:
-    // Running mode of the agent.  If SERVICE, a Docker Swarm is created
-    enum AgentMode { CONTAINER, SERVICE };
-
-    // Information on the service to be created, in Docker Swarm
-    struct ServiceInfo {
-        std::string              service;
-        std::string              serviceImg;
-        std::string              exe;
-        std::vector<std::string> args;
-        int                      scale;
-    };
+    //----------------------------------------------------------------------
+    // Constructor
+    //----------------------------------------------------------------------
+    HttpServer(const char * name, const char * addr = 0, bool serveFiles = false);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
-    TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+    HttpServer(std::string name, std::string addr = std::string(), bool serveFiles = false);
+
+public:
+    //----------------------------------------------------------------------
+    // Method: hello
+    //----------------------------------------------------------------------
+    void hello(Request &request, StreamResponse &response);
 
     //----------------------------------------------------------------------
-    // Constructor
+    // Method: form
     //----------------------------------------------------------------------
-    TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+    void form(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: formPost
+    //----------------------------------------------------------------------
+    void formPost(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: session
+    //----------------------------------------------------------------------
+    void session(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: forbid
+    //----------------------------------------------------------------------
+    void forbid(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: exception
+    //----------------------------------------------------------------------
+    void exception(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: uploadForm
+    //----------------------------------------------------------------------
+    void uploadForm(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: uploadFormExecute
+    //----------------------------------------------------------------------
+    void uploadFormExecute(Request &request, StreamResponse &response);
+
+    //----------------------------------------------------------------------
+    // Method: setup
+    //----------------------------------------------------------------------
+    void setup();
+
+    //----------------------------------------------------------------------
+    // Method: run
+    //----------------------------------------------------------------------
+    virtual void run();
 
 protected:
     //----------------------------------------------------------------------
@@ -108,50 +151,17 @@ protected:
     //----------------------------------------------------------------------
     virtual void fromRunningToOperational();
 
-    //----------------------------------------------------------------------
-    // Method: runEachIteration
-    //----------------------------------------------------------------------
-    virtual void runEachIteration();
-
-protected:
-#undef T
-#define TLIST_PSTATUS T(IDLE), T(WAITING), T(PROCESSING), T(FINISHING)
-
-#define T(x) x
-    enum ProcStatus { TLIST_PSTATUS };
-#undef T
-    static const std::string ProcStatusName[];
-
-protected:
-    //----------------------------------------------------------------------
-    // Method: processIncommingMessages
-    //----------------------------------------------------------------------
-    void processIncommingMessages();
-
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-    virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
-
 private:
     //----------------------------------------------------------------------
-    // Method: runEachIterationForContainers
+    // Method: step
     //----------------------------------------------------------------------
-    void runEachIterationForContainers();
-
-    //----------------------------------------------------------------------
-    // Method: runEachIterationForServices
-    //----------------------------------------------------------------------
-    void runEachIterationForServices();
+    void timeStep();
 
 private:
-    ProcStatus pStatus;
-    AgentMode  agentMode;
-    DockerMng  * dckMng;
+    bool enableSwarmRequests;
 
-    ServiceInfo *           serviceInfo;
-    std::string              srvManager;
-    std::vector<std::string> srvWorkers;
 };
 
 //}
 
-#endif  /* TASKAGENT_H */
+#endif  /* HTTPSERVER_H */

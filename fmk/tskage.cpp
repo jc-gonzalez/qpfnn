@@ -84,29 +84,6 @@ TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
     : Component(name, addr, s), agentMode(mode),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
-    if (agentMode == CONTAINER) {
-
-        // Create Container Manager
-        dckMng = new ContainerMng;
-
-    } else {
-
-        // Create list of workers
-        srvWorkers = cfg.network.serviceNodes();
-        srvManager = srvWorkers.at(0);
-        srvWorkers.erase(srvWorkers.begin());
-
-        // Create Service Manager
-        dckMng = new ServiceMng(srvManager, srvWorkers);
-
-        // Create Service
-        dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
-                              serviceInfo->scale,
-                              serviceInfo->exe, serviceInfo->args);
-    }
-
-    transitTo(OPERATIONAL);
-    InfoMsg("New state: " + getStateName(getState()));
 }
 
 //----------------------------------------------------------------------
@@ -143,6 +120,18 @@ void TskAge::fromRunningToOperational()
 // Method: runEachIteration
 //----------------------------------------------------------------------
 void TskAge::runEachIteration()
+{
+    if (agentMode == CONTAINER) {
+        runEachIterationForContainers();
+    } else {
+        runEachIterationForServices();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: runEachIterationForContainers
+//----------------------------------------------------------------------
+void TskAge::runEachIterationForContainers()
 {
     InfoMsg("Status is " + ProcStatusName[pStatus] +
             " at iteration " + str::toStr<int>(iteration));
@@ -184,6 +173,13 @@ void TskAge::runEachIteration()
 }
 
 //----------------------------------------------------------------------
+// Method: runEachIterationForServices
+//----------------------------------------------------------------------
+void TskAge::runEachIterationForServices()
+{
+}
+
+//----------------------------------------------------------------------
 // Method: processIncommingMessages
 //----------------------------------------------------------------------
 void TskAge::processIncommingMessages()
@@ -196,7 +192,8 @@ void TskAge::processIncommingMessages()
         while (conn->next(m)) {
             Message<MsgBodyTSK> msg(m);
             std::string type(msg.header.type());
-            DBG(compName << " received the message [" << m << "] through the channel " + chnl);
+            DBG(compName << " received the message [" << m
+                << "] through the channel " + chnl);
             if      (chnl == ChnlCmd)     { processCmdMsg(conn, m); }
             else if (type == ChnlTskProc) { processTskProcMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }

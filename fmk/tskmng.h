@@ -65,6 +65,7 @@
 #include "component.h"
 #include "tools.h"
 #include "message.h"
+#include "httpserver.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -178,6 +179,8 @@ private:
     std::map<TaskStatus, int> serviceTaskStatus;
 
     std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;
+
+    HttpServer * httpSrv;
 };
 
 //}

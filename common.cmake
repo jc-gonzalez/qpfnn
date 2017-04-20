@@ -48,6 +48,8 @@ set (STR_ROOT_DIR     ${PWD}/str)
 set (UUID_ROOT_DIR    ${PWD}/uuid)
 set (FMK_ROOT_DIR     ${PWD}/fmk)
 
+set (MONGOOSEDIR      ${PWD}/mongoose)
+
 #==== Common directives
 
 link_directories (

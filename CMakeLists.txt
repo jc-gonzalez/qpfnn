@@ -26,6 +26,8 @@ message (STATUS "Building QPF version ${QPF_VERSION}")
 set (BUILD_ID $ENV{BUILD_ID})
 add_definitions(-DBUILD_ID="${BUILD_ID}")
 
+add_subdirectory (mongoose)
+
 add_subdirectory (json)
 add_subdirectory (nncomm)
 add_subdirectory (infix)

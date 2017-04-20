@@ -127,7 +127,7 @@ bool ServiceMng::reScaleService(std::string srv, int newScale)
 //----------------------------------------------------------------------
 bool ServiceMng::getInfo(std::string srv, std::stringstream & info)
 {
-    procxx::process srvInspect("sdocker", "service", "inspect");
+    procxx::process srvInspect("docker", "service", "inspect");
     srvInspect.add_argument(srv);
     srvInspect.exec();
 

@@ -107,6 +107,13 @@ void TskMng::fromRunningToOperational()
         }
     }
 
+    // Launch the HTTP Server for Docker Swarm Services, and to
+    // serve information through HTML pages. We activate the service to
+    // provide data files only if we do really need it (swarm services)
+    httpSrv = new HttpServer("httpSrv",
+                             "cfg.network.httpServerAddress()",
+                             cfg.network.serviceNodes().size() > 0);
+
     // Transit to Operational
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
@@ -195,7 +202,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     bool isSrvRqst = (agName == "TskAgentSwarm");
     std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
 
-<<<<<<< HEAD
+    /*
     // Put input products in the appropriate place
     URLHandler urlh;
     int i = 0;
@@ -207,9 +214,8 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
         task["inputs"][i] = mg.val();
         ++i;
     }
+    */
 
-=======
->>>>>>> 94a5dd1... Towards closing the loop with TskAgents
     bool isTaskSent = true;
     std::string taskName;
     TaskStatus  taskStatus;
