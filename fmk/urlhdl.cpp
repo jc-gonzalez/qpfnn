@@ -137,7 +137,7 @@ ProductMetadata & URLHandler::fromFolder2Inbox()
     // Set new location and url
     std::string file(str::mid(productUrl,7));
     std::string newFile(cfg.storage.inbox + "/" + baseName);
-    std::string newUrl ("file://" + newFile);
+    std::string newUrl("file://" + newFile);
 
     // Set (hard) link (should it be move?)
     (void)relocate(file, newFile, LINK);
