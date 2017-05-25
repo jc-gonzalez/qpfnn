@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.qpfgui.version
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/07/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -50,10 +50,10 @@
 #define APP_NAME         "QPFGUI"
 
 //! Application Release Number
-#define APP_RELEASE      "1.1"
+#define APP_RELEASE      "1.2rc2"
 
 //! Application Release Date
-#define APP_DATE         "DEC 2016"
+#define APP_DATE         "MAY 2017"
 
 //! Application Developer Company
 #define APP_COMPANY      "Euclid SOC Team"

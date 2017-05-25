@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.qpfgui.configtool
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/09/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information

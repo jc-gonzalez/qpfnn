@@ -2,7 +2,7 @@
 -- File:     qpfdb.sql
 --           QPFDB PostgreSQL Database creation script
 --
--- Version:  1.1
+-- Version:  1.2
 --
 -- Date:     2016/12/21
 --

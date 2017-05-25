@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.qpfgui.mainwindow
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2016-11-03
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -67,6 +67,7 @@
 #include "procalertmodel.h"
 #include "productsmodel.h"
 #include "txtblmodel.h"
+#include "filters.h"
 
 namespace Ui {
     class MainWindow;
@@ -112,8 +113,16 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     void updateSystemView();
     void localarchViewUpdate();
+    void resizeLocalArch();
     void updateLocalArchModel();
     void setAutomaticUpdateLocalArchModel(bool b);
+    void setAutomaticExpandLocalArchModel(bool b);
+    void setAutomaticResizeLocalArchModel(bool b);
+    void setProductsFilter(QString qry, QStringList hdr);
+    void restartProductsFilter();
+
+    void setAlertFilter(QString qry, QStringList hdr);
+    void restartAlertFilter();
 
 private slots:
     void processPath();
@@ -148,7 +157,7 @@ private slots:
     void openLocalArchiveElement(QModelIndex idx);
 
     void showAlertsContextMenu(const QPoint & p);
-    void showAlertInfo(QTableView * tblvw);
+    void showAlertInfo(QTableView * tblvw, DBTableModel * model);
     void showSysAlertInfo();
     void showProcAlertInfo();
 
@@ -242,6 +251,8 @@ private:
     QSignalMapper *windowMapper;
 
     bool updateProductsModel;
+    bool expandProductsModel;
+    bool resizeProductsModel;
 
     QMenu *fileMenu;
     QMenu *editMenu;
@@ -299,7 +310,7 @@ private:
     bool isThereActiveCores;
 
     HMIProxy * hmiNode;
-
+    
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
 
@@ -340,6 +351,9 @@ private:
 
     QPoint pointOfAction;
     //DBManager *       dbMng;
+
+    bool isProductsCustomFilterActive;
+    bool isAlertsCustomFilterActive;
 };
 
 }

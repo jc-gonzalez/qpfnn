@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.libQPF.dbtreemodel
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/07/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -39,16 +39,23 @@
  ******************************************************************************/
 
 #include "dbtreemodel.h"
-
+#include <iostream>
 #include "dbmng.h"
 #include <QDebug>
 
 namespace QPF {
 
 DBTreeBoldHeaderDelegate::DBTreeBoldHeaderDelegate(QObject *parent)
-        : QStyledItemDelegate(parent)
+    : QStyledItemDelegate(parent),
+      isCustomFilter(false)
 {
 }
+
+void DBTreeBoldHeaderDelegate::setCustomFilter(bool b)
+{
+    isCustomFilter = b;
+}
+
 
 void DBTreeBoldHeaderDelegate::paint(QPainter* painter,
                                      const QStyleOptionViewItem& option,
@@ -57,8 +64,10 @@ void DBTreeBoldHeaderDelegate::paint(QPainter* painter,
     QStyleOptionViewItem opt = option;
     initStyleOption(&opt, index);
 
-    bool shouldBeBold = (! index.parent().isValid());
-    opt.font.setBold(shouldBeBold);
+    if (!isCustomFilter) {
+        bool shouldBeBold = (! index.parent().isValid());
+        opt.font.setBold(shouldBeBold);
+    }
     QStyledItemDelegate::paint(painter, opt, index);
 }
 
@@ -66,8 +75,11 @@ DBTreeModel::DBTreeModel(QString q, QStringList hdr) :
     queryString(q),
     headerLabels(hdr),
     rowsFromQuery(-1),
-    skippedColumns(0),
-    boldHeader(false)
+    skippedColumns(-1),
+    boldHeader(false),
+    initialSkippedColumns(-1),
+    getGroupId([](QSqlQuery & q){return q.value(0).toString();}),
+    isCustomFilter(false)
 {
     refresh();
 }
@@ -84,15 +96,37 @@ void DBTreeModel::setHeaders(QStringList & hdr)
 void DBTreeModel::defineHeaders(QStringList hdr)
 {
     headerLabels = hdr;
+    if (initialHeaders.size() < 1) { initialHeaders = hdr; }
 }
 
 void DBTreeModel::defineQuery(QString q)
 {
     queryString = q;
+    if (initialQuery.isEmpty()) { initialQuery = q; }
+}
+
+void DBTreeModel::setBoldHeader(bool b)
+{
+}
+
+void DBTreeModel::setCustomFilter(bool b)
+{
+    isCustomFilter = b;
+}
+
+void DBTreeModel::restart()
+{
+    defineQuery(initialQuery);
+    defineHeaders(initialHeaders);
+    skipColumns(initialSkippedColumns);
+    refresh();
 }
 
 void DBTreeModel::skipColumns(int n)
 {
+    if (initialSkippedColumns < 0) {
+        initialSkippedColumns = n;
+    }
     skippedColumns = n;
 }
 
@@ -110,7 +144,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     QSqlRecord rec = q.record();
     int fldCount = rec.count();
 
-    if (q.size() == rowsFromQuery) { return; }
+    //if ((q.size() == rowsFromQuery) && (!isCustomFilter)) { return; }
 
     clear();
 
@@ -120,13 +154,34 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
     QList<QStandardItem *> row;
     QString prevGrp("");
 
-    int children = 0;
     rowsFromQuery = 0;
+
+    if (headerLabels.count() < 1) {
+        for (int i = 0; i < rec.count(); ++i) {
+            headerLabels << rec.fieldName(i);
+        }
+    }
+
+    if (isCustomFilter) {
+        while (q.next()) {
+            row.clear();
+            for (int i = 0; i < fldCount; ++i) {
+                row << new QStandardItem(q.value(i).toString());
+            }
+            root->appendRow(row);
+            rowsFromQuery++;
+        }
+        setHeaders(headerLabels);
+        return;
+    }
+    
+    int children = 0;
     while (q.next()) {
-#if GROUP_ROW_EMPTY
+#define GROUP_ROW_EMPTY
+#ifdef  GROUP_ROW_EMPTY
         QString grp = q.value(0).toString();
         if (prevGrp != grp) {
-            parent = new QStandardItem(q.value(skippedColumns).toString());
+            parent = new QStandardItem(grp);
             row.clear();
             row << parent;
             for (int i = 1; i < fldCount - skippedColumns; ++i) { row << 0; }
@@ -152,6 +207,7 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
             children = 0;
             prevGrp = grp;
         } else {
+            std::cerr << "Skipping " << skippedColumns << " columns\n";
             for (int i = skippedColumns; i < fldCount; ++i) {
                 row << new QStandardItem(q.value(i).toString());
             }
@@ -161,10 +217,8 @@ void DBTreeModel::execQuery(QString & qry, QSqlDatabase & db)
         ++rowsFromQuery;
         ++children;
     }
-
-    if (headerLabels.count() > 0) {
-        setHeaders(headerLabels);
-    }
+    
+    setHeaders(headerLabels);
 }
 
 }

@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.qpfgui.dlgalert
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2016-11-03
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -61,7 +61,7 @@ void DlgAlert::setAlert(Alert & alert)
     ui->edID->setText(QString::fromStdString(Alert::TypeName[alert.getType()]));
     ui->edSeverity->setText(QString::fromStdString(Alert::SeverityName[alert.getSeverity()]));
     ui->edComponent->setText(QString::fromStdString(alert.getOrigin()));
-    ui->textedDescription->setPlainText(QString::fromStdString(alert.what()));
+    ui->textedDescription->setPlainText(QString::fromStdString(alert.allMessages("\n")));
 }
 
 }

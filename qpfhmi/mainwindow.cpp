@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.qpfhmi.mainwindow
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/07/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -136,6 +136,8 @@ MainWindow::MainWindow(QString url, QString sessionName,
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     updateProductsModel(false),
+    expandProductsModel(false),
+    resizeProductsModel(false),
     isThereActiveCores(true)
 {
     dbUrl         = url;
@@ -985,6 +987,8 @@ void MainWindow::quitAllQPF()
 
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
+    sleep(1);
+    
     qApp->closeAllWindows();
     qApp->quit();
 }
@@ -1009,6 +1013,7 @@ void MainWindow::processProductsInPath(QString folder)
     ProductMetadata m;
     foreach (const QString & fi, files) {
         fs.parseFileName(fi.toStdString(), m);
+        m.urlSpace = UserSpace;
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
         //sleep(5);
@@ -1388,6 +1393,39 @@ void MainWindow::initLocalArchiveView()
     acReprocess = new QAction("Reprocess data product", ui->treevwArchive);
     connect(acReprocess, SIGNAL(triggered()), this, SLOT(reprocessProduct()));
 
+    // Filter initialisation
+    FieldSet products;
+    Field fld("product_id"          , STRING); products[fld.name] = fld;
+    fld = Field("product_type"      , STRING); products[fld.name] = fld;
+    fld = Field("product_version"   , STRING); products[fld.name] = fld;
+    fld = Field("signature"         , STRING); products[fld.name] = fld;
+    fld = Field("instrument_id"     , NUMBER); products[fld.name] = fld;
+    fld = Field("product_size"      , STRING); products[fld.name] = fld;
+    fld = Field("product_status_id" , NUMBER); products[fld.name] = fld;
+    fld = Field("creator_id"        , NUMBER); products[fld.name] = fld;
+    fld = Field("obsmode_id"        , NUMBER); products[fld.name] = fld;
+    fld = Field("start_time"        , DATETIME); products[fld.name] = fld;
+    fld = Field("end_time"          , DATETIME); products[fld.name] = fld;
+    fld = Field("registration_time" , DATETIME); products[fld.name] = fld;
+    fld = Field("url"               , STRING); products[fld.name] = fld;
+    
+    QStringList flds {"product_id", "product_type", "product_version", "signature",
+                      "instrument_id", "product_size", "product_status_id", "creator_id",
+                      "obsmode_id", "start_time", "end_time", "registration_time", "url"};
+    QStringList hdrs {"Product Id", "Type", "Version", "Signature", "Instrument",
+                      "Size", "Status", "Creator", "Obs.Mode", "Start", "End",
+                      "Reg.Time", "URL"};
+    ui->wdgFilters->setFields(products, flds, hdrs);
+    ui->wdgFilters->setTableName("products_info");
+
+    ui->wdgFilters->setVisible(false);
+    connect(ui->wdgFilters, SIGNAL(filterIsDefined(QString,QStringList)),
+            this, SLOT(setProductsFilter(QString,QStringList)));
+    connect(ui->wdgFilters, SIGNAL(filterReset()),
+            this, SLOT(restartProductsFilter()));
+
+    isProductsCustomFilterActive = false;
+
     setUToolTasks();
 }
 
@@ -1413,8 +1451,16 @@ void MainWindow::setUToolTasks()
 void MainWindow::localarchViewUpdate()
 {
     if (updateProductsModel) {
-        productsModel->refresh();
+        updateLocalArchModel();
     }
+}
+
+//----------------------------------------------------------------------
+// SLOT: updateLocalArchModel
+// Updates the local archive model on demand
+//----------------------------------------------------------------------
+void MainWindow::resizeLocalArch()
+{
     for (int i = 0; i < productsModel->columnCount(); ++i) {
         ui->treevwArchive->resizeColumnToContents(i);
     }
@@ -1427,6 +1473,12 @@ void MainWindow::localarchViewUpdate()
 void MainWindow::updateLocalArchModel()
 {
     productsModel->refresh();
+    if (expandProductsModel) {
+        ui->treevwArchive->expandAll();
+    }
+    if (resizeProductsModel) {
+        resizeLocalArch();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -1436,6 +1488,24 @@ void MainWindow::updateLocalArchModel()
 void MainWindow::setAutomaticUpdateLocalArchModel(bool b)
 {
     updateProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticExpandLocalArchModel
+// Toggles automatic expand of local arch model on/off upon updates
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticExpandLocalArchModel(bool b)
+{
+    expandProductsModel = b;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAutomaticResizeLocalArchModel
+// Toggles automatic resize of local arch model on/off upon updates
+//----------------------------------------------------------------------
+void MainWindow::setAutomaticResizeLocalArchModel(bool b)
+{
+    resizeProductsModel = b;
 }
 
 //----------------------------------------------------------------------
@@ -1586,13 +1656,15 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
 {
     static const int NumOfProdTypeCol = 1;
 
+    if (isProductsCustomFilterActive) { return; }
+    
     QModelIndex m = ui->treevwArchive->indexAt(p);
     //if (m.parent() == QModelIndex()) { return; }
 
     QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
     if (!m2.data().isValid()) { return; }
     QString productType = m2.data().toString();
-
+        
     QList<QAction *> actions;
     if (m.isValid()) {
         foreach (QString key, userDefTools.keys()) {
@@ -1611,8 +1683,9 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
         menu.addSeparator();
         menu.addMenu(acArchiveOpenExt);
 
-        if (! m.parent().isValid()) {
-
+        if ((m.parent().isValid()) && ((productType.left(4) == "LE1_") ||
+                                       (productType.left(4) == "SIM_") ||
+                                       (productType.left(4) == "SOC_"))) {
             acReprocess->setEnabled(cfg.flags.allowReprocessing());
             menu.addSeparator();
             menu.addAction(acReprocess);
@@ -2231,8 +2304,35 @@ void MainWindow::initAlertsTables()
     connect(ui->tblvwSysAlerts, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(showAlertsContextMenu(const QPoint &)));
 
-    ui->tblvwAlerts->setSortingEnabled(false);
-    ui->tblvwSysAlerts->setSortingEnabled(false);
+    ui->tblvwAlerts->setSortingEnabled(true);
+    ui->tblvwSysAlerts->setSortingEnabled(true);
+
+    // Filter initialisation
+    QStringList a_sevs {"Warning", "Error", "Fatal"};
+    QStringList a_typs {"Resource", "OutOfRange", "Diagnostic"};
+
+    FieldSet alerts;
+    Field fld("alert_id",   NUMBER);   alerts[fld.name] = fld;
+    fld = Field("creation", DATETIME); alerts[fld.name] = fld;
+    fld = Field("sev",      CHOICE);
+    fld.setChoices(a_sevs);            alerts[fld.name] = fld;
+    fld = Field("typ",      CHOICE);
+    fld.setChoices(a_typs);            alerts[fld.name] = fld;
+    fld = Field("origin",   STRING);   alerts[fld.name] = fld;
+    fld = Field("msgs",     STRING);   alerts[fld.name] = fld;
+
+    QStringList flds {"alert_id", "creation", "sev", "typ", "origin", "msgs"};
+    QStringList hdrs {"ID", "Timestamp", "Severity", "Type", "Origin", "Information"};
+    ui->wdgAlertFilters->setFields(alerts, flds, hdrs);
+    ui->wdgAlertFilters->setTableName("alerts");
+
+    ui->wdgAlertFilters->setVisible(false);
+    connect(ui->wdgAlertFilters, SIGNAL(filterIsDefined(QString,QStringList)),
+            this, SLOT(setAlertFilter(QString,QStringList)));
+    connect(ui->wdgAlertFilters, SIGNAL(filterReset()),
+            this, SLOT(restartAlertFilter()));
+
+    isAlertsCustomFilterActive = false;
 }
 
 //----------------------------------------------------------------------
@@ -2240,11 +2340,13 @@ void MainWindow::initAlertsTables()
 //----------------------------------------------------------------------
 void MainWindow::showAlertsContextMenu(const QPoint & p)
 {
+    if (isAlertsCustomFilterActive) { return; }
+    
     QList<QAction *> actions;
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
     if (tblvw->indexAt(p).isValid()) {
         actions.append(acShowAlert);
-        actions.append(acAckAlert);
+        //actions.append(acAckAlert);
         if (tblvw == ui->tblvwSysAlerts) {
             connect(acShowAlert, SIGNAL(triggered()), this, SLOT(showSysAlertInfo()));
         } else {
@@ -2260,10 +2362,10 @@ void MainWindow::showAlertsContextMenu(const QPoint & p)
 // Method: showAlertInfo
 // Show dialog with alert information
 //----------------------------------------------------------------------
-void MainWindow::showAlertInfo(QTableView * tblvw)
+void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)
 {
     QModelIndex idx = tblvw->currentIndex();
-    Alert alert = sysAlertModel->getAlertAt(idx);
+    Alert alert = model->getAlertAt(idx);
     DlgAlert dlg;
     dlg.setAlert(alert);
     dlg.exec();
@@ -2276,7 +2378,7 @@ void MainWindow::showAlertInfo(QTableView * tblvw)
 //----------------------------------------------------------------------
 void MainWindow::showSysAlertInfo()
 {
-    showAlertInfo(ui->tblvwSysAlerts);
+    showAlertInfo(ui->tblvwSysAlerts, sysAlertModel);
 }
 
 //----------------------------------------------------------------------
@@ -2285,7 +2387,7 @@ void MainWindow::showSysAlertInfo()
 //----------------------------------------------------------------------
 void MainWindow::showProcAlertInfo()
 {
-    showAlertInfo(ui->tblvwAlerts);
+    showAlertInfo(ui->tblvwAlerts, procAlertModel);
 }
 
 //======================================================================
@@ -2370,31 +2472,19 @@ void MainWindow::updateAgentsMonitPanel()
 
     static int numOfRows = 0;
 
-    QVector<double> loadAvgs = QVector<double>::fromStdVector(getLoadAvgs());
-
-    if (numOfRows == 0) {
-        for (auto & kv : taskAgentsInfo) {
-            TaskAgentInfo * taInfo = kv.second;
-            (*taInfo)["total"]      = 0;
-            (*taInfo)["maxnum"]     = 3;
-            (*taInfo)["running"]    = 0;
-            (*taInfo)["waiting"]    = 0;
-            (*taInfo)["paused"]     = 0;
-            (*taInfo)["stopped"]    = 0;
-            (*taInfo)["failed"]     = 0;
-            (*taInfo)["finished"]   = 0;
-            (*taInfo)["load1min"]   = loadAvgs.at(0) * 100;
-            (*taInfo)["load5min"]   = loadAvgs.at(1) * 100;
-            (*taInfo)["load15min"]  = loadAvgs.at(2) * 100;
-            (*taInfo)["uptimesecs"] = 0;
-        }
-    }
-
     // 2. Count tasks
     ProcTaskStatusModel * mdl = qobject_cast<ProcTaskStatusModel *>(ui->tblvwTaskMonit->model());
     int currentNumOfRows = mdl->rowCount();
-    if (currentNumOfRows > numOfRows) {
-        for (int i = numOfRows; i < currentNumOfRows; ++i) {
+    if (true) {  //currentNumOfRows > numOfRows) {
+        QVector<double> loadAvgs = QVector<double>::fromStdVector(getLoadAvgs());
+        for (auto & kv : taskAgentsInfo) {
+            TaskAgentInfo * taInfo = kv.second;
+            taInfo->restart();
+            (*taInfo)["load1min"]   = loadAvgs.at(0) * 100;
+            (*taInfo)["load5min"]   = loadAvgs.at(1) * 100;
+            (*taInfo)["load15min"]  = loadAvgs.at(2) * 100;
+        }
+        for (int i = 0; i < currentNumOfRows; ++i) {
             std::string agent = mdl->index(i, AgentsCol).data().toString().toStdString();
             if (taskAgentsInfo.find(agent) != taskAgentsInfo.end()) {
                 TaskAgentInfo * taInfo = taskAgentsInfo.find(agent)->second;
@@ -2444,6 +2534,54 @@ void MainWindow::updateAgentsMonitPanel()
         }
         panel->updateInfo(*taInfo);
     }
+}
+
+//----------------------------------------------------------------------
+// SLOT: setPreoductsFilter
+//----------------------------------------------------------------------
+void MainWindow::setProductsFilter(QString qry, QStringList hdr)
+{
+    productsModel->defineQuery(qry);
+    productsModel->defineHeaders(hdr);
+    productsModel->skipColumns(0);
+    productsModel->setCustomFilter(true);
+    QAbstractItemDelegate * del = ui->treevwArchive->itemDelegate();
+    qobject_cast<DBTreeBoldHeaderDelegate*>(del)->setCustomFilter(true);
+    isProductsCustomFilterActive = true;
+    productsModel->refresh();
+}
+
+//----------------------------------------------------------------------
+// SLOT: restartProductsFilter
+//----------------------------------------------------------------------
+void MainWindow::restartProductsFilter()
+{
+    productsModel->setCustomFilter(false);
+    QAbstractItemDelegate * del = ui->treevwArchive->itemDelegate();
+    qobject_cast<DBTreeBoldHeaderDelegate*>(del)->setCustomFilter(false);
+    productsModel->restart();
+    isProductsCustomFilterActive = false;
+}
+
+//----------------------------------------------------------------------
+// SLOT: setAlertFilter
+//----------------------------------------------------------------------
+void MainWindow::setAlertFilter(QString qry, QStringList hdr)
+{
+    procAlertModel->defineQuery(qry);
+    procAlertModel->defineHeaders(hdr);
+    procAlertModel->setFullUpdate(true);
+    isAlertsCustomFilterActive = true;
+    procAlertModel->refresh();
+}
+
+//----------------------------------------------------------------------
+// SLOT: restartAlertFilter
+//----------------------------------------------------------------------
+void MainWindow::restartAlertFilter()
+{
+    procAlertModel->restart();
+    isAlertsCustomFilterActive = false;
 }
 
 //======================================================================

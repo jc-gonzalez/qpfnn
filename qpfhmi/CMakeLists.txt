@@ -3,8 +3,8 @@
 # QPF - Prototype of QLA Processing Framework
 # qpfgui - QPF HMI Application
 #======================================================================
-# Author: J C Gonzalez - 2015, 2016
-# Copyright (C) 2015, 2016 Euclid SOC Team at ESAC
+# Author: J C Gonzalez - 2015,2016,2017 
+# Copyright (C) 2015,2016,2017  Euclid SOC Team at ESAC
 #======================================================================
 include (../common.cmake)
 
@@ -27,6 +27,8 @@ set (qpfGuiLib_src
   dlgshowtaskinfo.cpp
   exttooledit.cpp
   exttoolsdef.cpp
+  frm_filter.cpp
+  frm_filterset.cpp
   frmagentstatus.cpp
   hmipxy.cpp
   logframe.cpp
@@ -60,6 +62,9 @@ set (qpfGuiLib_hdr
   dlgshowtaskinfo.h
   exttooledit.h
   exttoolsdef.h
+  filters.h
+  frm_filter.h
+  frm_filterset.h
   frmagentstatus.h
   hmipxy.h
   hmitypes.h
@@ -93,6 +98,8 @@ set (qpfGuiLib_ui
   dlgalert.ui
   exttooledit.ui
   exttoolsdef.ui
+  frm_filterset.ui
+  frm_filter.ui
   frmagentstatus.ui
   verbleveldlg.ui
   logframe.ui

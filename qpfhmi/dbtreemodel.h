@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.libQPF.dbtreemodel
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/07/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -43,6 +43,10 @@
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QSqlQuery>
+#include <QHash>
+#include <QVector>
+
+#include <functional>
 
 namespace QPF {
 
@@ -55,6 +59,9 @@ public:
     void paint(QPainter* painter,
                const QStyleOptionViewItem& option,
                const QModelIndex& index) const Q_DECL_OVERRIDE;
+    void setCustomFilter(bool b);
+protected:
+    bool        isCustomFilter;
 };
 
 class DBTreeModel : public QStandardItemModel {
@@ -65,24 +72,32 @@ public:
     explicit DBTreeModel(QString q = QString(""),
                          QStringList hdr = QStringList());
 
-    void refresh();
+    virtual void refresh();
 
-    void defineHeaders(QStringList hdr);
-    void defineQuery(QString q);
-    void skipColumns(int n = 0);
-    void setBoldHeader(bool b = false);
+    virtual void defineHeaders(QStringList hdr);
+    virtual void defineQuery(QString q);
+    virtual void skipColumns(int n = 0);
+    virtual void setCustomFilter(bool b);
+    virtual void setBoldHeader(bool b = false);
+    virtual void restart();
 
 protected:
-    void setHeaders(QStringList & hdr);
+    virtual void setHeaders(QStringList & hdr);
 
     //virtual QList<QStandardItem *> prepareRow(QStringList & l) = 0;
     virtual void execQuery(QString & qry, QSqlDatabase & db);
-
+    
     QString     queryString;
     QStringList headerLabels;
     int         rowsFromQuery;
     int         skippedColumns;
     bool        boldHeader;
+    QString     initialQuery;
+    QStringList initialHeaders;
+    int         initialSkippedColumns;
+
+    std::function<QString(QSqlQuery&)> getGroupId;
+    bool        isCustomFilter;
 };
 
 }

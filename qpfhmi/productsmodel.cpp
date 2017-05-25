@@ -4,13 +4,13 @@
  *
  * Domain:  QPF.libQPF.productsmodel
  *
- * Version:  1.1
+ * Version:  1.2
  *
  * Date:    2015/07/01
  *
  * Author:   J C Gonzalez
  *
- * Copyright (C) 2015,2016 Euclid SOC Team @ ESAC
+ * Copyright (C) 2015,2016,2017 Euclid SOC Team @ ESAC
  *_____________________________________________________________________________
  *
  * Topic: General Information
@@ -44,6 +44,7 @@ namespace QPF {
 
 ProductsModel::ProductsModel()
 {
+    /*
     defineQuery("SELECT  "
                 "    concat(i.instrument, ':', p.signature) AS Signature,  "
                 "    p.product_id as ID,  "
@@ -64,6 +65,24 @@ ProductsModel::ProductsModel()
                 "INNER JOIN observation_modes o ON p.obsmode_id = o.obsmode_id  "
                 "ORDER BY concat(i.instrument, '.',  "
                 "                p.signature, '.',  "
+                "                right(concat('00000000000000000000', p.ID), 20)),"
+                "                p.registration_time;");
+    */
+    defineQuery("SELECT  "
+                "    concat(p.obs_id, ':', p.instrument_id) AS ObsIdInstr,  "
+                "    p.product_id as ID,  "
+                "    p.product_type as Type,  "
+                "    p.product_version as Version,  "
+                "    p.product_size as Size,  "
+                "    p.product_status_id as Status,  "
+                "    p.creator_id as Creator,  "
+                "    p.obsmode_id as ObsMode,  "
+                "    p.start_time as Start,  "
+                "    p.end_time as End,  "
+                "    p.registration_time as RegTime,  "
+                "    p.url as URL "
+                "FROM products_info p  "
+                "ORDER BY concat(p.obs_id, '.', p.product_type, '.',  "
                 "                right(concat('00000000000000000000', p.ID), 20)),"
                 "                p.registration_time;");
     defineHeaders({//"Signature",
