@@ -202,20 +202,27 @@ std::string Alert::timeStampString() const
     return std::string(buf);
 }
 
-std::string Alert::allMessages() const
+std::string Alert::allMessages(std::string sep) const
 {
     std::string allMsgs(messages.at(0));
     for (unsigned int i = 1; i < messages.size(); ++i) {
-        allMsgs += "\n" + messages.at(i);
+        allMsgs += sep + messages.at(i);
     }
     return allMsgs;
+}
+
+std::string Alert::info() const
+{
+    return (timeStampString() +
+            " [" + GroupName[group] + "::" + SeverityName[severity] + "] " +
+            TypeName[type] + " " + origin + ": " + what());
 }
 
 std::string Alert::dump() const
 {
     return (timeStampString() +
             " [" + GroupName[group] + "::" + SeverityName[severity] + "] " +
-            TypeName[type] + " " + origin + ": " + what());
+            TypeName[type] + " " + origin + ": " + allMessages("|"));
 }
 
 }

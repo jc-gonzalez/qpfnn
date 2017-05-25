@@ -87,7 +87,7 @@ public:
 #define TLIST_GROUP T(Undefined), T(System), T(Diagnostics)
 #define TLIST_SEVERITY T(Warning), T(Error), T(Fatal)
 #define TLIST_TYPE T(Resource), T(OutOfRange), T(Diagnostic)
-#define TLIST_VARTYPE T(Int), T(Float), T(Double)
+#define TLIST_VARTYPE T(Int), T(Float), T(Double), T(Generic)
 
 #define T(x) x
     enum Group    { TLIST_GROUP };
@@ -150,7 +150,8 @@ public:
     std::string what() const;
     std::string varAsTuple() const;
     std::string timeStampString() const;
-    std::string allMessages() const;
+    std::string allMessages(std::string sep = std::string("\n")) const;
+    std::string info() const;
     std::string dump() const;
 };
 
