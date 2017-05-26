@@ -187,6 +187,24 @@ std::string mid(std::string & s, int from, int howmany);
 std::string mid(std::string & s, int from);
 
 //----------------------------------------------------------------------
+// Function: mid
+// trim from end of string (right)
+//----------------------------------------------------------------------
+std::string & rtrim(std::string & s, const char * t);
+
+//----------------------------------------------------------------------
+// Function: mid
+// trim from beginning of string (left)
+//----------------------------------------------------------------------
+std::string & ltrim(std::string & s, const char * t);
+
+//----------------------------------------------------------------------
+// Function: trim
+// trim from both ends of string (left & right)
+//----------------------------------------------------------------------
+std::string & trim(std::string & s, const char * t);
+
+//----------------------------------------------------------------------
 // Function: quoted
 // Single-quotes its argument
 //----------------------------------------------------------------------

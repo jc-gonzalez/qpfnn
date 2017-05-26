@@ -6,36 +6,33 @@
 # Author: J C Gonzalez - 2015-2017
 # Copyright (C) 2015-2017 Euclid SOC Team at ESAC
 #======================================================================
-include (../common.cmake)
+include (../../common.cmake)
 
 #===== Projec dir. =======
-project (tools)
+project (fitstest)
 
-set (libtools_hdr
-  process.h
-  propdef.h
-  alert.h
-  dwatcher.h
-  metadatareader.h
-  sm.h
-  tools.h
+set (fitstest_src
+  main.cpp
 )
 
-set (libtools_src
-  alert.cpp
-  dwatcher.cpp
-  sm.cpp
-  tools.cpp
-)
-
-add_library(tools SHARED ${libtools_src})
-target_include_directories (tools PUBLIC .
-  ${STR_ROOT_DIR}
+add_executable(fitstest ${fitstest_src})
+target_include_directories (fitstest PUBLIC .
+  ${NNMSG_ROOT_DIR}/include
+  ${NNCOMM_ROOT_DIR}
+  ${FMK_ROOT_DIR}
   ${JSON_ROOT_DIR}
-  ${TOOLS_ROOT_DIR})
-target_link_libraries (tools str json pthread)
-set_target_properties (tools PROPERTIES LINKER_LANGUAGE CXX)
-install (TARGETS tools
+  ${LOG_ROOT_DIR}
+  ${STR_ROOT_DIR}
+  ${UUID_ROOT_DIR}
+  ${INFIX_ROOT_DIR}
+  ${PSQLLIBDIR})
+target_link_libraries (fitstest
+  fmk json nncomm infix str log uuidxx
+  nanomsg
+  ${UUIDLIB} ${PSQLLIB}
+  pthread)
+set_target_properties (fitstest PROPERTIES LINKER_LANGUAGE CXX)
+install (TARGETS fitstest
          RUNTIME DESTINATION bin
          ARCHIVE DESTINATION lib
          LIBRARY DESTINATION lib)
