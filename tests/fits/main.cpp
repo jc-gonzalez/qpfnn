@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "metadatareader.h"
+#include "fitsmetadatareader.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // MAIN
