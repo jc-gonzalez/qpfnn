@@ -972,10 +972,10 @@ void MainWindow::quitApp()
 void MainWindow::quitAllQPF()
 {
     statusBar()->showMessage(tr("Quit application and end all QPF core instances?"),
-			     2 * MessageDelay);
+                             2 * MessageDelay);
     int ret = QMessageBox::warning(this, tr("Quit " APP_NAME " and Core"),
                                    tr("Do you really want to quit the QLA Processing "
-				      "Framework HMI and Core instances?"),
+                                      "Framework HMI and Core instances?"),
                                    QMessageBox::Yes | QMessageBox::No,
                                    QMessageBox::No);
 
@@ -1013,7 +1013,7 @@ void MainWindow::processProductsInPath(QString folder)
     ProductMetadata m;
     foreach (const QString & fi, files) {
         fs.parseFileName(fi.toStdString(), m);
-        m.urlSpace = UserSpace;
+        m["urlSpace"] = UserSpace;
         uh.setProduct(m);
         m = uh.fromFolder2Inbox();
         //sleep(5);
@@ -1069,8 +1069,7 @@ void MainWindow::init()
     //-----------------------------------------------------------------
     // a. Create HMI node element
     //-----------------------------------------------------------------
-    hmiNode = new HMIProxy("HMIProxy",
-			   masterAddress.toStdString(), &synchro);
+    hmiNode = new HMIProxy("HMIProxy", masterAddress.toStdString(), &synchro);
 
     //-----------------------------------------------------------------
     // b. Create component connections

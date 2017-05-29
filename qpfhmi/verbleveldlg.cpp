@@ -42,7 +42,6 @@
 #include "ui_verbleveldlg.h"
 
 #include "log.h"
-using namespace LibComm;
 
 namespace QPF {
 

@@ -403,6 +403,17 @@ struct TaskInfo : public JRecord {
 struct TaskAgentInfo : public JRecord {
     TaskAgentInfo() {}
     TaskAgentInfo(json v) : JRecord(v) {}
+    virtual void restart() {
+        value["total"]      = 0;
+        value["maxnum"]     = 0;
+        value["running"]    = 0;
+        value["waiting"]    = 0;
+        value["paused"]     = 0;
+        value["stopped"]    = 0;
+        value["failed"]     = 0;
+        value["finished"]   = 0;
+        value["uptimesecs"] = 0;
+    }
     virtual void dump() {
         DUMPJINT(total);
         DUMPJINT(maxnum);

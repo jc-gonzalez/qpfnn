@@ -24,103 +24,127 @@ protected:
 class FitsMetadataReader : public MetadataReader {
 
 public:
-    MetadataReader() {}
-    MetadataReader(std::string & fName) : fileName(fName) {}
+    FitsMetadataReader() {}
+    FitsMetadataReader(std::string & fName) : MetadataReader(fName) {}
 
     virtual bool setFile(std::string & fName) {
         return false;
     }
+
     virtual bool getMetadataInfo(MetadataInfo & md) {
         std::string content;
-        readFitsMetadata(content);
-        std::cerr << content << "\n";
-        return false;
+        bool retVal = readFitsMetadata(content);
+        if (retVal) { md.fromStr(content); }
+        return retVal;
     }
 
 protected:
     bool readFitsMetadata(std::string & str) {
+        const int BLOCK_LEN = 36 * 80; // 2880 bytes
         const int BUF_LEN = 80;
         const int TAG_LEN = 8;
-        char buffer[BUF_LEN + 1];
 
-        buffer[BUF_LEN] = 0;
+        char block[BLOCK_LEN + 1];
+        char * buffer;
+        int blockBytesLeft = 0;
+
+        block[BUF_LEN] = 0;
 
         int bytes, tbytes = 0;
-        str = "{ \"Header\": { ";
+
         bool inHdr = true;
         bool isStart = true;
+        bool inHistory = false;
         int numOfExtensions = 0;
 
-        std::ifstream in(fileName.c_str());
+        str = "{ \"Header\": { ";
 
-        while (in.good()) {
-            bytes = in.read(buffer, BUF_LEN);
-            if (bytes < 0) { break; }
-            tbytes += bytes;
+        std::ifstream in(fileName.c_str(), std::ifstream::binary);
+
+        while (in) {
+
+            // Get data from file or from internal block
+            if (blockBytesLeft < BUF_LEN) {
+                in.read(block, BLOCK_LEN);
+                // Check everything is OK
+                if (!in) { break; }
+                buffer = block;
+                blockBytesLeft = BLOCK_LEN;
+            } else {
+                buffer += BUF_LEN;
+            }
+
+            // Check if in data block
+            if ((buffer[0] < 0x20) || (buffer[0] > 0x7f)) { break; }
+
+            blockBytesLeft -= BUF_LEN;
+            tbytes         += BUF_LEN;
+
+            std::cerr << "{{" << std::string(buffer, BUF_LEN) << "}}";
+
+            // Get and cheeck tag
             std::string tag = std::string(buffer, TAG_LEN);
             if (tag == "END     ") {
+                if (inHistory) { str += std::string(" ] ");  }
                 str += "}";
                 inHdr = false;
+                inHistory = false;
             } else {
+                // Get content
                 std::string content = std::string(buffer + TAG_LEN, BUF_LEN - TAG_LEN);
+                clearComment(content);
                 if (content.at(0) == '=') {
                     content.erase(0, 1);
-                } else {
-                    content = "\"" + content + "\"";
                 }
+                // Clean-up content and tag
+                clearQuotes(content);
+                str::trim(tag, " \t\n\r\f\v");
+                str::trim(content, " \t\n\r\f\v");
                 if (tag == "XTENSION") {
+                    // Open section for extensions
                     inHdr = true;
-                    clearComment(content)
                     str += std::string((numOfExtensions < 1) ? ", \"Extensions\": [ " : ", ") +
-                        " { \"" + tag + "\": " + content;
+                        " { \"" + tag + "\": \"" + content + "\"";
                     numOfExtensions++;
                 } else {
                     if (inHdr) {
-                        str::replaceAll(content, " T ", " true ");
-                        str::replaceAll(content, " F ", " false ");
-                        clearComment(content);
-                        if (!isStart) { str += ", "; }
-                        str += "\"" + tag + "\": " + content;
+                        if (tag == "HISTORY") {
+                            str += std::string(!inHistory ? ", \"HISTORY\": [ " : std::string(", ")) +
+                                "\"" + content + "\"";
+                            inHistory = true;
+                        } else {
+                            if (inHistory) { str += std::string(" ], ");  }
+                            inHistory = false;
+                            str::replaceAll(content, " T ", " true ");
+                            str::replaceAll(content, " F ", " false ");
+                            if (!isStart) { str += std::string(", "); }
+                            str += "\"" + tag + "\": \"" + content + "\"";
+                        }
                     }
                 }
+                std::cerr << "  => '" << tag << "': '" << content << "'\n";
             }
+
             isStart = false;
         }
         in.close();
 
         str += (numOfExtensions > 0) ? "] }": "}";
-        /*
-        str.replace(QRegExp("[ ]+\""), "\"");
-        str.replace(QRegExp("[ ]+'"), "'");
-
-        QRegExp * rx = new QRegExp("(\"HISTORY\"):(\".*\"),(\"HISTORY\":)");
-        rx->setMinimal(true);
-        int pos = 0;
-        while ((pos = rx->indexIn(str, pos)) != -1) {
-            std::string srx(rx->cap(1) + ":" + rx->cap(2) + ",");
-            str.replace(rx->cap(0), srx);
-        }
-        delete rx;
-        rx = new QRegExp("(\"HISTORY\"):(\".*\")[}]");
-        rx->setMinimal(true);
-        pos = 0;
-        while ((pos = rx->indexIn(str, pos)) != -1) {
-            std::string srx(rx->cap(1) + ": [" + rx->cap(2) + "] }");
-            str.replace(rx->cap(0), srx);
-            pos += srx.length();
-        }
-        delete rx;
-        */
-        //str.replace(",\"\":\"\"", "");
-        //str.replace("\":'", "\":\"");
-        //str.replace(QRegExp("'[ ]*,"), "\",");
     }
 
     void clearComment(std::string & line) {
         size_t pos = line.rfind(" / ");
         if (pos != std::string::npos) {
             line.erase(pos,1000);
+            str::trim(line, " \t\n\r\f\v");
         }
-        str::trim(line);
+    }
+
+    void clearQuotes(std::string & line) {
+        size_t fpos = line.find_first_of("\"'");
+        if (fpos != std::string::npos) line.erase(0, fpos + 1);
+        size_t tpos = line.find_last_of("\"'");
+        if (tpos != std::string::npos) line.erase(tpos);
+        str::replaceAll(line, "\\", "/");
     }
 };
