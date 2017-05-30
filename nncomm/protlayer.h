@@ -8,11 +8,22 @@
 #include "commnode.h"
 
 class ProtocolLayer {
+
 public:
-    enum ProtocolLayerClass { UNDEFINED, PIPELINE, PUBSUB, SURVEY, BUS};
+
+#define TLIST_OF_PROTLAYERCLASSES                               \
+    T(UNDEFINED), T(PIPELINE), T(PUBSUB), T(SURVEY), T(BUS)
+
     ProtocolLayer();
 
+#define T(x)  x
+    enum ProtocolLayerClass { TLIST_OF_PROTLAYERCLASSES };
+#undef T
+
+    static const std::string ProtocolLayerClassName[];
+
     ProtocolLayerClass getClass();
+    std::string getClassName();
 
     void createPipeline(ChannelDescriptor chnl,
                         CommNode* pusher,

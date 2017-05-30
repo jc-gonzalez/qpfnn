@@ -1,5 +1,6 @@
 #include "scalprotrole.h"
 #include <cassert>
+#include <sstream>
 
 ScalabilityProtocolRole::ScalabilityProtocolRole()
     : sck(0), readyToGo(false), incMsgsMask(NN_IN | NN_OUT)
@@ -43,13 +44,20 @@ void ScalabilityProtocolRole::setMsgOut(MessageString m)
 {
     if (readyToGo) {
         sck->send((void*)(m.c_str()), m.size(), 0);
-        DBG("++ Sending msg. " << m);
+        TRC("++ Sending msg. " << m);
     }
 }
 
 int ScalabilityProtocolRole::getClass()
 {
     return elemClass;
+}
+
+std::string ScalabilityProtocolRole::getClassName()
+{
+    std::stringstream ss;
+    ss << elemClass;
+    return ss.str();
 }
 
 std::string ScalabilityProtocolRole::getName()

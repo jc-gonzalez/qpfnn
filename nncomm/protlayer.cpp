@@ -8,6 +8,10 @@
 #include <sstream>
 #include <string>
 
+#define T(x)  std::string(#x)
+const std::string ProtocolLayer::ProtocolLayerClassName[] = { TLIST_OF_PROTLAYERCLASSES };
+#undef T
+
 ProtocolLayer::ProtocolLayer() : protLayerClass(UNDEFINED)
 {
 }
@@ -15,6 +19,11 @@ ProtocolLayer::ProtocolLayer() : protLayerClass(UNDEFINED)
 ProtocolLayer::ProtocolLayerClass ProtocolLayer::getClass()
 {
     return protLayerClass;
+}
+
+std::string ProtocolLayer::getClassName()
+{
+    return ProtocolLayerClassName[protLayerClass];
 }
 
 void ProtocolLayer::createPipeline(ChannelDescriptor chnl,
@@ -36,7 +45,7 @@ void ProtocolLayer::createPipeline(ChannelDescriptor chnl,
         bindAddr = "tcp://" + pusherHost + ":" + ssPort.str();
         connAddr = "tcp://" + pullerHost + ";" + pusherHost + ":" + ssPort.str();
     }
-    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
+    TRC("Binding: " << bindAddr << ", Connect from: " << connAddr);
     if (protLayerClass != PIPELINE) { components.clear(); }
     if (pusher != 0) {
         pusher->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
@@ -67,7 +76,7 @@ void ProtocolLayer::createPubSub(ChannelDescriptor chnl,
         bindAddr = "tcp://*:" + ssPort.str();
         connAddr = "tcp://" + publisherHost + ":" + ssPort.str();
     }
-    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
+    TRC("Binding: " << bindAddr << ", Connect from: " << connAddr);
     //if ((publishers.size() > 1) && (subscribers.size() == 1)) {
     //    bindAddr.swap(connAddr);
     //}
@@ -106,7 +115,7 @@ void ProtocolLayer::createSurvey(ChannelDescriptor chnl,
         bindAddr = "tcp://*:" + ssPort.str();
         connAddr = "tcp://" + surveyorHost + ":" + ssPort.str();
     }
-    DBG("Binding: " << bindAddr << ", Connect from: " << connAddr);
+    TRC("Binding: " << bindAddr << ", Connect from: " << connAddr);
     components.clear();
     if (surveyor != 0) {
         surveyor->addConnection(chnl, new Survey(NN_SURVEYOR,   bindAddr));
@@ -144,7 +153,7 @@ void ProtocolLayer::createBus(ChannelDescriptor chnl,
             addr = "tcp://" + host + ":" + ssPort.str();
         }
         if (c != 0) {
-            DBG("Binding: " << addr << ", Connect from anywhere");
+            TRC("Binding: " << addr << ", Connect from anywhere");
             Bus * conn = new Bus(NN_BUS, addr);
             for (auto & adr: addressesToConnect) { conn->connectTo(adr); }
             addressesToConnect.push_back(addr);

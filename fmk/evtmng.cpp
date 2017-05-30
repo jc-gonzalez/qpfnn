@@ -101,7 +101,8 @@ void EvtMng::runEachIteration()
     // 1. Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
-        std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
+        TraceMsg("New DirWatchEvent: " + e.path + "/" + e.name
+                 + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
         // Process only files
         // TODO: Process directories that appear at inbox
@@ -110,7 +111,10 @@ void EvtMng::runEachIteration()
             // Set new content for InData Message
             FileNameSpec fs;
             ProductMetadata m;
-            fs.parseFileName(file, m);
+            if (!fs.parseFileName(file, m)) {
+                WarnMsg("Problem while trying to parse filename with regex");
+                continue;
+            }
 
             Message<MsgBodyINDATA> msg;
             msg.buildHdr(ChnlInData, ChnlInData, "1.0",

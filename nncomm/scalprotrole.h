@@ -39,6 +39,7 @@ public:
     virtual bool next(MessageString & m);
     virtual void setMsgOut(MessageString m);
     virtual int getClass();
+    virtual std::string getClassName();
     virtual std::string getName();
     virtual void setName(std::string & name);
     virtual std::string getAddress();
