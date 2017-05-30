@@ -113,11 +113,8 @@ void EvtMng::runEachIteration()
             fs.parseFileName(file, m);
 
             Message<MsgBodyINDATA> msg;
-            msg.buildHdr(ChnlInData,
-                         ChnlInData,
-                         "1.0",
-                         compName,
-                         "*",
+            msg.buildHdr(ChnlInData, ChnlInData, "1.0",
+                         compName, "*",
                          "", "", "");
 
             MsgBodyINDATA body;
@@ -133,7 +130,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (((iteration + 1) % 10) == 0) {
+    if (((iteration + 1) == 100)) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
         if (it != connections.end()) {
@@ -144,7 +141,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (iteration > 1000) { transitTo(RUNNING); }
+    if (iteration > 200) { transitTo(RUNNING); }
 }
 
 //----------------------------------------------------------------------

@@ -41,7 +41,7 @@
 #include <cmath>
 using namespace std;
 
-#define DEBUG_INFIX
+//#define DEBUG_INFIX
 
 #ifdef DEBUG_INFIX
 #  define DBGI(s) std::cerr << s << std::endl << std::flush; std::cout << std::flush
