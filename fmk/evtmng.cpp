@@ -111,21 +111,7 @@ void EvtMng::runEachIteration()
             FileNameSpec fs;
             ProductMetadata m;
             fs.parseFileName(file, m);
-            /*
-            m["productType"] = "LE1_VIS";
-            m["instrument"] = "VIS";
-            m["mission"] = "EUC";
-            m["obsMode"] = "W";
-            m["params"] = "";
-            m["procFunc"] = "LE1";
-            m["productVersion"] = "01.00";
-            m["startTime"] = "20200101T000000.0Z";
-            m["endTime"] = "20200101T120000.0Z";
-            m["productId"] = "EUC_LE1_VIS-W-00034-1_20200707T144425.0Z_03.04";
-            m["signature"] = "00034-W-1";
 
-            std::string prodType(m.productType());
-            */
             Message<MsgBodyINDATA> msg;
             msg.buildHdr(ChnlInData,
                          ChnlInData,
@@ -175,11 +161,8 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Create message and send
     Message<MsgBodyCMD> msg;
-    msg.buildHdr(ChnlHMICmd,
-                 ChnlHMICmd,
-                 "1.0",
-                 compName,
-                 "*",
+    msg.buildHdr(ChnlHMICmd, ChnlHMICmd, "1.0",
+                 compName, "*",
                  "", "", "");
 
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
