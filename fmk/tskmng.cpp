@@ -194,7 +194,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     // Create message
     msg.buildHdr(ChnlTskProc, ChnlTskProc, "1.0",
-                 compName, "*", "", "", "");
+                 compName, agName, "", "", "");
 
     MsgBodyTSK body;
 

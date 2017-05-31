@@ -137,7 +137,7 @@ void TskAge::runEachIterationForContainers()
             " at iteration " + str::toStr<int>(iteration));
 
     // Request task for processing in case the agent is idle
-    if ((pStatus == IDLE) && (iteration > 50)) {
+    if ((pStatus == IDLE) && (iteration == 50)) {
         // Create message and send
         Message<MsgBodyTSK> msg;
         msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
@@ -151,11 +151,9 @@ void TskAge::runEachIterationForContainers()
             ScalabilityProtocolRole * conn = it->second;
             conn->setMsgOut(msg.str());
             InfoMsg("Sending request via channel " + chnl);
-
+            pStatus = WAITING;
+            InfoMsg("Switching to status " + ProcStatusName[pStatus]);
         }
-
-        pStatus = WAITING;
-        InfoMsg("Switching to status " + ProcStatusName[pStatus]);
     }
 
     if (pStatus == FINISHING) {
@@ -213,6 +211,7 @@ void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     if (pStatus == WAITING) {
+
         // Define ans set task object
         Message<MsgBodyTSK> msg(m);
         MsgBodyTSK & body = msg.body;

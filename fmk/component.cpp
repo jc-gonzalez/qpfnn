@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "component.h"
+#include "message.h"
 
 //#include "dbhdlpostgre.h"
 //#include "except.h"
@@ -196,6 +197,9 @@ void Component::processIncommingMessages()
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
         while (conn->next(m)) {
+            MessageBase msg(m);
+            std::string tgt(msg.header.target());
+            if ((tgt != "*") and (tgt != compName)) { continue; }
             DbgMsg(compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
