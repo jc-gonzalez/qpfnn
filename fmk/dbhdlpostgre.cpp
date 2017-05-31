@@ -139,16 +139,19 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
         TRC(m.startTime() << ", " << m.endTime() << ", " << timeTag());
         ss << "INSERT INTO products_info "
            << "(product_id, product_type, product_status_id, product_version, product_size, creator_id, "
+           << "obs_id, soc_id, "
            << "instrument_id, obsmode_id, signature, start_time, end_time, registration_time, url) "
            << "VALUES ("
            << str::quoted(m.productId()) << ", "
            << str::quoted(m.productType()) << ", "
-           << 0 << ", "
+           << str::quoted("OK") << ", "
            << str::quoted(m.productVersion()) << ", "
            << m.productSize() << ", "
-           << 1 << ", "
-           << 1 << ", "
-           << 2 << ", "
+           << str::quoted("SOC_QLA_TEST") << ", "
+           << str::quoted(m.obsIdStr) << ", "
+           << str::quoted(m.obsIdStr) << ", "
+           << str::quoted(m.instrument) << ", "
+           << str::quoted(m.obsMode) << ", "
            << str::quoted(m.signature()) << ", "
            << str::quoted(str::tagToTimestamp(m.startTime())) << ", "
            << str::quoted(str::tagToTimestamp(m.endTime())) << ", "
@@ -160,6 +163,8 @@ int DBHdlPostgreSQL::storeProducts(ProductList & prodList)
         PQclear(res);
         nInsProd++;
     }
+
+    UNUSED(result);
 
     return nInsProd;
 }
@@ -215,6 +220,8 @@ int  DBHdlPostgreSQL::retrieveProducts(ProductList & prodList,
     }
     prodList = ProductList(productArray);
     PQclear(res);
+
+    UNUSED(result);
 
     return nRows;
 }

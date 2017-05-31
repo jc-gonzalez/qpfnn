@@ -258,6 +258,7 @@ struct ProductMetadata : public JRecord {
         DUMPJSTR(regTime);
         DUMPJSTR(timeInterval);   // %D
         DUMPJINT(obsId);
+        DUMPJINT(obsIdStr);
         DUMPJSTR(instrument);     // %I
         DUMPJSTR(obsMode);
         DUMPJINT(expos);
@@ -286,6 +287,7 @@ struct ProductMetadata : public JRecord {
     JSTR(regTime);
     JSTR(timeInterval);   // %D
     JINT(obsId);
+    JSTR(obsIdStr);
     JSTR(instrument);     // %I
     JSTR(obsMode);
     JINT(expos);

@@ -269,8 +269,6 @@ bool FileNameSpec::parseFileName(std::string fileName,
         }
     }
 
-    m["productId"] = buildProductId(m);
-
     struct stat buf;
     if (stat(fileName.c_str(), &buf) != 0) {
         std::cerr << "PROBLEM!!" << std::endl;
@@ -279,6 +277,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     decodeSignature(m);
 
     m["creator"]        = creator;
+    m["productId"]      = buildProductId(m);
     m["productStatus"]  = "OK";
     m["productSize"]    = (int)(buf.st_size);
     m["regTime"]        = timeTag();
@@ -340,8 +339,9 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         // TBD
     }
 
-    m["obsId"]  = (int)(strtoul(obsId.c_str(), NULL, 10));
-    m["expos"]  = (int)(strtoul(expos.c_str(), NULL, 10));
+    m["obsIdStr"] = obsId;
+    m["obsId"]    = (int)(strtoul(obsId.c_str(), NULL, 10));
+    m["expos"]    = (int)(strtoul(expos.c_str(), NULL, 10));
 
     if ((m.fileType() == "LOG") || (m.fileType() == "ARCH")) {
         m["productType"] = m.productType() + "-" + m.fileType();

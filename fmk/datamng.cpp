@@ -242,6 +242,9 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
                 std::string origVer = m.productVersion();
                 std::string newVer  = fs.incrMinorVersion(origVer);
 
+                WarnMsg("Found in database:" + sgnt + " [" + ver +
+                        "], changing " + origVer + " with " + newVer);
+
                 std::vector<std::string> svec {m.url(), m.baseName(), m.productId(), m.baseName(), sgnt };
                 for (auto & s: svec) { str::replaceAll(s, origVer, newVer); }
 
@@ -252,6 +255,11 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
                 m["signature"]      = svec.at(i++);
 
                 m["productVersion"] = newVer;
+
+                std::string newFile(str::mid(m.url,7,1000));
+                if (rename(oldFile.c_str(), newFile.c_str()) != 0) {
+                    WarnMsg("ERROR: Cannot rename file " + oldFile + " to " + newFile);
+                }
             }
         }
 
