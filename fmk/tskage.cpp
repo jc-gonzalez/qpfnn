@@ -137,7 +137,7 @@ void TskAge::runEachIterationForContainers()
             " at iteration " + str::toStr<int>(iteration));
 
     // Request task for processing in case the agent is idle
-    if ((pStatus == IDLE) && (iteration == 90)) {
+    if ((pStatus == IDLE) && (iteration > 50)) {
         // Create message and send
         Message<MsgBodyTSK> msg;
         msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",

@@ -242,6 +242,9 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
                 std::string origVer = m.productVersion();
                 std::string newVer  = fs.incrMinorVersion(origVer);
 
+                std::string url(m.url());
+                std::string oldFile(str::mid(url,7,1000));
+
                 WarnMsg("Found in database:" + sgnt + " [" + ver +
                         "], changing " + origVer + " with " + newVer);
 
@@ -256,7 +259,8 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
 
                 m["productVersion"] = newVer;
 
-                std::string newFile(str::mid(m.url,7,1000));
+                url = m.url();
+                std::string newFile(str::mid(url,7,1000));
                 if (rename(oldFile.c_str(), newFile.c_str()) != 0) {
                     WarnMsg("ERROR: Cannot rename file " + oldFile + " to " + newFile);
                 }

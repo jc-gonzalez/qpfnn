@@ -309,9 +309,9 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         // Instrument-ObsId-Exposure-ObsMode
         if (nParts < 4) { return; }
         m["instrument"]  = signParts[0];
-        m["obsMode"]     = signParts[1];
-        obsId            = signParts[2];
-        expos            = signParts[3];
+        obsId            = signParts[1];
+        expos            = signParts[2];
+        m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
         TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
@@ -319,9 +319,9 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         // Instrument-ObsMode-ObsId-Exposure
         if (nParts < 4) { return; }
         m["instrument"]  = signParts[0];
-        m["obsMode"]     = signParts[1];
-        obsId            = signParts[2];
-        expos            = signParts[3];
+        obsId            = signParts[1];
+        expos            = signParts[2];
+        m["obsMode"]     = signParts[3];
         m["origin"]      = m.procFunc();
         m["productType"] = m.procFunc() + "_" + m.instrument();
         TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
@@ -330,9 +330,9 @@ void FileNameSpec::decodeSignature(ProductMetadata & m)
         if (nParts < 5) { return; }
         m["origin"]      = signParts[0];
         m["instrument"]  = signParts[1];
-        m["obsMode"]     = signParts[2];
-        obsId            = signParts[3];
-        expos            = signParts[4];
+        obsId            = signParts[2];
+        expos            = signParts[3];
+        m["obsMode"]     = signParts[4];
         m["productType"] = m.procFunc() + "_" + m.origin() + "_" + m.instrument();
         TRC(m.procFunc() << "::=>  " << str::join(signParts, "/") << " , " << m.productType());
     } else {
