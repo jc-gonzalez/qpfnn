@@ -187,6 +187,15 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    static bool first = true;
+    if (first) {
+        json taskInfoData;
+        taskInfoData["taskName"] = std::string("task_name");
+        taskInfoData["taskStatus"] = 42;
+        containerTasks.push_back(taskInfoData);
+        first = false;
+    }
+
     // Define and set task object
     Message<MsgBodyTSK> msg(m);
     std::string agName(msg.header.source());
@@ -216,30 +225,28 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     }
     */
 
-    bool isTaskSent = true;
+    bool isTaskSent = false;
     std::string taskName;
     TaskStatus  taskStatus;
 
-    if (listOfTasks->size() < 1) {
-        body["info"] = nullJson;
-        isTaskSent = false;
-    } else {
+    if (listOfTasks->size() > 0) {
         json taskInfoData = listOfTasks->front().val();
         taskName = taskInfoData["taskName"].asString();
         taskStatus = TaskStatus(taskInfoData["taskStatus"].asInt());
         body["info"] = taskInfoData;
         listOfTasks->pop_front();
-    }
 
-    msg.buildBody(body);
+        msg.buildBody(body);
 
-    // Send msg
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    ChannelDescriptor chnl(ChnlTskProc + "_" + agName);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
+        // Send msg
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        ChannelDescriptor chnl(ChnlTskProc + "_" + agName);
+        it = connections.find(chnl);
+        if (it != connections.end()) {
+            ScalabilityProtocolRole * conn = it->second;
+            conn->setMsgOut(msg.str());
+            isTaskSent = true;
+        }
     }
 
     // Task info is sent, register the task and status
