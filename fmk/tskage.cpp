@@ -190,7 +190,8 @@ void TskAge::processIncommingMessages()
             DBG(compName << " received the message [" << m
                 << "] through the channel " + chnl);
             if      (chnl == ChnlCmd)     { processCmdMsg(conn, m); }
-            else if (type == ChnlTskProc) { processTskProcMsg(conn, m); }
+            else if ((type == ChnlTskProc) &&
+                     (msg.header.target() == compName)) { processTskProcMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
@@ -218,6 +219,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         TaskInfo task(body["info"]);
 
         std::string agName(msg.header.source());
+
         DBG(">>>>>>>>>> RECEIVED TASK INFO FOR PROCESSING");
         DBG(">>>>>>>>>> name:" << msg.body("info")["name"].asString());
 
