@@ -414,7 +414,7 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
     }
 
     if (retVal != 0) {
-        perror((std::string("ERROR relocating product: ") +
+        perror(("ERROR (" + std::to_string(retVal) + ") relocating product: " +
                 sFrom + std::string(" => ") + sTo).c_str());
         showBacktrace();
     }

@@ -137,14 +137,11 @@ void TskAge::runEachIterationForContainers()
             " at iteration " + str::toStr<int>(iteration));
 
     // Request task for processing in case the agent is idle
-    if ((pStatus == IDLE) && (iteration > 100)) {
+    if ((pStatus == IDLE) && (iteration == 90)) {
         // Create message and send
         Message<MsgBodyTSK> msg;
-        msg.buildHdr(ChnlTskRqst,
-                     ChnlTskRqst,
-                     "1.0",
-                     compName,
-                     "*",
+        msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
+                     compName, "*",
                      "", "", "");
 
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
@@ -166,7 +163,7 @@ void TskAge::runEachIterationForContainers()
         InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
     }
 
-    if ((pStatus == PROCESSING) && (iteration > 150)) {
+    if ((pStatus == PROCESSING) && (iteration == 120)) {
         pStatus = FINISHING;
         InfoMsg("Switching to status " + ProcStatusName[pStatus]);
     }

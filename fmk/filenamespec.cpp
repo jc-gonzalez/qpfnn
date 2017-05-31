@@ -172,7 +172,6 @@ bool FileNameSpec::parseFileName(std::string fileName,
     if (re->match(baseName)) {
         re->get(mre);
     } else {
-        DBG("Filename does not match regex");
         return false;
     }
 #endif
@@ -206,7 +205,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
     // substrings start at m[1]
     unsigned int count = mre.size() - 1;
 #endif
-    DBG("size: " << mre.size() << count);
+    TRC("size: " << mre.size() << count);
 
     for (unsigned int i = 0; i < count; ++i) {
         // Extract the matches of the regex
@@ -225,7 +224,7 @@ bool FileNameSpec::parseFileName(std::string fileName,
             if (idx <= count + 1) { fld = mre[k]; }
             if (kv.second.find(idx) != kv.second.end()) {
                 std::string tpl(assignationsTpl[kv.first]);
-                DBG(k << idx << fld << ' ' << kv.first);
+                TRC(k << idx << fld << ' ' << kv.first);
                 switch (kv.first) {
                 case 'M':
                     m["mission"]          = placeIn(m.mission(),      tpl, idx, fld);

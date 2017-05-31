@@ -101,7 +101,8 @@ void EvtMng::runEachIteration()
     // 1. Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
-        std::cout << e.path << "/" << e.name << (e.isDir ? " DIR " : " ") << e.mask << std::endl;
+        TraceMsg("New DirWatchEvent: " + e.path + "/" + e.name
+                 + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
         // Process only files
         // TODO: Process directories that appear at inbox
@@ -110,28 +111,14 @@ void EvtMng::runEachIteration()
             // Set new content for InData Message
             FileNameSpec fs;
             ProductMetadata m;
-            fs.parseFileName(file, m);
-            /*
-            m["productType"] = "LE1_VIS";
-            m["instrument"] = "VIS";
-            m["mission"] = "EUC";
-            m["obsMode"] = "W";
-            m["params"] = "";
-            m["procFunc"] = "LE1";
-            m["productVersion"] = "01.00";
-            m["startTime"] = "20200101T000000.0Z";
-            m["endTime"] = "20200101T120000.0Z";
-            m["productId"] = "EUC_LE1_VIS-W-00034-1_20200707T144425.0Z_03.04";
-            m["signature"] = "00034-W-1";
+            if (!fs.parseFileName(file, m)) {
+                WarnMsg("Problem while trying to parse filename with regex");
+                continue;
+            }
 
-            std::string prodType(m.productType());
-            */
             Message<MsgBodyINDATA> msg;
-            msg.buildHdr(ChnlInData,
-                         ChnlInData,
-                         "1.0",
-                         compName,
-                         "*",
+            msg.buildHdr(ChnlInData, ChnlInData, "1.0",
+                         compName, "*",
                          "", "", "");
 
             MsgBodyINDATA body;
@@ -147,7 +134,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (((iteration + 1) % 10) == 0) {
+    if (((iteration + 1) == 100)) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
         if (it != connections.end()) {
@@ -158,7 +145,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (iteration > 1000) { transitTo(RUNNING); }
+    if (iteration > 200) { transitTo(RUNNING); }
 }
 
 //----------------------------------------------------------------------
@@ -175,11 +162,8 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Create message and send
     Message<MsgBodyCMD> msg;
-    msg.buildHdr(ChnlHMICmd,
-                 ChnlHMICmd,
-                 "1.0",
-                 compName,
-                 "*",
+    msg.buildHdr(ChnlHMICmd, ChnlHMICmd, "1.0",
+                 compName, "*",
                  "", "", "");
 
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;

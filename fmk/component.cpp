@@ -191,12 +191,12 @@ void Component::updateConnections()
 void Component::processIncommingMessages()
 {
     MessageString m;
-    TRC("Component::processIncommingmessages()");
+    TraceMsg("Component::processIncommingmessages()");
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
         while (conn->next(m)) {
-            DBG(compName << " received the message [" << m << "]");
+            DbgMsg(compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
@@ -273,9 +273,8 @@ void Component::run()
     for (auto & kv: connections) {
         ChannelDescriptor chnl = kv.first;
         ScalabilityProtocolRole * role = kv.second;
-        TRC(role->getName() << "(" << this << ") in Channel " << chnl
-            << " with address " << role->getAddress()
-            << " - " << role->getClass());
+        TraceMsg(role->getName() + " in Channel " + chnl + " with address " +
+                 role->getAddress() + " - " + role->getClassName());
     }
 
     // State: Initialised
