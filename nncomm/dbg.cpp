@@ -4,6 +4,6 @@
 
 namespace Dbg {
 
-    int verbosityLevel = SILENT_LEVEL;		 
+    int verbosityLevel = SILENT_LEVEL;
 
 }

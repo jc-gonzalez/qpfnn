@@ -44,7 +44,7 @@ void ScalabilityProtocolRole::setMsgOut(MessageString m)
 {
     if (readyToGo) {
         sck->send((void*)(m.c_str()), m.size(), 0);
-        TRC("++ Sending msg. " << m);
+        //TRC("++ Sending msg. " << m);
     }
 }
 
@@ -78,7 +78,7 @@ std::string ScalabilityProtocolRole::getAddress()
 void ScalabilityProtocolRole::getIncommingMessageStrings()
 {
     int rev = getevents(sck->fd(), incMsgsMask, 50);
-    TRC(elemName << ": checking incomming messages... " << rev);
+    //TRC(elemName << ": checking incomming messages... " << rev);
     //if (rev & NN_IN == NN_IN) {
     if (rev != 0) {
         rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);

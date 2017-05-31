@@ -7,6 +7,9 @@
 
 #include "dbg.h"
 
+#include <chrono>
+#include <ctime>
+
 //==========================================================================
 // Class: MsgHeader
 //==========================================================================
@@ -129,6 +132,7 @@ public:
                   std::string dateCreation,
                   std::string dateTransmission,
                   std::string dateReception) {
+        std::time_t the_time = std::time(nullptr);
         header["id"]               = id;
         header["type"]             = type;
         header["version"]          = version;
@@ -137,6 +141,7 @@ public:
         header["dateCreation"]     = dateCreation;
         header["dateTransmission"] = dateTransmission;
         header["dateReception"]    = dateReception;
+        header["timeStamp"]        = std::string(std::ctime(&the_time));
         value["header"] = header.val();
     }
     void buildBody(T & bdy) {
