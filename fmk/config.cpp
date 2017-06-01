@@ -102,9 +102,9 @@ void Config::init(std::string fName)
 {
     isLive = false;
     sessionId = timeTag();
-    DBG("Provided fName='" << fName << "'");
+    TRC("Provided fName='" << fName << "'");
     if (fName.compare(0,5,"db://") == 0) {
-        DBG("A database URL!");
+        TRC("A database URL!");
 
         // fName in fact is a db url in the form:
         //   db://user:pwd@host:port/dbname
@@ -116,7 +116,7 @@ void Config::init(std::string fName)
         DBPort = url.substr(0, url.find("/")); url.erase(0, url.find("/") + 1); // take port
         DBName = url; // take database name
 
-        DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+        TRC(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
         fName = ""; // clear filename, to read from DB
     }
@@ -156,7 +156,7 @@ void Config::fillData()
     DBUser = db.user();
     DBPwd  = db.pwd();
 
-    DBG(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
+    TRC(DBUser << ":" << DBPwd << "@" << DBHost << ":" << DBPort << "/" << DBName);
 
     weAreOnMaster = (network.masterNode() == currentHostAddr);
 }
@@ -216,7 +216,7 @@ void Config::readConfigFromDB()
     try {
         dbHdl->openConnection();
     } catch (RuntimeException & e) {
-        DBG("ERROR Trying to open connection to DB");
+        TRC("ERROR Trying to open connection to DB");
         Log::log("SYSTEM", Log::FATAL, e.what());
         return;
     }
@@ -237,11 +237,11 @@ void Config::readConfigFromDB()
             cfg.fromStr(configData);
         cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
-            DBG("ERROR Trying to retrieve configuration table");
+            TRC("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-            DBG("ERROR Trying to retrieve configuration table");
+            TRC("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR,
                           "Unexpected error accessing "
                           "database for retrieval of system configuration");
@@ -379,7 +379,6 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
-    TRC("BEGIN processConfig()");
     PATHBase         = general.workArea();
 
     PATHData         = PATHBase + "/data";
@@ -402,14 +401,12 @@ void Config::processConfig()
             Config::PATHTmp,
             Config::PATHTsk,
             Config::PATHMsg };
-    for (auto & p : runPaths) {
-        TRC(p);
-    }
+    for (auto & p : runPaths) { TRC(p); }
+
     storage.inbox    = PATHData + "/inbox";
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
-    TRC("END processConfig()");
 }
 
 //----------------------------------------------------------------------

@@ -220,10 +220,11 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         MsgBodyTSK & body = msg.body;
         TaskInfo task(body["info"]);
 
-        assert(compName == msg.header.source());
+        assert(compName == msg.header.target());
 
-        DBG(">>>>>>>>>> RECEIVED TASK INFO FOR PROCESSING"
-            ">>>>>>>>>> name:" << msg.body("info")["name"].asString());
+        DBG(">>>>>>>>>> " << compName
+            << " RECEIVED TASK INFO FOR PROCESSING\n"
+            ">>>>>>>>>> Task name:" << msg.body("info")["name"].asString());
 
         numTask++;
 
