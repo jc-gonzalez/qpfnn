@@ -51,6 +51,7 @@
 //------------------------------------------------------------
 #include <thread>
 #include <mutex>
+#include <sys/stat.h>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -142,7 +143,9 @@ private:
     //----------------------------------------------------------------------
     void runEachIterationForServices();
 
-    Property(TskAge, bool, remote, Remote);
+    Property(TskAge, std::string, workDir, WorkDir);
+    Property(TskAge, std::string, sysDir,  SysDir);
+    Property(TskAge, bool,        remote,  Remote);
 
 private:
     AgentMode                agentMode;
@@ -152,6 +155,14 @@ private:
     ServiceInfo *            serviceInfo;
     std::string              srvManager;
     std::vector<std::string> srvWorkers;
+
+    std::string              internalTaskNameIdx;
+    std::string              exchangeDir;
+    std::string              exchgIn;
+    std::string              exchgOut;
+    std::string              exchgLog;
+
+    int                      numTask;
 };
 
 //}

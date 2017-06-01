@@ -270,6 +270,9 @@ void Config::readConfigFromDB()
             std::pair<std::string, std::string> sessionAndState;
             sessionAndState = dbHdl->getLatestState();
             sessionId = sessionAndState.first;
+            if (sessionId.empty()) {
+                sessionId = timeTag();
+            }
         } catch (...) {
             Log::log("SYSTEM", Log::ERROR,
                               "Unexpected error accessing "

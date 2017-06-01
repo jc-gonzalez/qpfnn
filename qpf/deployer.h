@@ -149,7 +149,7 @@ private:
     // Set the address (IP) of the current host
     //----------------------------------------------------------------------
     void setCurrentHostAddr(std::string addr);
-    
+
     //----------------------------------------------------------------------
     // Method: readConfiguration
     // Retrieves the configuration for the execution of the system (from
@@ -174,6 +174,12 @@ private:
     // Gets from the system the host name and ip address of the host
     //----------------------------------------------------------------------
     void getHostnameAndIp(std::string & hName, std::string & ipAddr);
+
+    //----------------------------------------------------------------------
+    // Method: existsDir
+    // Removes old log and msg files
+    //----------------------------------------------------------------------
+    bool existsDir(std::string pathName);
 
     //----------------------------------------------------------------------
     // Method: installSignalHandlers
@@ -207,17 +213,17 @@ private:
     MasterNodeElements     masterNodeElems;
     std::vector<CommNode*> agentsNodes;
 
-    Synchronizer 	   synchro;
+    Synchronizer           synchro;
 
-    std::string  	   cfgFileName;
-    std::string  	   currentHostAddr;
-    std::string  	   currentHostName;
-    int          	   initialPort;
+    std::string            cfgFileName;
+    std::string            currentHostAddr;
+    std::string            currentHostName;
+    int                    initialPort;
 
-    std::string  	   exeName;
-    
-    std::string  	   masterAddress;
-    bool         	   isMasterHost;
+    std::string            exeName;
+
+    std::string            masterAddress;
+    bool                   isMasterHost;
 
 };
 

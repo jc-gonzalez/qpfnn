@@ -264,6 +264,25 @@ void Deployer::readConfiguration()
     }
     //cfg.dump();
     TRC("Config::PATHBase: " << Config::PATHBase);
+
+    // Ensure paths for the execution are available and readu
+    assert(existsDir(Config::PATHBase));
+    assert(existsDir(Config::PATHBin));
+    std::vector<std::string> runPaths {
+            Config::PATHSession,
+            Config::PATHLog,
+            Config::PATHRlog,
+            Config::PATHTmp,
+            Config::PATHTsk,
+            Config::PATHMsg };
+    for (auto & p : runPaths) {
+        if (mkdir(p.c_str(), Config::PATHMode) != 0) {
+            std::perror(("mkdir " + p).c_str());
+            exit(EXIT_FAILURE);
+        }
+    }
+    Log::setLogBaseDir(Config::PATHSession);
+
 }
 
 //----------------------------------------------------------------------
@@ -367,6 +386,16 @@ void Deployer::actionOnSigInt()
 }
 
 //----------------------------------------------------------------------
+// Method: existsDir
+// Removes old log and msg files
+//----------------------------------------------------------------------
+bool Deployer::existsDir(std::string pathName)
+{
+    struct stat sb;
+    return (stat(pathName.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode));
+}
+
+//----------------------------------------------------------------------
 // Method: installSignalHandlers
 // Install signal handlers
 //----------------------------------------------------------------------
@@ -434,6 +463,9 @@ void Deployer::createElementsNetwork()
                     cfg.agentNames.push_back(sAgName);
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
+                    tskag->setRemote(true);
+                    tskag->setSysDir(Config::PATHRun);
+                    tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 1, h, i));

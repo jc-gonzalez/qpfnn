@@ -112,6 +112,8 @@ void TskAge::fromRunningToOperational()
                               serviceInfo->exe, serviceInfo->args);
     }
 
+    numTask = 0;
+
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 }
@@ -218,14 +220,43 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         MsgBodyTSK & body = msg.body;
         TaskInfo task(body["info"]);
 
-        std::string agName(msg.header.source());
+        assert(compName == msg.header.source());
 
-        DBG(">>>>>>>>>> RECEIVED TASK INFO FOR PROCESSING");
-        DBG(">>>>>>>>>> name:" << msg.body("info")["name"].asString());
+        DBG(">>>>>>>>>> RECEIVED TASK INFO FOR PROCESSING"
+            ">>>>>>>>>> name:" << msg.body("info")["name"].asString());
+
+        numTask++;
+
+        // Define processing environment
+
+        // Prepare folders:
+        // * workDir             := <DIR>/qpf/run/yymmddTHHMMSS/tsk
+        // * internalTaskNameIdx := TskAgentName-yyyymmddTHHMMSS-n
+        // * exchangeDir         := workDir + / + TskAgent1-yyyymmddTHHMMSS-n
+        internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
+                               std::to_string(numTask));
+        exchangeDir = workDir + "/" + internalTaskNameIdx;
+        exchgIn     = exchangeDir + "/in";
+        exchgOut    = exchangeDir + "/out";
+        exchgLog    = exchangeDir + "/log";
+
+        // Create exchange area
+        mkdir(exchangeDir.c_str(), 0755);
+        mkdir(exchgIn.c_str(),     0755);
+        mkdir(exchgOut.c_str(),    0755);
+        mkdir(exchgLog.c_str(),    0755);
+
+        // Define task parameters
+        std::string sysBinDir  = sysDir + "/bin";
+        std::string taskDriver = sysDir + "/bin/runTask.sh";
+        std::string cfgFile    = exchangeDir + "/dummy.cfg";
 
         // Retrieve the input products
         URLHandler urlh;
-        urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
+        urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
+        if (remote) {
+            urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
+        }
 
         int i = 0;
         for (auto & m : task.inputs.products) {
@@ -237,6 +268,10 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
             ++i;
         }
 
+        // * * * LAUNCH TASK * * *
+        // TODO
+
+        // Set processing status
         pStatus = PROCESSING;
     }
 }

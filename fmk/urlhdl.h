@@ -76,7 +76,7 @@
 class URLHandler {
 
 public:
-    URLHandler(bool remote = true);
+    URLHandler(bool remote = false);
 
     PropertyRef(URLHandler, ProductMetadata, product, Product);
 
