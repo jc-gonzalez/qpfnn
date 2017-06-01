@@ -142,12 +142,14 @@ private:
     //----------------------------------------------------------------------
     void runEachIterationForServices();
 
-private:
-    ProcStatus pStatus;
-    AgentMode  agentMode;
-    DockerMng  * dckMng;
+    Property(TskAge, bool, remote, Remote);
 
-    ServiceInfo *           serviceInfo;
+private:
+    AgentMode                agentMode;
+    ProcStatus               pStatus;
+    DockerMng *              dckMng;
+
+    ServiceInfo *            serviceInfo;
     std::string              srvManager;
     std::vector<std::string> srvWorkers;
 };

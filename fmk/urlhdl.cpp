@@ -235,7 +235,7 @@ ProductMetadata & URLHandler::fromLocalArch2Gateway()
                     cfg.storage.gateway + "/in");
 
     // Set (hard) link
-    (void)relocate(file, newFile, LINK);
+    (void)relocate(file, newFile, LINK, -1);
 
     // Change url in processing task
     product["url"]      = newUrl;
@@ -373,7 +373,14 @@ ProductMetadata & URLHandler::fromGateway2LocalArch()
 int URLHandler::relocate(std::string & sFrom, std::string & sTo,
                          LocalArchiveMethod method, int msTimeOut)
 {
-    if (msTimeOut > 0) {
+    // Wait for the file to appear
+    if (msTimeOut != 0) {
+        // If timeout is > 0, wait unti timeout is completed
+        if (msTimeOut < 0) {
+            // If timeout < 0, wait forever until stat is successful
+            // (in fact, set a very large value for timeout, say 1 minute)
+            msTimeOut = 60000;
+        }
         struct stat buffer;
         struct timespec tsp1, tsp2;
         long elapsed = 0;
@@ -382,6 +389,12 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
             (void)clock_gettime(CLOCK_REALTIME_COARSE, &tsp2);
             elapsed = ((tsp2.tv_sec - tsp1.tv_sec) * 1000 +
                        (tsp2.tv_nsec - tsp1.tv_nsec) / 1000000);
+        }
+        if (elapsed > msTimeOut) {
+            std::cerr << ("ERROR: Timeout of " + std::to_string(msTimeOut) +
+                          "ms before successful stat:\n\t" +
+                          sFrom + std::string(" => ") + sTo + "\n");
+            return -1;
         }
     }
 
@@ -415,9 +428,9 @@ int URLHandler::relocate(std::string & sFrom, std::string & sTo,
 
     if (retVal != 0) {
         perror(("ERROR (" + std::to_string(retVal) + "/" + std::to_string(errno) +
-                ") relocating product: " +
+                ") relocating product:\n\t" +
                 sFrom + std::string(" => ") + sTo).c_str());
-        showBacktrace();
+        //showBacktrace();
     }
     return retVal;
 }
@@ -496,7 +509,8 @@ void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)
     intTaskDir = tskDir;
 
     taskExchgDir = workDir + "/" + intTaskDir;
-    TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir << "  => TaskExchgDir: " << taskExchgDir);
+    TRC("Workdir: " << workDir << "   IntTaskDir: " << intTaskDir
+        << "  => TaskExchgDir: " << taskExchgDir);
 }
 
 //}

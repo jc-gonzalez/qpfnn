@@ -71,7 +71,7 @@ const std::string TskAge::ProcStatusName[] { TLIST_PSTATUS };
 //----------------------------------------------------------------------
 TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
                AgentMode mode, ServiceInfo * srvInfo)
-    : Component(name, addr, s), agentMode(mode),
+    : Component(name, addr, s), remote(true), agentMode(mode),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
 }
@@ -81,7 +81,7 @@ TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
 //----------------------------------------------------------------------
 TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
                AgentMode mode, ServiceInfo * srvInfo)
-    : Component(name, addr, s), agentMode(mode),
+    : Component(name, addr, s), remote(true), agentMode(mode),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
 }
@@ -225,6 +225,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         // Retrieve the input products
         URLHandler urlh;
+        urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
+
         int i = 0;
         for (auto & m : task.inputs.products) {
             urlh.setProduct(m);
