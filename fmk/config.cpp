@@ -379,29 +379,24 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
-    PATHBase         = general.workArea();
+    PATHBase    = general.workArea();
 
-    PATHData         = PATHBase + "/data";
+    PATHData    = PATHBase + "/data";
 
-    PATHRun          = PATHBase + "/run";
+    PATHRun     = PATHBase + "/run";
 
-    PATHBin          = PATHRun + "/bin";
-    PATHSession      = PATHRun + "/" + sessionId;
+    PATHBin     = PATHRun + "/bin";
+    PATHSession = PATHRun + "/" + sessionId;
 
-    PATHLog          = PATHSession + "/log";
-    PATHRlog         = PATHSession + "/rlog";
-    PATHTmp          = PATHSession + "/tmp";
-    PATHTsk          = PATHSession + "/tsk";
-    PATHMsg          = PATHSession + "/msg";
+    PATHLog     = PATHSession + "/log";
+    PATHRlog    = PATHSession + "/rlog";
+    PATHTmp     = PATHSession + "/tmp";
+    PATHTsk     = PATHSession + "/tsk";
+    PATHMsg     = PATHSession + "/msg";
 
-    std::vector<std::string> runPaths {
-        Config::PATHSession,
-            Config::PATHLog,
-            Config::PATHRlog,
-            Config::PATHTmp,
-            Config::PATHTsk,
-            Config::PATHMsg };
-    for (auto & p : runPaths) { TRC(p); }
+    for (auto & p : std::vector<std::string>
+        { PATHSession, PATHLog, PATHRlog,
+                PATHTmp, PATHTsk, PATHMsg }) { TRC(p); }
 
     storage.inbox    = PATHData + "/inbox";
     storage.archive  = PATHData + "/archive";

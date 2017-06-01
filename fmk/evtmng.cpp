@@ -145,7 +145,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (iteration > 200) { transitTo(RUNNING); }
+    if (iteration > 400) { transitTo(RUNNING); }
 }
 
 //----------------------------------------------------------------------
