@@ -263,7 +263,8 @@ void Deployer::readConfiguration()
         TRC(kv.first << ": " << kv.second);
     }
     //cfg.dump();
-    TRC("Config::PATHBase: " << Config::PATHBase);
+    TRC("Config::PATHBase....: " << Config::PATHBase);
+    TRC("Config::PATHSession.: " << Config::PATHSession);
 
     // Ensure paths for the execution are available and readu
     assert(existsDir(Config::PATHBase));
@@ -276,6 +277,7 @@ void Deployer::readConfiguration()
             Config::PATHTsk,
             Config::PATHMsg };
     for (auto & p : runPaths) {
+        TRC(p);
         if (mkdir(p.c_str(), Config::PATHMode) != 0) {
             std::perror(("mkdir " + p).c_str());
             exit(EXIT_FAILURE);

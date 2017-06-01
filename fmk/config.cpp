@@ -101,6 +101,7 @@ void Config::setCurrentHostAddress(std::string & addr)
 void Config::init(std::string fName)
 {
     isLive = false;
+    sessionId = timeTag();
     DBG("Provided fName='" << fName << "'");
     if (fName.compare(0,5,"db://") == 0) {
         DBG("A database URL!");
@@ -265,7 +266,7 @@ void Config::readConfigFromDB()
     }
 
     // Get session id
-    if (cfg.sessionId.empty()) {
+    if (sessionId.empty()) {
         try {
             std::pair<std::string, std::string> sessionAndState;
             sessionAndState = dbHdl->getLatestState();
@@ -279,9 +280,8 @@ void Config::readConfigFromDB()
                               "database for retrieval of session name");
             return;
         }
-    } else {
-        sessionId = cfg.sessionId;
     }
+    TRC("SessionId: " << sessionId);
 
     // Close connection
     dbHdl->closeConnection();
@@ -379,6 +379,7 @@ std::string Config::getRegExFromCfg(std::string & regexStr)
 //----------------------------------------------------------------------
 void Config::processConfig()
 {
+    TRC("BEGIN processConfig()");
     PATHBase         = general.workArea();
 
     PATHData         = PATHBase + "/data";
@@ -394,10 +395,21 @@ void Config::processConfig()
     PATHTsk          = PATHSession + "/tsk";
     PATHMsg          = PATHSession + "/msg";
 
+    std::vector<std::string> runPaths {
+        Config::PATHSession,
+            Config::PATHLog,
+            Config::PATHRlog,
+            Config::PATHTmp,
+            Config::PATHTsk,
+            Config::PATHMsg };
+    for (auto & p : runPaths) {
+        TRC(p);
+    }
     storage.inbox    = PATHData + "/inbox";
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
+    TRC("END processConfig()");
 }
 
 //----------------------------------------------------------------------
