@@ -274,19 +274,19 @@
             "LE1_VIS_Processing": {
                 "inputs": "SOC_VIS",
                 "outputs": "LE1_VIS,LE1_VIS_LOG",
-                "processing": "LE1_Processor",
+                "processing": "LE1_VIS_Processor",
                 "condition": "1"
             },
             "LE1_NIR_Processing": {
                 "inputs": "SOC_NIR",
                 "outputs": "LE1_NIR,LE1_NIR_LOG",
-                "processing": "LE1_Processor",
+                "processing": "LE1_NISP_Processor",
                 "condition": "1"
             },
             "LE1_SIR_Processing": {
                 "inputs": "SOC_SIR",
                 "outputs": "LE1_SIR,LE1_SIR_LOG",
-                "processing": "LE1_Processor",
+                "processing": "LE1_NISP_Processor",
                 "condition": "1"
             },
             "LE1_VIS_Ingestion": {
@@ -318,10 +318,17 @@
                 "output_path": "/opt/pe/output",
                 "version": "V1.1"
             },
-            "LE1_Processor": {
+             "LE1_VIS_Processor": {
                 "exe_path": "/opt/pe/bin",
                 "input_path": "/opt/pe/input",
-                "name": "LE1_Processor",
+                "name": "LE1_VIS_Processor",
+                "output_path": "/opt/pe/output",
+                "version": "V0.1"
+            },
+             "LE1_NISP_Processor": {
+                "exe_path": "/opt/pe/bin",
+                "input_path": "/opt/pe/input",
+                "name": "LE1_NISP_Processor",
                 "output_path": "/opt/pe/output",
                 "version": "V0.1"
             },

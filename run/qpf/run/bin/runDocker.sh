@@ -36,16 +36,25 @@ mkdir -p ${localPath}/out ${localPath}/log
 ln ${DOCKER_TOOLS_PATH}/${procElem} ${localPath}/
 
 prefix=${procElem%_*}
+binPath=/qlabin
 
 case ${procElem} in
     LE1_Processor|LE1_VIS_MetadataCollector|LE1_VIS_Ingestor)
-	procBinPath=${PROC_BIN_ROOT}/QPFTestProcessors
-	;;
+        procBinPath=${PROC_BIN_ROOT}/QPFTestProcessors
+        echo "${UID}" > ${localPath}/dummy.cfg
+        ;;
     QLA_Processor)
         procBinPath=${PROC_BIN_ROOT}/QDT
+        echo "${UID}" > ${localPath}/dummy.cfg
+        ;;
+    LE1_VIS_Processor|LE1_NISP_Processor)
+        procBinPath=${PROC_BIN_ROOT}/QDT
+        binPath=""
+        DOCKER_IMAGE="le1-sim-debian:a"
+        ls -1 ${localPath}/in/* | sed -e "s#${localPath}/##g" > ${localPath}/dummy.cfg
         ;;
     *)
-	procBinPath=${PROC_BIN_ROOT}/EuclidqlaDocker/euclidqla_dep
+        procBinPath=${PROC_BIN_ROOT}
 esac
 
 #OPTS="-i -t"
@@ -53,14 +62,12 @@ OPTS="-d -P"
 OPTS="$OPTS --privileged=true "
 
 declare -A map
-map[1]="${procBinPath}:/qlabin"
-map[2]="${localPath}:${imgPath}"
-map[3]="${localPath}/in:${imgPath}/in"
-map[4]="${localPath}/out:${imgPath}/out"
-map[5]="/media/jcgonzalez:/media/jcgonzalez"
-
-echo "${UID}" > ${localPath}/dummy.cfg
-
+map[1]="${localPath}:${imgPath}"
+map[2]="${localPath}/in:${imgPath}/in"
+map[3]="${localPath}/out:${imgPath}/out"
+if [ -n "${binPath}" ]; then
+    map[4]="${procBinPath}:${binPath}"
+fi
 MAPPED_DIRS=$(echo " ${map[@]}" |sed 's/ / -v /g')
 
 DOCKER_COMMAND="/bin/bash ${imgPath}/${procElem} ${imgPath}/dummy.cfg"

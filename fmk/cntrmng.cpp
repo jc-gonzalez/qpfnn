@@ -95,8 +95,7 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
     cnt.wait();
 
     std::ifstream dockerIdFile(tmpFileName);
-    std::string id;
-    std::getline(dockerIdFile, id);
+    std::getline(dockerIdFile, containerId);
 
     return (cnt.code() == 0);
 }

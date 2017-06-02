@@ -1,0 +1,41 @@
+#==============================================================================
+# VERSION:        1.2
+# DESCRIPTION:    Create bae image for the container with its dependencies
+#                 for the execution of the fake LE1 processor
+# AUTHOR:         J. C. Gonzalez <JCGonzalez@sciops.esa.int>
+# COMMENTS:
+#   This file describes how to build a container for the execution of the
+#   fake LE1 processor.  The processor is embeded in the container.
+# USAGE:
+#   # Build LE1 fake base image 
+#   docker build -t le1-sim-debian:base -f Dockerfile-base .
+#==============================================================================
+
+# Base Docker image
+FROM debian
+MAINTAINER J C Gonzalez <JCGonzalez@sciops.esa.int>
+
+LABEL esa.euclid.soc.qla.content="LE1 fake processor - Base image" \
+      esa.euclid.soc.qla.version="1.2-RC2" \
+      esa.euclid.soc.qla.release-date="2017-05-18"
+      
+# see update.sh for why all "apt-get install"s have to stay as one long line
+RUN apt-get update && \
+    apt-get install -y apt-utils curl && \
+    apt-get install -y --no-install-recommends \
+        python2.7 \
+        python-dev \
+        python-tk \
+        libhdf5-dev \
+        saods9 \
+        build-essential && \
+    curl https://bootstrap.pypa.io/get-pip.py | python && \
+    pip install cython && \
+    pip install scipy && \
+    pip install astropy && \
+    pip install zmq && \
+    pip install h5py && \
+    pip install matplotlib && \
+    pip install pyds9 && \
+    rm -rf /var/lib/apt/lists/*
+

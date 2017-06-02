@@ -228,6 +228,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         numTask++;
 
+        //............................................................
         // Define processing environment
 
         // Prepare folders:
@@ -252,6 +253,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         std::string taskDriver = sysDir + "/bin/runTask.sh";
         std::string cfgFile    = exchangeDir + "/dummy.cfg";
 
+        //............................................................
         // Retrieve the input products
         URLHandler urlh;
         urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
@@ -269,8 +271,37 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
             ++i;
         }
 
+        //............................................................
         // * * * LAUNCH TASK * * *
-        // TODO
+
+        static const std:string QPFImgRun("/qpf/run");
+
+        std::string containerId;
+
+        std::string taskDir = QpfImgRun + "/" + internalTaskNameIdx;
+        std::map<std::string, std::string> dirMaps;
+        dirMaps[exchangeDir] = taskDir;
+        //dirMaps[exchgIn]     = taskDir + "/in";
+        //dirMaps[exchgOut]    = taskDir + "/out";
+
+        link("/home/eucops/qpf/run/bin/DummyProc", (taskDir + "/DummyProc").c_str())
+        bool dckExec = dckMng->createContainer("qla-debian:a",
+                                               {"-d", "-P", "--privileged=true", "-w=" + taskDir},
+                                               dirMapsm,
+                                               "/bin/bash",
+                                               {"DummyProc"},
+                                               containerId);
+
+        std::stringstream info;
+
+        if (dckExec) {
+            sleep(1);
+            if (dckMng->getInfo(containerId, info)) {
+                InfoMsg(info.str());
+            }
+        } else {
+            WarnMsg("Couldn't execute docker container");
+        }
 
         // Set processing status
         pStatus = PROCESSING;
