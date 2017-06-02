@@ -274,20 +274,21 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         //............................................................
         // * * * LAUNCH TASK * * *
 
-        static const std:string QPFImgRun("/qpf/run");
+        static const std::string QPFImgRun("/qpf/run");
 
         std::string containerId;
 
-        std::string taskDir = QpfImgRun + "/" + internalTaskNameIdx;
+        std::string taskDir = QPFImgRun + "/" + internalTaskNameIdx;
         std::map<std::string, std::string> dirMaps;
         dirMaps[exchangeDir] = taskDir;
         //dirMaps[exchgIn]     = taskDir + "/in";
         //dirMaps[exchgOut]    = taskDir + "/out";
 
-        link("/home/eucops/qpf/run/bin/DummyProc", (taskDir + "/DummyProc").c_str())
+        link("/home/eucops/qpf/run/bin/DummyProc",
+             (taskDir + "/DummyProc").c_str());
         bool dckExec = dckMng->createContainer("qla-debian:a",
                                                {"-d", "-P", "--privileged=true", "-w=" + taskDir},
-                                               dirMapsm,
+                                               dirMaps,
                                                "/bin/bash",
                                                {"DummyProc"},
                                                containerId);
