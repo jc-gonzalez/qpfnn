@@ -143,7 +143,7 @@ void TskAge::runEachIterationForContainers()
         // Create message and send
         Message<MsgBodyTSK> msg;
         msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
-                     compName, "*",
+                     compName, "TskMng",
                      "", "", "");
 
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
