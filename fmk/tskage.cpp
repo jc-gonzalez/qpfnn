@@ -182,7 +182,9 @@ void TskAge::runEachIterationForServices()
 void TskAge::processIncommingMessages()
 {
     MessageString m;
-    TRC("TskAge::processIncommingmessages()");
+    TRC("TskAge::processIncommingmessages() while status is " +
+        ProcStatusName[pStatus] +
+        " at iteration " + std::to_string(iteration));
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;

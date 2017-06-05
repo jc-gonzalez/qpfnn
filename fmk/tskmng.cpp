@@ -125,7 +125,7 @@ void TskMng::fromRunningToOperational()
 void TskMng::processIncommingMessages()
 {
     MessageString m;
-    TRC("TskMng::processIncommingmessages()");
+    //TRC("TskMng::processIncommingmessages()");
     for (auto & kv: connections) {
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
