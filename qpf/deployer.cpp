@@ -504,6 +504,7 @@ void Deployer::createElementsNetwork()
         h = 0;
         for (auto & a : ag) {
             chnl = ChnlTskProc + "_" + agName.at(h);
+            TRC("### Connections for channel " << chnl);
             connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(h));
             ReqRep * r = new ReqRep(NN_REQ, connAddr);
             a->addConnection(chnl, r);
@@ -545,6 +546,7 @@ void Deployer::createElementsNetwork()
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
     chnl     = ChnlCmd;
+    TRC("### Connections for channel " << chnl);
     bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     Survey * surveyor = new Survey(NN_SURVEYOR, bindAddr);
@@ -557,6 +559,7 @@ void Deployer::createElementsNetwork()
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     chnl     = ChnlHMICmd;
+    TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
 
@@ -564,6 +567,7 @@ void Deployer::createElementsNetwork()
     // - Publisher: EvtMng
     // - Subscriber: DataMng TskOrc
     chnl     = ChnlInData;
+    TRC("### Connections for channel " << chnl);
     bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
@@ -575,6 +579,7 @@ void Deployer::createElementsNetwork()
     // - Publisher: TskOrc
     // - Subscriber: DataMng TskMng
     chnl     = ChnlTskSched;
+    TRC("### Connections for channel " << chnl);
     bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskOrc->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
@@ -587,6 +592,7 @@ void Deployer::createElementsNetwork()
     h = 0;
     for (auto & p : agPortTsk) {
         chnl = ChnlTskProc + "_" + agName.at(h);
+        TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
         m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
         ++h;
@@ -596,6 +602,7 @@ void Deployer::createElementsNetwork()
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
+    TRC("### Connections for channel " << chnl);
     bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
