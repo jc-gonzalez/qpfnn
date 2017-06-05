@@ -23,6 +23,7 @@ void Bus::init(int elemCls, const char * addr) {
     elemClass = elemCls;
     createSocket(elemClass);
     endPoint = sck->bind(addr);
+    TRC("BIND+CONNECT >> " << addr);
     int to = 100;
     sck->setsockopt(NN_SOL_SOCKET, NN_RCVTIMEO, &to, sizeof(to));
     address = std::string(addr);

@@ -19,8 +19,10 @@ void ReqRep::init(int elemCls, const char * addr)
     createSocket(elemClass);
     if (elemClass == NN_REP) {
         endPoint = sck->bind(addr);
+        TRC("BIND >> " << addr);
     } else {
         endPoint = sck->connect(addr);
+        TRC("CONNECT >> " << addr);
     }
     address = std::string(addr);
     (void)usleep(WAIT_BINDING);

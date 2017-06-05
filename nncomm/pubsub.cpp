@@ -26,9 +26,11 @@ void PubSub::init(int elemCls, const char * addr)
     createSocket(elemClass);
     if (elemClass == NN_PUB) {
         endPoint = sck->bind(addr);
+        TRC("BIND >> " << addr);
     } else {
         sck->setsockopt(NN_SUB, NN_SUB_SUBSCRIBE, "", 0);
         endPoint = sck->connect(addr);
+        TRC("CONNECT >> " << addr);
     }
     address = std::string(addr);
     (void)usleep(WAIT_BINDING);

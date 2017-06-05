@@ -38,17 +38,19 @@
 */
 
 #define TRC(x)  \
-    do { if (Dbg::verbosityLevel >= Dbg::TRACE_LEVEL) {			\
-	    std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
-	} } while (0)
-#define DBG(x)  \
-    do { if (Dbg::verbosityLevel >= Dbg::DEBUG_LEVEL) {			\
-	    std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
-	} } while (0)
-#define INFO(x)  \
-    do { if (Dbg::verbosityLevel >= Dbg::INFO_LEVEL) {			\
-	    std::cerr << x << "\n"; \
-	} } while (0)
+    do { if (Dbg::verbosityLevel >= Dbg::TRACE_LEVEL) {                 \
+            std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
+        } } while (0)
+
+#define DBG(x)                                                          \
+    do { if (Dbg::verbosityLevel >= Dbg::DEBUG_LEVEL) {                 \
+            std::cerr << __FUNCTION__ << ":" << __LINE__ << " " << x << "\n"; \
+        } } while (0)
+
+#define INFO(x)                                                         \
+    do { if (Dbg::verbosityLevel >= Dbg::INFO_LEVEL) {                  \
+            std::cerr << x << "\n"; \
+        } } while (0)
 
 namespace Dbg {
 
@@ -57,7 +59,7 @@ namespace Dbg {
     const int DEBUG_LEVEL  = 2;
     const int TRACE_LEVEL  = 3;
 
-    extern int verbosityLevel;		 
+    extern int verbosityLevel;
 }
 
 #endif

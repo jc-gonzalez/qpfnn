@@ -17,10 +17,11 @@ void Survey::setMsgOut(MessageString m)
 {
     if (elemClass == NN_RESPONDENT) {
         ScalabilityProtocolRole::setMsgOut(m);
+        DBG("++ Sending answer >> " << m);
     } else {
         if (readyToGo) {
             sck->send((void*)(m.c_str()), m.size(), 0);
-            DBG("++ Sending msg. " << m);
+            DBG("++ Sending msg >> " << m);
             DBG("++ Waiting for answers . . . ");
             int numResp = 1;
             try {
@@ -50,8 +51,10 @@ void Survey::init(int elemCls, const char * addr)
         //int deadline = WAIT_BINDING;
         //sck->setsockopt(NN_SURVEYOR, NN_SURVEYOR_DEADLINE, &deadline, sizeof(int));
         endPoint = sck->bind(addr);
+        TRC("BIND >> " << addr);
     } else {
         endPoint = sck->connect(addr);
+        TRC("CONNECT >> " << addr);
     }
     address = std::string(addr);
     (void)usleep(WAIT_BINDING);
