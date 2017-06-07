@@ -96,6 +96,11 @@ void TskAge::fromRunningToOperational()
         // Create Container Manager
         dckMng = new ContainerMng;
 
+        // Set parameters for requesting tasks and waiting
+        idleCycles              = 0;
+        maxWaitingCycles        = 20;
+        idleCyclesBeforeRequest = 50;
+
     } else {
 
         // Create list of workers
@@ -138,36 +143,49 @@ void TskAge::runEachIterationForContainers()
     InfoMsg("Status is " + ProcStatusName[pStatus] +
             " at iteration " + str::toStr<int>(iteration));
 
-    // Request task for processing in case the agent is idle
-    if ((pStatus == IDLE) && (iteration == 100)) {
-        // Create message and send
-        Message<MsgBodyTSK> msg;
-        msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
-                     compName, "TskMng",
-                     "", "", "");
+    switch (pStatus) {
+    case IDLE:
+        ++idleCycles;
+        // Request task for processing in case the agent is idle
+        if (idleCycles > idleCyclesBeforeRequest) {
+            // Create message and send
+            Message<MsgBodyTSK> msg;
+            msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
+                         compName, "TskMng",
+                         "", "", "");
 
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        std::string chnl(ChnlTskProc + "_" + compName);
-        DBG("Looking for channel " << chnl);
-        it = connections.find(chnl);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-            DBG("Sending request via channel " + chnl);
-            InfoMsg("Sending request via channel " + chnl);
-            pStatus = WAITING;
+            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+            std::string chnl(ChnlTskProc + "_" + compName);
+            DBG("Looking for channel " << chnl);
+            it = connections.find(chnl);
+            if (it != connections.end()) {
+                ScalabilityProtocolRole * conn = it->second;
+                conn->setMsgOut(msg.str());
+                DBG("Sending request via channel " + chnl);
+                InfoMsg("Sending request via channel " + chnl);
+                pStatus = WAITING;
+                InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+                waitingCycles = 0;
+            }
+        }
+        break;
+    case WAITING:
+        ++waitingCycles;
+        break;
+    case PROCESSING:
+        ++workingDuring;
+        if (workingDuring > 20) {
+            pStatus = FINISHING;
             InfoMsg("Switching to status " + ProcStatusName[pStatus]);
         }
-    }
-
-    if (pStatus == FINISHING) {
+        break;
+    case FINISHING:
         pStatus = IDLE;
         InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
-    }
-
-    if ((pStatus == PROCESSING) && (iteration == 120)) {
-        pStatus = FINISHING;
-        InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+        idleCycles = 0;
+        break;
+    default:
+        break;
     }
 }
 
@@ -310,6 +328,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         // Set processing status
         pStatus = PROCESSING;
+        workingDuring = 0;
     }
 }
 

@@ -74,7 +74,7 @@ void EvtMng::fromRunningToOperational()
 {
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(Config::PATHBase + "/data/inbox");
-    InfoMsg("DirWatcher installed at " + Config::PATHBase + "/data/inbox");
+    InfoMsg("DirW2tcher installed at " + Config::PATHBase + "/data/inbox");
 
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));

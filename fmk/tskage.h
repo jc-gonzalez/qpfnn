@@ -163,6 +163,11 @@ private:
     std::string              exchgLog;
 
     int                      numTask;
+    int                      waitingCycles;
+    int                      maxWaitingCycles;
+    int                      idleCycles;
+    int                      idleCyclesBeforeRequest;
+    int                      workingDuring;
 };
 
 //}
