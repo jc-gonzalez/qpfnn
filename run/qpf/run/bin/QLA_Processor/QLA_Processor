@@ -1,0 +1,70 @@
+#!/bin/bash
+##############################################################################
+# QLA_Processor
+# Driver script for EUCLID QLA Processor (python)
+#-----------------------------------------------------------------------------
+# Usage:  QLA_Processor {cfgFile}
+##############################################################################
+
+VERSION=1.1
+
+# Set I/O directories and files
+baseScriptName=${BASH_SOURCE##*/}
+
+usage() {
+    echo "Usage: $baseScriptName {cfgFile}"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+cfgFile=$1
+workDir=$(dirname $cfgFile)
+
+cd ${workDir}
+[ -t 0 ] || exec 1>${bashScriptName}.log 2>&1
+
+binPath=/qlabin
+inPath=${workDir}/in
+logPath=${workDir}/log
+outPath=${workDir}/out
+
+in=$(find ${inPath} -name "*.fits" -print)
+id=$(basename $in .fits)
+
+idres=$(echo $id|sed -e 's#\(LE1\|SIM\)_\(VIS\|NIR\|SIR\)#QLA_\1-\2#g')
+idlog=$(echo $id|sed -e 's#\(LE1\|SIM\)_\(VIS\|NIR\|SIR\)#QLA_\1-\2#g')
+
+exe=driver.py
+results=${outPath}/${idres}.json
+log=${logPath}/${idlog}.log
+chk=${outPath}/${idlog}.chk
+
+bpm="${binPath}/config/bpm.fits"
+satmap="${binPath}/config/vis_sat_map.fits"
+
+opts=""
+opts="$opts -i ${inPath}"
+opts="$opts -r ${results}"
+#opts="$opts --vis_bpm ${bpm}"
+#opts="$opts --vis_sat_map_fits ${satmap}"
+#opts="$opts --checks_file ${chk}"
+#opts="$opts --intermediate_products"
+opts="$opts -v"
+
+# Run the processor
+
+cd ${workDir}
+
+python ${binPath}/${exe} ${opts} 1>${log} 2>&1
+
+# Compress results (can be large)
+#if [ -n "${results}" ]; then
+#    gzip ${results}
+#fi
+
+#mv ${logPath}/* $(outPath)/
+
+chown -hR --reference=${cfgFile} ${workDir}

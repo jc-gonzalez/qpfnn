@@ -172,6 +172,7 @@ void TskAge::runEachIterationForContainers()
     case WAITING:
         ++waitingCycles;
         if (waitingCycles > maxWaitingCycles) {
+            pStatus = IDLE;
             InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
             idleCycles = 0;
         }

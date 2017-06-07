@@ -106,6 +106,8 @@ void DirWatcher::watch(std::string pth)
 //----------------------------------------------------------------------
 void DirWatcher::start()
 {
+    static std::string lastTriggerEventFileName("");
+
     int poll_num;
     nfds_t nfds;
     struct pollfd fds[1];
@@ -158,9 +160,13 @@ void DirWatcher::start()
                     // Store event in queue
                     DirWatchEvent dwe;
                     dwe.name = std::string(event->name);
+                    if (dwe.name == lastTriggerEventFileName) { continue; }
+
                     dwe.path = watchedDirs[event->wd];
                     dwe.mask = event->mask;
                     dwe.isDir = (event->mask & IN_ISDIR);
+
+                    lastTriggerEventFileName = dwe.name;
 
                     // Check file size
                     if (!dwe.isDir) {

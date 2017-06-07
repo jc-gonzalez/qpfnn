@@ -1,0 +1,59 @@
+#!/bin/bash
+##############################################################################
+# LE1_NISP_Processor
+# Script for the Processing of EUCLID RAW Products, to generate LE1 Products,
+# for the NISP data
+#-----------------------------------------------------------------------------
+# Usage:  LE1_NISP_Processor {cfgFile}
+# It is expected that the full path+file name of the input file to be
+# processed is stored in the first line of the cfgFile.
+##############################################################################
+
+VERSION=1.2-fake
+
+# Set I/O directories and files
+baseScriptName=${BASH_SOURCE##*/}
+
+usage() {
+    echo "Usage: $baseScriptName {cfgFile}"
+}
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+cfgFile=$1
+workDir=$(dirname $cfgFile)
+
+cd ${workDir}
+[ -t 0 ] || exec 1>${bashScriptName}.log 2>&1
+
+binPath=/le1bin
+inPath=${workDir}/in
+outPath=${workDir}/out
+
+in=$(head -1 ${cfgFile})
+id=$(basename $in .h5)
+out=${outPath}/${id}.fits
+
+log=${outPath}/${id}.log
+
+le1nispProc=${binPath}/Lev_1/computeCdsSingle.py
+
+opts=""
+opts="$opts --inputFile ${in}"
+opts="$opts --outputFile ${out}"
+
+# Run the processor
+
+cd ${workDir}
+
+python ${le1nispProc} ${opts} 1>${log} 2>&1
+
+chown -hR --reference=${cfgFile} ${workDir}
+if [ -f ${out} ]; then
+    for i in ${outPath}/EUC_* ; do
+        mv $i $(echo $i | sed -e 's#SOC_NIR#LE1_NIR#g' -e 's#SOC_SIR#LE1_SIR#g')
+    done
+fi
