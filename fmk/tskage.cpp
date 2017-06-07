@@ -99,7 +99,7 @@ void TskAge::fromRunningToOperational()
         // Set parameters for requesting tasks and waiting
         idleCycles              = 0;
         maxWaitingCycles        = 20;
-        idleCyclesBeforeRequest = 50;
+        idleCyclesBeforeRequest = 30;
 
     } else {
 
@@ -171,6 +171,10 @@ void TskAge::runEachIterationForContainers()
         break;
     case WAITING:
         ++waitingCycles;
+        if (waitingCycles > maxWaitingCycles) {
+            InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
+            idleCycles = 0;
+        }
         break;
     case PROCESSING:
         ++workingDuring;
