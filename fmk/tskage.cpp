@@ -278,7 +278,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         // * exchangeDir         := workDir + / + TskAgent1-yyyymmddTHHMMSS-n
         internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
                                std::to_string(numTask));
-        /*
+
         exchangeDir = workDir + "/" + internalTaskNameIdx;
         exchgIn     = exchangeDir + "/in";
         exchgOut    = exchangeDir + "/out";
@@ -290,11 +290,13 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         mkdir(exchgOut.c_str(),    0755);
         mkdir(exchgLog.c_str(),    0755);
 
+        /*
         // Define task parameters
         std::string sysBinDir  = sysDir + "/bin";
         std::string taskDriver = sysDir + "/bin/runTask.sh";
         std::string cfgFile    = exchangeDir + "/dummy.cfg";
         */
+
         //............................................................
         // Retrieve the input products
         URLHandler urlh;
@@ -316,15 +318,13 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         // * * * LAUNCH TASK * * *
 
         std::string containerId;
-        std::string taskDir  = workDir + "/" + internalTaskNameIdx;
-        std::string procName = task["taskPath"].asString();
-
-        bool dckExec = dckMng->createContainer(procName, taskDir, containerId);
-
-        std::stringstream info;
+        bool dckExec = dckMng->createContainer(task.taskPath(), exchangeDir, containerId);
 
         if (dckExec) {
+            InfoMsg("Running task " + task.taskName() +
+                    " (" + task.taskPath() + ") within container " + containerId);
             sleep(1);
+            std::stringstream info;
             if (dckMng->getInfo(containerId, info)) {
                 InfoMsg(info.str());
             }
