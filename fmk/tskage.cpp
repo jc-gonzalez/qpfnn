@@ -311,7 +311,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         //dirMaps[exchgIn]     = taskDir + "/in";
         //dirMaps[exchgOut]    = taskDir + "/out";
 
-        link("/home/eucops/qpf/run/bin/DummyProc",
+        link(Config::PathBin + "/DummyProc",
              (taskDir + "/DummyProc").c_str());
         bool dckExec = dckMng->createContainer("qla-debian:a",
                                                {"-d", "-P", "--privileged=true", "-w=" + taskDir},

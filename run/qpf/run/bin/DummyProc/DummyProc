@@ -1,0 +1,59 @@
+#! /bin/bash -x
+
+#-- This script path and name ----------------------------------------
+SCRIPT_PATH="${BASH_SOURCE[0]}";
+SCRIPT_NAME=$(basename "${SCRIPT_PATH}")
+if [ -h "${SCRIPT_PATH}" ]; then
+    while [ -h "${SCRIPT_PATH}" ]; do
+        SCRIPT_PATH=$(readlink "${SCRIPT_PATH}")
+    done
+fi
+pushd . > /dev/null
+cd $(dirname ${SCRIPT_PATH}) > /dev/null
+SCRIPT_PATH=$(pwd)
+popd  > /dev/null
+
+cd ${SCRIPT_PATH}
+[ -t 0 ] || exec 1>${SCRIPT_NAME}.log 2>&1
+
+first=$(basename $1)
+
+theObsId=$(dd if=/dev/random bs=4 count=1 2>/dev/null|sum 2>&1|cut -d" " -f1)
+theDate=$(date +"%Y%m%dT%H%M%S")
+
+if [ "$first" == "dummy.cfg" ]; then
+    files=$(echo in/*)
+    if [ "$files" == 'in/*' ]; then
+        files="in/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.fits"
+        dd if=/dev/random of=$files count=4
+    fi
+    output=out/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.json
+else
+    files="$*"
+    output=/dev/stdout
+fi
+
+for i in $files ; do
+    stat $i >> $output
+done
+
+exit 0
+
+##----------------------------------------------------------------------------
+
+declare -a stt
+k=0
+for i in $files ; do
+    b=$(basename $i)
+    data="{\""$(stat -s $i |sed -e 's#st_##g' -e 's#=#":"#g' -e 's# #", "#g')"\"}"
+    stt[$k]="\"$b\": $data"
+    k=$((k + 1))
+done
+
+content=$(echo ${stt[@]} | sed -e 's#} "#}, "#g')
+
+echo "{$content}" > $output
+ls -l $output
+
+
+exit 0
