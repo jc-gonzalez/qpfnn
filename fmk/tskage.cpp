@@ -268,8 +268,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
         if (sessId != cfg.sessionId) {
             DBG(">> CHANGING SESSION ID");
-            cfg.synchronizeSessionId(sessId);
             str::replaceAll(workDir, cfg.sessionId, sessId);
+            cfg.synchronizeSessionId(sessId);
         }
 
         // Prepare folders:
