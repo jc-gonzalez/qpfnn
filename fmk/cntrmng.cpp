@@ -47,6 +47,10 @@
 #include <cassert>
 #include <fstream>
 
+#include "config.h"
+
+using Configuration::cfg;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -96,6 +100,28 @@ bool ContainerMng::createContainer(std::string img, std::vector<std::string> opt
 
     std::ifstream dockerIdFile(tmpFileName);
     std::getline(dockerIdFile, containerId);
+
+    return (cnt.code() == 0);
+}
+
+//----------------------------------------------------------------------
+// Method: createContainer
+// Creates a container that executes the requested application
+//----------------------------------------------------------------------
+bool ContainerMng::createContainer(std::string proc, std::string workDir,
+                                   std::string & containerId)
+{
+    std::string RunProcessorScript(Config::PATHBin + "/RunProcessor.sh");
+
+    std::string cfgFileArg(workDir + "/dummy.cfg");
+    std::string dockerIdFile(workDir + "/docker.id");
+
+    procxx::process cnt(RunProcessorScript, proc, cfgFileArg);
+    cnt.exec();
+    cnt.wait();
+
+    std::ifstream dockerIdStrm(dockerIdFile);
+    std::getline(dockerIdStrm, containerId);
 
     return (cnt.code() == 0);
 }

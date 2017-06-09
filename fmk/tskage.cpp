@@ -264,6 +264,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         // * exchangeDir         := workDir + / + TskAgent1-yyyymmddTHHMMSS-n
         internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
                                std::to_string(numTask));
+        /*
         exchangeDir = workDir + "/" + internalTaskNameIdx;
         exchgIn     = exchangeDir + "/in";
         exchgOut    = exchangeDir + "/out";
@@ -279,7 +280,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         std::string sysBinDir  = sysDir + "/bin";
         std::string taskDriver = sysDir + "/bin/runTask.sh";
         std::string cfgFile    = exchangeDir + "/dummy.cfg";
-
+        */
         //............................................................
         // Retrieve the input products
         URLHandler urlh;
@@ -292,7 +293,6 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         for (auto & m : task.inputs.products) {
             urlh.setProduct(m);
             ProductMetadata & mg = urlh.fromGateway2Processing();
-
             task.inputs.products.push_back(mg);
             task["inputs"][i] = mg.val();
             ++i;
@@ -301,24 +301,11 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         //............................................................
         // * * * LAUNCH TASK * * *
 
-        static const std::string QPFImgRun("/qpf/run");
-
         std::string containerId;
+        std::string taskDir  = workDir + "/" + internalTaskNameIdx;
+        std::string procName = task["taskPath"].asString();
 
-        std::string taskDir = QPFImgRun + "/" + internalTaskNameIdx;
-        std::map<std::string, std::string> dirMaps;
-        dirMaps[exchangeDir] = taskDir;
-        //dirMaps[exchgIn]     = taskDir + "/in";
-        //dirMaps[exchgOut]    = taskDir + "/out";
-
-        link(Config::PathBin + "/DummyProc",
-             (taskDir + "/DummyProc").c_str());
-        bool dckExec = dckMng->createContainer("qla-debian:a",
-                                               {"-d", "-P", "--privileged=true", "-w=" + taskDir},
-                                               dirMaps,
-                                               "/bin/bash",
-                                               {"DummyProc"},
-                                               containerId);
+        bool dckExec = dckMng->createContainer(procName, exchangeDir, containerId);
 
         std::stringstream info;
 

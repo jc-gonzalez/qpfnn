@@ -105,6 +105,13 @@ public:
                                  std::string & containerId) {}
 
     //----------------------------------------------------------------------
+    // Method: createContainer
+    // Creates a container that executes the requested application
+    //----------------------------------------------------------------------
+    virtual bool createContainer(std::string proc, std::string workDir,
+                                 std::string & containerId) {}
+
+    //----------------------------------------------------------------------
     // Method: reScaleService
     // Rescales a running service
     //----------------------------------------------------------------------
