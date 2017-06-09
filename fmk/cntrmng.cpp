@@ -116,6 +116,11 @@ bool ContainerMng::createContainer(std::string proc, std::string workDir,
     std::string cfgFileArg(workDir + "/dummy.cfg");
     std::string dockerIdFile(workDir + "/docker.id");
 
+    std::ofstream ofs;
+    ofs.open(cfgFileArg, std::ofstream::out);
+    ofs << getuid() << '\n';
+    ofs.close();
+
     procxx::process cnt(RunProcessorScript, proc, cfgFileArg);
     cnt.exec();
     cnt.wait();
