@@ -119,11 +119,6 @@ protected:
     virtual void processIncommingMessages();
 
     //----------------------------------------------------------------------
-    // Method: processCmdMsg
-    //----------------------------------------------------------------------
-    void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
     // Method: processTskSchedMsg
     //----------------------------------------------------------------------
     void processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m);

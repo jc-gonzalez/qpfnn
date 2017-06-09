@@ -99,11 +99,6 @@ public:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processCmdMsg
-    //----------------------------------------------------------------------
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
     // Method: processHMICmdMsg
     //----------------------------------------------------------------------
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
@@ -115,5 +110,7 @@ protected:
 
 private:
     DirWatcher * dw;
+
+    std::map<std::string, json> elements;
 };
 #endif

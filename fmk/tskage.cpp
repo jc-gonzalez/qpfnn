@@ -231,9 +231,16 @@ void TskAge::processIncommingMessages()
 //----------------------------------------------------------------------
 void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    json msg(m);
+    std::string sessId = msg["sessionId"].asString();
+    if (sessId != cfg.sessionId) {
+        cfg.synchronizeSessionId(sessId);
+    }
+
     MessageString ack = "ACK from " + compName;
     c->setMsgOut(ack);
 }
+
 
 //----------------------------------------------------------------------
 // Method: processTskProcMsg

@@ -137,6 +137,30 @@ void Config::init(std::string fName)
 }
 
 //----------------------------------------------------------------------
+// Method: synchronizeSessionId
+//----------------------------------------------------------------------
+void Config::synchronizeSessionId(std::string newId)
+{
+    std::string newPATHSession(PATHRun + "/" + newId);
+
+    if (rename(PATHSession.c_str(), newPATHSession.c_str()) != 0) {
+        TRC("Cannot rename PATHSession from " + PATHSession +
+            " to " + newPATHSession);
+        WarnMsg("Cannot rename PATHSession from " + PATHSession +
+                " to " + newPATHSession);
+        return;
+    }
+
+    PATHSession = newPATHSession;
+
+    PATHLog     = PATHSession + "/log";
+    PATHRlog    = PATHSession + "/rlog";
+    PATHTmp     = PATHSession + "/tmp";
+    PATHTsk     = PATHSession + "/tsk";
+    PATHMsg     = PATHSession + "/msg";
+}
+
+//----------------------------------------------------------------------
 // Method: fillData
 //----------------------------------------------------------------------
 void Config::fillData()

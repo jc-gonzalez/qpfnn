@@ -43,6 +43,10 @@
 #include "filenamespec.h"
 #include "message.h"
 
+#include "config.h"
+
+using Configuration::cfg;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -139,24 +143,26 @@ void EvtMng::runEachIteration()
         it = connections.find(ChnlCmd);
         if (it != connections.end()) {
             ScalabilityProtocolRole * conn = it->second;
+/*
             char msg[128];
             sprintf(msg, "Tell me your name for iter.# %d ...", iteration);
-            conn->setMsgOut(msg);
+*/
+            json jdata;
+            jdata["request"]   = "WhoAreYou?";
+            jdata["iteration"] = std::to_string(iteration);
+            jdata["sessionId"] = cfg.sessionId;
+            JValue msg(jdata);
+            conn->setMsgOut(msg.str());
         }
     }
 
-    if (iteration > 400) { transitTo(RUNNING); }
+    if (iteration > 1000) {
+        transitTo(RUNNING);
+    }
 }
 
 //----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void EvtMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-}
-
-//----------------------------------------------------------------------
-// Method: processCmdMsg
+// Method: processHMICmdMsg
 //----------------------------------------------------------------------
 void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {

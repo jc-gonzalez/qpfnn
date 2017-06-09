@@ -154,15 +154,6 @@ void TskMng::runEachIteration()
 }
 
 //----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void TskMng::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    MessageString ack = "ACK from " + compName;
-    c->setMsgOut(ack);
-}
-
-//----------------------------------------------------------------------
 // Method: processTskSchedMsg
 //----------------------------------------------------------------------
 void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
