@@ -349,6 +349,7 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     task["taskExitCode"] = 0;
     task["taskStatus"]   = TASK_SCHEDULED;
     task["taskSet"]      = "CONTAINER";
+    task["taskSession"]  = cfg.sessionId;
     task["params"]       = nullJson;
 
     URLHandler urlh;

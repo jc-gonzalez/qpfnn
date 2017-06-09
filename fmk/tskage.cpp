@@ -264,6 +264,10 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         //............................................................
         // Define processing environment
+        std::string sessId = task["taskSession"].asString();
+        if (sessId != cfg.sessionId) {
+            cfg.synchronizeSessionId(sessId);
+        }
 
         // Prepare folders:
         // * workDir             := <DIR>/qpf/run/yymmddTHHMMSS/tsk

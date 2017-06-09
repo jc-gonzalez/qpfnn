@@ -388,6 +388,7 @@ struct TaskInfo : public JRecord {
         DUMPJSTRSTRMAP(params);
         DUMPJSTR(taskData);
         DUMPJSTR(taskSet);
+        DUMPJSTR(taskSession);
     }
     JSTR(taskName);
     JSTR(taskPath);
@@ -400,6 +401,7 @@ struct TaskInfo : public JRecord {
     JSTRSTRMAP(params);
     JSTR(taskData);
     JSTR(taskSet);
+    JSTR(taskSession);
 };
 
 struct TaskAgentInfo : public JRecord {

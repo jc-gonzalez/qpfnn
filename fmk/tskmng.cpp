@@ -178,14 +178,14 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    static bool first = true;
-    if (first) {
-        json taskInfoData;
-        taskInfoData["taskName"] = std::string("task_name");
-        taskInfoData["taskStatus"] = 42;
-        containerTasks.push_back(taskInfoData);
-        first = false;
-    }
+    // static bool first = true;
+    // if (first) {
+    //     json taskInfoData;
+    //     taskInfoData["taskName"] = std::string("task_name");
+    //     taskInfoData["taskStatus"] = 42;
+    //     containerTasks.push_back(taskInfoData);
+    //     first = false;
+    // }
 
     // Define and set task object
     Message<MsgBodyTSK> msg(m);
