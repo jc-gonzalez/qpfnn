@@ -269,6 +269,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         if (sessId != cfg.sessionId) {
             DBG(">> CHANGING SESSION ID");
             cfg.synchronizeSessionId(sessId);
+            str::replaceAll(workDir, cfg.sessionId, sessId);
         }
 
         // Prepare folders:
@@ -318,7 +319,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         std::string taskDir  = workDir + "/" + internalTaskNameIdx;
         std::string procName = task["taskPath"].asString();
 
-        bool dckExec = dckMng->createContainer(procName, exchangeDir, containerId);
+        bool dckExec = dckMng->createContainer(procName, taskDir, containerId);
 
         std::stringstream info;
 
