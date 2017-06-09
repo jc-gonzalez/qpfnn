@@ -264,8 +264,10 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 
         //............................................................
         // Define processing environment
-        std::string sessId = task["taskSession"].asString();
+        std::string sessId = task.taskSession();
+        DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
         if (sessId != cfg.sessionId) {
+            DBG(">> CHANGING SESSION ID");
             cfg.synchronizeSessionId(sessId);
         }
 
