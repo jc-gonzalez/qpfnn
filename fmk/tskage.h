@@ -143,6 +143,11 @@ private:
     //----------------------------------------------------------------------
     void runEachIterationForServices();
 
+    //----------------------------------------------------------------------
+    // Method: sendTaskReport
+    //----------------------------------------------------------------------
+    void sendTaskReport();
+
     Property(TskAge, std::string, workDir, WorkDir);
     Property(TskAge, std::string, sysDir,  SysDir);
     Property(TskAge, bool,        remote,  Remote);
@@ -156,11 +161,18 @@ private:
     std::string              srvManager;
     std::vector<std::string> srvWorkers;
 
+    std::string              containerId;
+
+    TaskInfo *               runningTask;
+    TaskStatus               taskStatus;
+
     std::string              internalTaskNameIdx;
     std::string              exchangeDir;
     std::string              exchgIn;
     std::string              exchgOut;
     std::string              exchgLog;
+
+    MessageString            origMsgString;
 
     int                      numTask;
     int                      waitingCycles;

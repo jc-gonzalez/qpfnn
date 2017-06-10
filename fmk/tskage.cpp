@@ -178,11 +178,7 @@ void TskAge::runEachIterationForContainers()
         }
         break;
     case PROCESSING:
-        ++workingDuring;
-        if (workingDuring > 20) {
-            pStatus = FINISHING;
-            InfoMsg("Switching to status " + ProcStatusName[pStatus]);
-        }
+        sendTaskReport();
         break;
     case FINISHING:
         pStatus = IDLE;
@@ -241,7 +237,6 @@ void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     c->setMsgOut(ack);
 }
 
-
 //----------------------------------------------------------------------
 // Method: processTskProcMsg
 //----------------------------------------------------------------------
@@ -249,21 +244,20 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     if (pStatus == WAITING) {
 
-        // Define ans set task object
+        // Define and set task object
         Message<MsgBodyTSK> msg(m);
         MsgBodyTSK & body = msg.body;
-        TaskInfo task(body["info"]);
+        runningTask = new TaskInfo(body["info"]);
+        TaskInfo & task = (*runningTask);
 
         assert(compName == msg.header.target());
-
         DBG(">>>>>>>>>> " << compName
             << " RECEIVED TASK INFO FOR PROCESSING\n"
             ">>>>>>>>>> Task name:" << msg.body("info")["name"].asString());
 
         numTask++;
 
-        //............................................................
-        // Define processing environment
+        //---- Define processing environment
         std::string sessId = task.taskSession();
         DBG(">> [" << sessId << "] vs. [" << cfg.sessionId << "]");
         if (sessId != cfg.sessionId) {
@@ -272,10 +266,7 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
             cfg.synchronizeSessionId(sessId);
         }
 
-        // Prepare folders:
-        // * workDir             := <DIR>/qpf/run/yymmddTHHMMSS/tsk
-        // * internalTaskNameIdx := TskAgentName-yyyymmddTHHMMSS-n
-        // * exchangeDir         := workDir + / + TskAgent1-yyyymmddTHHMMSS-n
+        //---- Create exchange area
         internalTaskNameIdx = (compName + "-" + timeTag() + "-" +
                                std::to_string(numTask));
 
@@ -284,21 +275,12 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         exchgOut    = exchangeDir + "/out";
         exchgLog    = exchangeDir + "/log";
 
-        // Create exchange area
         mkdir(exchangeDir.c_str(), 0755);
         mkdir(exchgIn.c_str(),     0755);
         mkdir(exchgOut.c_str(),    0755);
         mkdir(exchgLog.c_str(),    0755);
 
-        /*
-        // Define task parameters
-        std::string sysBinDir  = sysDir + "/bin";
-        std::string taskDriver = sysDir + "/bin/runTask.sh";
-        std::string cfgFile    = exchangeDir + "/dummy.cfg";
-        */
-
-        //............................................................
-        // Retrieve the input products
+        //---- Retrieve the input products
         URLHandler urlh;
         urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
         if (remote) {
@@ -314,28 +296,95 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
             ++i;
         }
 
-        //............................................................
-        // * * * LAUNCH TASK * * *
+        //----  * * * LAUNCH TASK * * *
+        if (dckMng->createContainer(task.taskPath(), exchangeDir, containerId)) {
 
-        std::string containerId;
-        bool dckExec = dckMng->createContainer(task.taskPath(), exchangeDir, containerId);
-
-        if (dckExec) {
             InfoMsg("Running task " + task.taskName() +
                     " (" + task.taskPath() + ") within container " + containerId);
+            origMsgString = m;
             sleep(1);
-            std::stringstream info;
-            if (dckMng->getInfo(containerId, info)) {
-                InfoMsg(info.str());
-            }
+
+            // Set processing status
+            pStatus = PROCESSING;
+            workingDuring = 0;
+
+            // Send back information to Task Manager
+            sendTaskReport();
+
         } else {
             WarnMsg("Couldn't execute docker container");
         }
 
-        // Set processing status
-        pStatus = PROCESSING;
-        workingDuring = 0;
     }
 }
+
+//----------------------------------------------------------------------
+// Method: sendTaskReport
+//----------------------------------------------------------------------
+void TskAge::sendTaskReport()
+{
+    // Define and set task object
+    TaskInfo & task = (*runningTask);
+
+    std::stringstream info;
+    if (dckMng->getInfo(containerId, info)) {
+
+        JValue jinfo(info.str());
+        json taskData = jinfo.val()[0];
+        task["taskData"] = taskData;
+
+        json jstate = taskData["State"];
+        std::string inspStatus = jstate["Status"].asString();
+        int         inspCode   = jstate["ExitCode"].asInt();
+
+        if      (inspStatus == "running") {
+            taskStatus = TASK_RUNNING;
+        } else if (inspStatus == "paused") {
+            taskStatus = TASK_PAUSED;
+        } else if (inspStatus == "created") {
+            taskStatus = TASK_STOPPED;
+        } else if (inspStatus == "dead") {
+            taskStatus = TASK_STOPPED;
+        } else if (inspStatus == "exited") {
+            taskStatus = (inspCode == 0) ? TASK_FINISHED : TASK_FAILED;
+        } else {
+            taskStatus = TASK_UNKNOWN_STATE;
+        }
+
+    } else {
+        taskStatus = TASK_FAILED;
+    }
+
+    if ((taskStatus == TASK_STOPPED) ||
+        (taskStatus == TASK_FAILED) ||
+        (taskStatus == TASK_FINISHED) ||
+        (taskStatus == TASK_UNKNOWN_STATE)) {
+        InfoMsg("Task container monitoring finished");
+        pStatus = FINISHING;
+        InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+    } else {
+        workingDuring++;
+    }
+
+    task["taskStatus"] = taskStatus;
+
+    // Define and set task object
+    Message<MsgBodyTSK> msg(origMsgString);
+    MsgBodyTSK & body = msg.body;
+    body["info"] = task.val();
+
+    msg.buildBody(body);
+
+    // Send msg
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    ChannelDescriptor chnl(ChnlTskRepDist);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
+    }
+
+}
+
 
 //}

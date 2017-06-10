@@ -178,15 +178,6 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // static bool first = true;
-    // if (first) {
-    //     json taskInfoData;
-    //     taskInfoData["taskName"] = std::string("task_name");
-    //     taskInfoData["taskStatus"] = 42;
-    //     containerTasks.push_back(taskInfoData);
-    //     first = false;
-    // }
-
     // Define and set task object
     Message<MsgBodyTSK> msg(m);
     std::string agName(msg.header.source());
@@ -201,20 +192,6 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     // Select task to send
     bool isSrvRqst = (agName == "TskAgentSwarm");
     std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
-
-    /*
-    // Put input products in the appropriate place
-    URLHandler urlh;
-    int i = 0;
-    for (auto & m : task.inputs.products) {
-        urlh.setProduct(m);
-        ProductMetadata & mg = urlh.fromGateway2Processing();
-
-        task.inputs.products.push_back(mg);
-        task["inputs"][i] = mg.val();
-        ++i;
-    }
-    */
 
     bool isTaskSent = false;
     std::string taskName;
@@ -283,6 +260,10 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
             containerTaskStatusPerAgent[oldPair]--;
             containerTaskStatusPerAgent[tskPair]++;
         }
+    }
+
+    if (taskStatus == TASK_FINISHED) {
+        InfoMsg("Finished task " + taskName);
     }
 }
 
