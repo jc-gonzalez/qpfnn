@@ -373,6 +373,9 @@ void TskAge::sendTaskReport()
     MsgBodyTSK & body = msg.body;
     body["info"] = task.val();
 
+    msg.buildHdr(ChnlTskRepDist, ChnlTskRepDist, "1.0",
+                 compName, "TskMng",
+                 "", "", "");
     msg.buildBody(body);
 
     // Send msg
