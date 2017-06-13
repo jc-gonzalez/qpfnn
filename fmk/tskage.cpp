@@ -373,14 +373,14 @@ void TskAge::sendTaskReport()
     MsgBodyTSK & body = msg.body;
     body["info"] = task.val();
 
-    msg.buildHdr(ChnlTskRepDist, ChnlTskRepDist, "1.0",
+    msg.buildHdr(ChnlTskRep, ChnlTskRep, "1.0",
                  compName, "TskMng",
                  "", "", "");
     msg.buildBody(body);
 
     // Send msg
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    ChannelDescriptor chnl(ChnlTskRepDist);
+    ChannelDescriptor chnl(ChnlTskRep);
     it = connections.find(chnl);
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
