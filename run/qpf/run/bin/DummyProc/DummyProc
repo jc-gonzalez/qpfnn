@@ -42,9 +42,19 @@ else
     output=/dev/stdout
 fi
 
+date > $output
+
 for i in $files ; do
-    stat $i >> $output
-done
+    echo ""
+    ls -lisan $i
+    stat $i
+done >> $output
+
+echo "" >> $output
+
+sleep 10
+
+date >> $output
 
 exit 0
 
@@ -61,7 +71,6 @@ done
 
 content=$(echo ${stt[@]} | sed -e 's#} "#}, "#g')
 
-ls -lisan > $output
 echo "{$content}" >> $output
 
 ls -l $output
