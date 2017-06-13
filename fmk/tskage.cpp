@@ -384,6 +384,7 @@ void TskAge::sendTaskReport()
     it = connections.find(chnl);
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
+        TRC("Sending report <<" + msg.str() + ">>");
         conn->setMsgOut(msg.str());
     }
 
