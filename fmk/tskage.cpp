@@ -380,7 +380,7 @@ void TskAge::sendTaskReport()
 
     // Send msg
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    ChannelDescriptor chnl(ChnlTskProc + "_" + compName);
+    std::string chnl(ChnlTskProc + "_" + compName);
     it = connections.find(chnl);
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;

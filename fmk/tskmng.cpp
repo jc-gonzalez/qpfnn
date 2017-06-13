@@ -197,6 +197,8 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     std::string taskName;
     TaskStatus  taskStatus;
 
+    TRC("Pool of tasks has size of " << listOfTasks->size());
+
     if (listOfTasks->size() > 0) {
         json taskInfoData = listOfTasks->front().val();
         taskName = taskInfoData["taskName"].asString();
@@ -215,6 +217,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
             conn->setMsgOut(msg.str());
             isTaskSent = true;
         }
+        TRC("Task sent to " << agName);
     }
 
     // Task info is sent, register the task and status
@@ -241,10 +244,14 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     TaskInfo task(body["info"]);
 
     std::string taskName = task.taskName();
-    TaskStatus  taskStatus = TaskStatus(task.taskStatus());
+
+    TaskStatus taskStatus = TaskStatus(task.taskStatus());
+    TaskStatus oldStatus  = taskRegistry[taskName];
+
+    TRC("Processing TaskReport: status: " << TaskStatusName[oldStatus] <<
+        " ==> " << TaskStatusName[taskStatus]);
 
     // Update registry and status maps if needed
-    TaskStatus oldStatus = taskRegistry[taskName];
     if (oldStatus != taskStatus) {
         taskRegistry[taskName] = taskStatus;
         if (task.taskSet() == "SERVICE") {
