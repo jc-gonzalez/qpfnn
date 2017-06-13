@@ -1,4 +1,13 @@
 #! /bin/bash -x
+##############################################################################
+# DummyProc
+# Simple dummy processor, just takes some info fmor the file and save it to
+# the output file
+#-----------------------------------------------------------------------------
+# Usage:  DummyProc {cfgFile} | {files}
+# It is expected that the full path+file name of the input file to be
+# processed is stored in the first line of the cfgFile.
+##############################################################################
 
 #-- This script path and name ----------------------------------------
 SCRIPT_PATH="${BASH_SOURCE[0]}";
@@ -52,8 +61,11 @@ done
 
 content=$(echo ${stt[@]} | sed -e 's#} "#}, "#g')
 
-echo "{$content}" > $output
+ls -lisan > $output
+echo "{$content}" >> $output
+
 ls -l $output
 
+sleep 2
 
 exit 0
