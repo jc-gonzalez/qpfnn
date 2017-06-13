@@ -66,6 +66,6 @@ echo "{$content}" >> $output
 
 ls -l $output
 
-sleep 2
+sleep 10
 
 exit 0
