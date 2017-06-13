@@ -137,7 +137,7 @@ void TskMng::processIncommingMessages()
             if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
             else if (type == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
-            else if (type == ChnlTskProc)  { processTskRepMsg(conn, m); }
+            else if (type == ChnlTskRep)   { processTskRepMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
