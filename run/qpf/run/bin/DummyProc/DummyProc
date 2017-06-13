@@ -52,7 +52,7 @@ done >> $output
 
 echo "" >> $output
 
-sleep 10
+sleep 4
 
 date >> $output
 
