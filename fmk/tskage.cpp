@@ -45,10 +45,13 @@
 #include "channels.h"
 #include "message.h"
 #include "str.h"
-#include "urlhdl.h"
+
+#include <dirent.h>
 
 #include "cntrmng.h"
 #include "srvmng.h"
+
+#include "filenamespec.h"
 
 #include "config.h"
 
@@ -281,7 +284,6 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         mkdir(exchgLog.c_str(),    0755);
 
         //---- Retrieve the input products
-        URLHandler urlh;
         urlh.setProcElemRunDir(workDir, internalTaskNameIdx);
         if (remote) {
             urlh.setRemoteCopyParams(cfg.network.masterNode(), compAddress);
@@ -366,6 +368,10 @@ void TskAge::sendTaskReport()
         workingDuring++;
     }
 
+    if (taskStatus == TASK_FINISHED) {
+        retrieveOutputProducts();
+    }
+
     task["taskStatus"] = taskStatus;
 
     // Define and set task object
@@ -390,5 +396,56 @@ void TskAge::sendTaskReport()
 
 }
 
+//----------------------------------------------------------------------
+// Method: retrieveOutputProducts
+//----------------------------------------------------------------------
+void TskAge::retrieveOutputProducts()
+{
+    // Define and set task object
+    TaskInfo & task = (*runningTask);
+
+    DBG("Retrieving output products for task: " << task.taskName());
+
+    //-------------------------------------------------------------------
+    // Get output data
+    //-------------------------------------------------------------------
+    std::vector<std::string> outFiles;
+    DIR * dp = NULL;
+    struct dirent * dirp;
+    for (auto & vd : {exchgOut, exchgLog}) {
+        if ((dp = opendir(vd.c_str())) == NULL) {
+            WarnMsg("Cannot open output directory " + vd);
+            TRC("Cannot open output directory " + vd);
+        } else {
+            while ((dirp = readdir(dp)) != NULL) {
+                if (dirp->d_name[0] != '.') {
+                    std::string dname(dirp->d_name);
+                    //if (dname.substr(0, 3) != "EUC") { continue; }
+                    std::string outputFile = vd + "/" + dname;
+                    TRC("Saving outfile " + outputFile);
+                    outFiles.push_back(outputFile);
+                }
+            }
+            closedir(dp);
+        }
+    }
+
+    TRC("outFiles has " << outFiles.size() << " elements");
+    task.outputs.products.clear();
+
+    FileNameSpec fs;
+    for (unsigned int i = 0; i < outFiles.size(); ++i) {
+        ProductMetadata m;
+        if (fs.parseFileName(outFiles.at(i), m, ProcessingSpace, task.taskPath())) {
+            // Place output product at external (output) shared area
+            urlh.setProduct(m);
+            m = urlh.fromProcessing2Gateway();
+        } else {
+            continue;
+        }
+        task.outputs.products.push_back(m);
+        task["outputs"][i] = m.val();
+    }
+}
 
 //}

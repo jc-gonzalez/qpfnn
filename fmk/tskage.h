@@ -64,6 +64,7 @@
 //------------------------------------------------------------
 #include "component.h"
 #include "dckmng.h"
+#include "urlhdl.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -148,6 +149,11 @@ private:
     //----------------------------------------------------------------------
     void sendTaskReport();
 
+    //----------------------------------------------------------------------
+    // Method: retrieveOutputProducts
+    //----------------------------------------------------------------------
+    void retrieveOutputProducts();
+
     Property(TskAge, std::string, workDir, WorkDir);
     Property(TskAge, std::string, sysDir,  SysDir);
     Property(TskAge, bool,        remote,  Remote);
@@ -180,6 +186,9 @@ private:
     int                      idleCycles;
     int                      idleCyclesBeforeRequest;
     int                      workingDuring;
+
+    URLHandler               urlh;
+
 };
 
 //}

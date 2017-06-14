@@ -342,7 +342,7 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     TaskInfo task;
 
     DateTime epoch = timeTag();
-    task["taskName"]     = "task-" + rule->name + "_" + epoch;
+    task["taskName"]     = rule->name + "_" + epoch;
     task["taskPath"]     = rule->processingElement;
     task["taskStart"]    = epoch;
     task["taskEnd"]      = "";

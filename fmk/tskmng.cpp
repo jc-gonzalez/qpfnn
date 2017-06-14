@@ -132,8 +132,8 @@ void TskMng::processIncommingMessages()
         while (conn->next(m)) {
             Message<MsgBodyTSK> msg(m);
             std::string type(msg.header.type());
-            DBG(compName << " received the message [" << m
-                << "] through the channel " + chnl);
+            DBG(compName << " received the message of type " << type
+                << " through the channel " + chnl);
             if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
             else if (type == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
@@ -151,6 +151,22 @@ void TskMng::runEachIteration()
     // Each iteration the Task Manager, apart from processing incoming
     // messages, performs the following actions:
     // 1. Send Task Status Reports to
+
+    TRC("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
+        "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
+        "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
+        "P(" + std::to_string(serviceTaskStatus[TASK_PAUSED]) + ")" +
+        "S(" + std::to_string(serviceTaskStatus[TASK_STOPPED]) + ")" +
+        "E(" + std::to_string(serviceTaskStatus[TASK_FAILED]) + ")" +
+        "F(" + std::to_string(serviceTaskStatus[TASK_FINISHED]) + ")" +
+        "   CONT.: Q(" + std::to_string(containerTasks.size()) + ")" +
+        "R(" + std::to_string(containerTaskStatus[TASK_RUNNING]) + ")" +
+        "W(" + std::to_string(containerTaskStatus[TASK_SCHEDULED]) + ")" +
+        "P(" + std::to_string(containerTaskStatus[TASK_PAUSED]) + ")" +
+        "S(" + std::to_string(containerTaskStatus[TASK_STOPPED]) + ")" +
+        "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
+        "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
+        );
 }
 
 //----------------------------------------------------------------------
@@ -201,7 +217,9 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     if (listOfTasks->size() > 0) {
         json taskInfoData = listOfTasks->front().val();
-        taskName = taskInfoData["taskName"].asString();
+        taskName = ((isSrvRqst ? "Swarm" : agName) + "_" +
+                    taskInfoData["taskName"].asString());
+        taskInfoData["taskName"] = taskName;
         taskStatus = TaskStatus(taskInfoData["taskStatus"].asInt());
         body["info"] = taskInfoData;
         listOfTasks->pop_front();
@@ -217,7 +235,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
             conn->setMsgOut(msg.str());
             isTaskSent = true;
         }
-        TRC("Task sent to " << agName);
+        TRC("Task " + taskName + "sent to " << agName);
     }
 
     // Task info is sent, register the task and status
@@ -243,7 +261,7 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     MsgBodyTSK & body = msg.body;
     TaskInfo task(body["info"]);
 
-    std::string taskName = task.taskName();
+    std::string taskName  = task.taskName();
 
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
     TaskStatus oldStatus  = taskRegistry[taskName];
