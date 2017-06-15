@@ -65,6 +65,7 @@
 #include "component.h"
 #include "dckmng.h"
 #include "urlhdl.h"
+#include "hostinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -189,6 +190,7 @@ private:
 
     URLHandler               urlh;
 
+    HostInfo                 hostInfo;
 };
 
 //}

@@ -66,6 +66,7 @@
 #include "tools.h"
 #include "message.h"
 #include "httpserver.h"
+#include "hostinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -92,6 +93,7 @@ public:
     TskMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
 public:
+    /*
     struct AgentInfo {
         int    idx;
         int    runningTasks;
@@ -99,6 +101,42 @@ public:
         int    finishedTasks;
         int    launchedTasks;
         double load;
+        };*/
+
+    struct TaskStatusSpectra {
+        int    running;
+        int    scheduled;
+        int    paused;
+        int    stopped;
+        int    failed;
+        int    finished;
+    };
+
+    struct AgentInfo {
+        std::string       name;
+        TaskStatusSpectra taskStatus;
+        float             load;
+    };
+
+    struct ProcessingHostInfo {
+        std::string            name;
+        std::string            numAgents;
+        HostInfo               hostInfo;
+        std::vector<AgentInfo> agInfo;
+    };
+
+    struct SwarmInfo {
+        std::string       name;
+        std::string       scale;
+        HostInfo          hostInfo;
+        TaskStatusSpectra taskStatus;
+    };
+
+    struct QPFInfo {
+        std::vector<ProcessingHostInfo> hostsInfo;
+        SwarmInfo                       swarmInfo;
+        int                             numSrvTasks;
+        int                             numContTasks;
     };
 
     //----------------------------------------------------------------------

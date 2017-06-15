@@ -33,6 +33,7 @@ set (libfmk_hdr
   httpserver.h
   metadatareader.h
   fitsmetadatareader.h
+  hostinfo.h
   sync.h
   urlhdl.h
 )
@@ -53,6 +54,7 @@ set (libfmk_src
   cntrmng.cpp
   httpserver.cpp
   fitsmetadatareader.cpp
+  hostinfo.cpp
   urlhdl.cpp
 )
 

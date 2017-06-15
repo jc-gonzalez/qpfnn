@@ -81,6 +81,7 @@ TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)
 void TskMng::fromRunningToOperational()
 {
     // Create Agents Info. table
+    /*
     AgentInfo emptyInfo;
     int i = 0;
     for (auto & a : cfg.agentNames) {
@@ -94,7 +95,7 @@ void TskMng::fromRunningToOperational()
         agentInfo[a] = emptyInfo;
         ++i;
     }
-
+    */
     // Initialize Task Status maps
     for (int k = TASK_SCHEDULED; k != TASK_UNKNOWN_STATE; ++k) {
         TaskStatus status = TaskStatus(k);
@@ -338,6 +339,7 @@ std::string TskMng::selectAgent()
 */
 
     // Select agent with lower weight (try to balance load)
+    /*
     double weight = -1;
     double newW;
     int agIdx = 0;
@@ -349,9 +351,10 @@ std::string TskMng::selectAgent()
             weight = newW;
             agIdx = i;
         }
-    }
+        }*/
     // Return agent peer
-    return agents.at(agIdx);
+    //return agents.at(agIdx);
+    return std::string();
 }
 
 //----------------------------------------------------------------------

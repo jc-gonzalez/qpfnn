@@ -122,6 +122,11 @@ void TskAge::fromRunningToOperational()
 
     numTask = 0;
 
+    // Get initial values for Host Info structure
+    hostInfo.cpuInfo.overallCpuLoad.timeInterval = 0;
+    hostInfo.update();
+    hostInfo.cpuInfo.overallCpuLoad.timeInterval = 10;
+
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 }
@@ -190,6 +195,12 @@ void TskAge::runEachIterationForContainers()
         break;
     default:
         break;
+    }
+
+    if (compName.substr(compName.size() - 3) == "_01") {
+        if ((iteration % 10) == 0) {
+            hostInfo.update();
+        }
     }
 }
 
