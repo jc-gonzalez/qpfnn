@@ -4,6 +4,7 @@
 #define MESSAGE_H
 
 #include "datatypes.h"
+#include "channels.h"
 
 #include "dbg.h"
 
@@ -150,5 +151,16 @@ public:
     }
     T body;
 };
+
+typedef std::string MessageDescriptor;
+
+const MessageDescriptor MsgCmd        (ChannelAcronym[CHNL_CMD]);
+const MessageDescriptor MsgHMICmd     (ChannelAcronym[CHNL_HMICMD]);
+const MessageDescriptor MsgInData     (ChannelAcronym[CHNL_INDATA]);
+const MessageDescriptor MsgTskSched   (ChannelAcronym[CHNL_TSKSCHED]);
+const MessageDescriptor MsgTskProc    (ChannelAcronym[CHNL_TSKPROC]);
+const MessageDescriptor MsgTskRqst    (ChannelAcronym[CHNL_TSKRQST]);
+const MessageDescriptor MsgTskRep     (ChannelAcronym[CHNL_TSKREP]);
+const MessageDescriptor MsgTskRepDist (ChannelAcronym[CHNL_TSKREPDIST]);
 
 #endif

@@ -158,7 +158,7 @@ void TskAge::runEachIterationForContainers()
         if (idleCycles > idleCyclesBeforeRequest) {
             // Create message and send
             Message<MsgBodyTSK> msg;
-            msg.buildHdr(ChnlTskRqst, ChnlTskRqst, "1.0",
+            msg.buildHdr(ChnlTskProc, MsgTskRqst, "1.0",
                          compName, "TskMng",
                          "", "", "");
 
@@ -229,7 +229,7 @@ void TskAge::processIncommingMessages()
             DBG(compName << " received the message [" << m
                 << "] through the channel " + chnl);
             if      (chnl == ChnlCmd)     { processCmdMsg(conn, m); }
-            else if ((type == ChnlTskProc) &&
+            else if ((type == MsgTskProc) &&
                      (msg.header.target() == compName)) { processTskProcMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
@@ -390,7 +390,7 @@ void TskAge::sendTaskReport()
     MsgBodyTSK & body = msg.body;
     body["info"] = task.val();
 
-    msg.buildHdr(ChnlTskRep, ChnlTskRep, "1.0",
+    msg.buildHdr(ChnlTskProc, MsgTskRep, "1.0",
                  compName, "TskMng",
                  "", "", "");
     msg.buildBody(body);

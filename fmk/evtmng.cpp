@@ -121,7 +121,7 @@ void EvtMng::runEachIteration()
             }
 
             Message<MsgBodyINDATA> msg;
-            msg.buildHdr(ChnlInData, ChnlInData, "1.0",
+            msg.buildHdr(ChnlInData, MsgInData, "1.0",
                          compName, "*",
                          "", "", "");
 
@@ -168,7 +168,7 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Create message and send
     Message<MsgBodyCMD> msg;
-    msg.buildHdr(ChnlHMICmd, ChnlHMICmd, "1.0",
+    msg.buildHdr(ChnlHMICmd, MsgHMICmd, "1.0",
                  compName, "*",
                  "", "", "");
 

@@ -137,8 +137,8 @@ void TskMng::processIncommingMessages()
                 << " through the channel " + chnl);
             if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
-            else if (type == ChnlTskRqst)  { processTskRqstMsg(conn, m); }
-            else if (type == ChnlTskRep)   { processTskRepMsg(conn, m); }
+            else if (type == MsgTskRqst)   { processTskRqstMsg(conn, m); }
+            else if (type == MsgTskRep)    { processTskRepMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
@@ -201,7 +201,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     DBG("TASK REQUEST FROM " << agName << " RECEIVED");
 
     // Create message
-    msg.buildHdr(ChnlTskProc, ChnlTskProc, "1.0",
+    msg.buildHdr(ChnlTskProc, MsgTskProc, "1.0",
                  compName, agName, "", "", "");
 
     MsgBodyTSK body;

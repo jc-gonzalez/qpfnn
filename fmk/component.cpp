@@ -200,14 +200,15 @@ void Component::processIncommingMessages()
             MessageBase msg(m);
             std::string tgt(msg.header.target());
             if ((tgt != "*") and (tgt != compName)) { continue; }
+            std::string type(msg.header.type());
             DbgMsg(compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
             else if (chnl == ChnlTskSched)   { processTskSchedMsg(conn, m); }
-            else if (chnl == ChnlTskRqst)    { processTskRqstMsg(conn, m); }
-            else if (chnl == ChnlTskProc)    { processTskProcMsg(conn, m); }
-            else if (chnl == ChnlTskRep)     { processTskRepMsg(conn, m); }
+            else if (type == MsgTskRqst)     { processTskRqstMsg(conn, m); }
+            else if (type == MsgTskProc)     { processTskProcMsg(conn, m); }
+            else if (type == MsgTskRep)      { processTskRepMsg(conn, m); }
             else if (chnl == ChnlTskRepDist) { processTskRepDistMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }

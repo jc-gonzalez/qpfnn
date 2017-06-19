@@ -30,8 +30,8 @@ const ChannelDescriptor ChnlHMICmd     (ChannelAcronym[CHNL_HMICMD]);
 const ChannelDescriptor ChnlInData     (ChannelAcronym[CHNL_INDATA]);
 const ChannelDescriptor ChnlTskSched   (ChannelAcronym[CHNL_TSKSCHED]);
 const ChannelDescriptor ChnlTskProc    (ChannelAcronym[CHNL_TSKPROC]);
-const ChannelDescriptor ChnlTskRqst    (ChannelAcronym[CHNL_TSKRQST]);
-const ChannelDescriptor ChnlTskRep     (ChannelAcronym[CHNL_TSKREP]);
+//const ChannelDescriptor ChnlTskRqst    (ChannelAcronym[CHNL_TSKRQST]);
+//const ChannelDescriptor ChnlTskRep     (ChannelAcronym[CHNL_TSKREP]);
 const ChannelDescriptor ChnlTskRepDist (ChannelAcronym[CHNL_TSKREPDIST]);
 
 #endif
