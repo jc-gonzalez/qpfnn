@@ -470,7 +470,7 @@ void Deployer::createElementsNetwork()
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
                     agName.push_back(std::string(sAgName));
-                    agPortTsk.push_back(portnum(startingPort + 1, h, i));
+                    agPortTsk.push_back(portnum(startingPort + 10, h, i));
                 }
             }
             ++h;
@@ -487,13 +487,24 @@ void Deployer::createElementsNetwork()
                 ag.push_back(new TskAge(sAgName, thisHost, &synchro, TskAge::SERVICE));
                 cfg.agentNames.push_back(sAgName);
                 agName.push_back(std::string(sAgName));
-                agPortTsk.push_back(portnum(startingPort + 1, h, 0));
+                agPortTsk.push_back(portnum(startingPort + 10, h, 0));
             }
         }
 
         //-----------------------------------------------------------------
         // c. Create agent connections
         //-----------------------------------------------------------------
+
+        // CHANNEL CMD - SURVEY
+        // - Surveyor: EvtMng
+        // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+        chnl     = ChnlCmd;
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+        connAddr = bindAddr;
+        for (auto & a : ag) {
+            a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        }
 
         // CHANNEL TASK-PROCESSING - REQREP
         // - Out/In: TskAge*/TskMng
@@ -533,7 +544,7 @@ void Deployer::createElementsNetwork()
         for (unsigned int i = 0; i < kv.second; ++i) {
             sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
             agName.push_back(std::string(sAgName));
-            agPortTsk.push_back(portnum(startingPort + 1, h, i));
+            agPortTsk.push_back(portnum(startingPort + 10, h, i));
         }
         ++h;
     }
@@ -545,6 +556,7 @@ void Deployer::createElementsNetwork()
     // CHANNEL CMD - SURVEY
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
+/*
     chnl     = ChnlCmd;
     TRC("### Connections for channel " << chnl);
     bindAddr = "inproc://" + chnl;
@@ -555,12 +567,23 @@ void Deployer::createElementsNetwork()
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
         c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
     }
+*/
+    chnl     = ChnlCmd;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+    connAddr = bindAddr;
+    Survey * surveyor = new Survey(NN_SURVEYOR, bindAddr);
+    surveyor->setNumOfRespondents(4 + agPortTsk.size());
+    m.evtMng->addConnection(chnl, surveyor);
+    for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
+        c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+    }
 
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     chnl     = ChnlHMICmd;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + 1);
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
 
     // CHANNEL INDATA -  PUBSUB
