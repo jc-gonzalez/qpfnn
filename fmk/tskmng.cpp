@@ -171,6 +171,19 @@ void TskMng::runEachIteration()
 }
 
 //----------------------------------------------------------------------
+// Method: processCmdMsg
+//----------------------------------------------------------------------
+void TskMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
+{
+    JValue msg(m);
+    std::string cmd = msg["cmd"].asString();
+
+    if (cmd == "QUIT") {
+        transitTo(RUNNING);
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: processTskSchedMsg
 //----------------------------------------------------------------------
 void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)

@@ -241,14 +241,17 @@ void TskAge::processIncommingMessages()
 //----------------------------------------------------------------------
 void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    json msg(m);
-    std::string sessId = msg["sessionId"].asString();
-    if (sessId != cfg.sessionId) {
-        cfg.synchronizeSessionId(sessId);
-    }
+    JValue msg(m);
+    std::string cmd = msg["cmd"].asString();
 
-    MessageString ack = "ACK from " + compName;
-    c->setMsgOut(ack);
+    if (cmd == "QUIT") {
+        transitTo(RUNNING);
+    } else if (cmd == "INIT") {
+        std::string sessId = msg["sessionId"].asString();
+        if (sessId != cfg.sessionId) {
+            cfg.synchronizeSessionId(sessId);
+        }
+    }
 }
 
 //----------------------------------------------------------------------

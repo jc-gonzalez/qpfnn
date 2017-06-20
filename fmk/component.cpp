@@ -201,7 +201,7 @@ void Component::processIncommingMessages()
             std::string tgt(msg.header.target());
             if ((tgt != "*") and (tgt != compName)) { continue; }
             std::string type(msg.header.type());
-            DbgMsg(compName + " received the message [" + m + "]");
+            DbgMsg("(FROM component.cpp:)"  + compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }

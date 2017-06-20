@@ -309,13 +309,19 @@ void Deployer::sayHello()
         buildId = std::string(buf);
     }
 
+    std::chrono::time_point<std::chrono::system_clock>
+        now = std::chrono::system_clock::now();
+    std::time_t end_time = std::chrono::system_clock::to_time_t(now);
+
     const std::string hline("----------------------------------------"
                             "--------------------------------------");
     INFO(hline << '\n'
          << " " << APP_NAME << " - " << APP_LONG_NAME << '\n'
          << " " << APP_DATE << " - "
          << APP_RELEASE << " Build " << buildId << '\n'
-         << " Started at " << currentHostName << " [" << currentHostAddr << "]\n"
+         << " " << std::ctime(&end_time) << '\n'
+         << " Started at " << currentHostName
+         << " [" << currentHostAddr << "]\n"
          << hline << std::endl);
 }
 
@@ -503,7 +509,7 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+            a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -572,11 +578,9 @@ void Deployer::createElementsNetwork()
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
     connAddr = bindAddr;
-    Survey * surveyor = new Survey(NN_SURVEYOR, bindAddr);
-    surveyor->setNumOfRespondents(4 + agPortTsk.size());
-    m.evtMng->addConnection(chnl, surveyor);
+    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-        c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
     // CHANNEL HMICMD - REQREP

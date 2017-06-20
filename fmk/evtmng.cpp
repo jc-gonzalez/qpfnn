@@ -148,7 +148,7 @@ void EvtMng::runEachIteration()
             sprintf(msg, "Tell me your name for iter.# %d ...", iteration);
 */
             json jdata;
-            jdata["request"]   = "WhoAreYou?";
+            jdata["cmd"]       = "INIT";
             jdata["iteration"] = std::to_string(iteration);
             jdata["sessionId"] = cfg.sessionId;
             JValue msg(jdata);
@@ -157,6 +157,17 @@ void EvtMng::runEachIteration()
     }
 
     if (iteration > 1000) {
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        it = connections.find(ChnlCmd);
+        if (it != connections.end()) {
+            ScalabilityProtocolRole * conn = it->second;
+            json jdata;
+            jdata["cmd"]       = "QUIT";
+            jdata["iteration"] = std::to_string(iteration);
+            JValue msg(jdata);
+            conn->setMsgOut(msg.str());
+        }
+
         transitTo(RUNNING);
     }
 }

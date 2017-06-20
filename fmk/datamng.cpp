@@ -90,8 +90,12 @@ DataMng::DataMng(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void DataMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
 {
-    MessageString ack = "ACK from " + compName;
-    conn->setMsgOut(ack);
+    JValue msg(m);
+    std::string cmd = msg["cmd"].asString();
+
+    if (cmd == "QUIT") {
+        transitTo(RUNNING);
+    }
 }
 
 //----------------------------------------------------------------------

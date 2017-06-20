@@ -159,8 +159,12 @@ void TskOrc::runEachIteration()
 //----------------------------------------------------------------------
 void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    MessageString ack = "ACK from " + compName;
-    c->setMsgOut(ack);
+    JValue msg(m);
+    std::string cmd = msg["cmd"].asString();
+
+    if (cmd == "QUIT") {
+        transitTo(RUNNING);
+    }
 }
 
 //----------------------------------------------------------------------
