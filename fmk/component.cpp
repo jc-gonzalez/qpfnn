@@ -199,7 +199,7 @@ void Component::processIncommingMessages()
         while (conn->next(m)) {
             MessageBase msg(m);
             std::string tgt(msg.header.target());
-            if ((tgt != "*") and (tgt != compName)) { continue; }
+            if ((tgt != "*") && (tgt != compName)) { continue; }
             std::string type(msg.header.type());
             DbgMsg("(FROM component.cpp:)"  + compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }

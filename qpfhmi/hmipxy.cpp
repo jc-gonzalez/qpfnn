@@ -45,6 +45,7 @@
 #include "channels.h"
 #include "message.h"
 #include "str.h"
+#include "hostinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -107,8 +108,14 @@ void HMIProxy::processIncommingMessages()
         const ChannelDescriptor & chnl = kv.first;
         ScalabilityProtocolRole * conn = kv.second;
         while (conn->next(m)) {
+            MessageBase msg(m);
+            std::string tgt(msg.header.target());
+            if ((tgt != "*") && (tgt != compName)) { continue; }
+            std::string type(msg.header.type());
             DBG(compName << " received the message [" << m << "] through the channel " + chnl);
             if      (chnl == ChnlHMICmd)  { processHMICmdMsg(conn, m); }
+            else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
+            else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
@@ -120,6 +127,37 @@ void HMIProxy::processIncommingMessages()
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     MessageString ack = "Received info from Core: " + m;
+}
+
+//----------------------------------------------------------------------
+// Method: processTskRepDistMsg
+//----------------------------------------------------------------------
+void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    TaskInfo task(body["info"]);
+
+    std::string taskName  = task.taskName();
+    TaskStatus taskStatus = TaskStatus(task.taskStatus());
+
+    TRC("EvtMng: Processing TaskReport: " << taskName
+        << " has status " << TaskStatusName[taskStatus]);
+}
+
+//----------------------------------------------------------------------
+// Method: processHostMonMsg
+//----------------------------------------------------------------------
+void HMIProxy::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    JValue hostInfoData(body["info"]);
+
+    HostInfo hostInfo;
+    hostInfo.fromStr(hostInfoData.str());
+
+    DBG(hostInfo.dump() + "\n");
 }
 
 //----------------------------------------------------------------------
