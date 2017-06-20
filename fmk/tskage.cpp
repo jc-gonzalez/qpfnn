@@ -213,6 +213,7 @@ void TskAge::runEachIterationForContainers()
             MsgBodyTSK & body = msg.body;
 
             JValue hostInfoValue(hostInfo.toJsonStr());
+            DBG(hostInfo.toJsonStr());
             body["info"] = hostInfoValue.val();
 
             msg.buildHdr(ChnlTskProc, MsgHostMon, "1.0",
