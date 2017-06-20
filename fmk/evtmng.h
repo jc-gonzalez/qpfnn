@@ -104,9 +104,14 @@ protected:
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: processTskRepMsg
+    // Method: processTskRepDistMsg
     //----------------------------------------------------------------------
-    virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m);
+    virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+    //----------------------------------------------------------------------
+    // Method: processHostMonMsg
+    //----------------------------------------------------------------------
+    virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 private:
     DirWatcher * dw;

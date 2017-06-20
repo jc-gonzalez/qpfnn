@@ -209,7 +209,8 @@ void Component::processIncommingMessages()
             else if (type == MsgTskRqst)     { processTskRqstMsg(conn, m); }
             else if (type == MsgTskProc)     { processTskProcMsg(conn, m); }
             else if (type == MsgTskRep)      { processTskRepMsg(conn, m); }
-            else if (chnl == ChnlTskRepDist) { processTskRepDistMsg(conn, m); }
+            else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
+            else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }

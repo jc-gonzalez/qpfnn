@@ -42,6 +42,7 @@
 
 #include "filenamespec.h"
 #include "message.h"
+#include "hostinfo.h"
 
 #include "config.h"
 
@@ -194,10 +195,34 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 }
 
 //----------------------------------------------------------------------
-// Method: processTskRepMsg
+// Method: processTskRepDistMsg
 //----------------------------------------------------------------------
-void EvtMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
+void EvtMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    TaskInfo task(body["info"]);
+
+    std::string taskName  = task.taskName();
+    TaskStatus taskStatus = TaskStatus(task.taskStatus());
+
+    TRC("EvtMng: Processing TaskReport: " << taskName
+        << " has status " << TaskStatusName[taskStatus]);
+}
+
+//----------------------------------------------------------------------
+// Method: processHostMonMsg
+//----------------------------------------------------------------------
+void EvtMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    JValue hostInfoData(body["info"]);
+
+    HostInfo hostInfo;
+    hostInfo.fromStr(hostInfoData.str());
+
+    DBG(hostInfo.dump() + "\n");
 }
 
 //}

@@ -48,7 +48,6 @@
 #include "log.h"
 #include "tools.h"
 #include "config.h"
-#include "hostinfo.h"
 
 using Configuration::cfg;
 
@@ -306,6 +305,8 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     if (taskStatus == TASK_FINISHED) {
         InfoMsg("Finished task " + taskName);
     }
+
+    sendTskRepDistMsg(m, MsgTskRepDist);
 }
 
 //----------------------------------------------------------------------
@@ -313,14 +314,7 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    Message<MsgBodyTSK> msg(m);
-    MsgBodyTSK & body = msg.body;
-    JValue hostInfoData(body["info"]);
-
-    HostInfo hostInfo;
-    hostInfo.fromStr(hostInfoData.str());
-
-    DBG(hostInfo.dump() + "\n");
+    sendTskRepDistMsg(m, MsgHostMon);
 }
 
 //----------------------------------------------------------------------
@@ -329,23 +323,11 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::execContainerTask()
 {
-/*
-    std::string peName = msg->task.taskPath;
-    InfoMsg("Proc.Elem. in rule: " + peName);
-
-    // Select TaskAgent to use
-    std::string agent = selectAgent();
-    InfoMsg("Selected Agent is " + agent);
-
-    // Send message to agent
-    if (sendTaskAgMsg(msg, agent->name)) {
-        agentInfo[agent].launchedTasks++;
-        agentInfo[agent].runningTasks++;
-    }
-*/
 }
 
-inline double weightFunc(double load, double tasks) { return 100 * load + tasks; }
+inline double weightFunc(double load, double tasks) {
+    return 100 * load + tasks;
+}
 
 //----------------------------------------------------------------------
 // Method: selectAgent
@@ -354,36 +336,6 @@ inline double weightFunc(double load, double tasks) { return 100 * load + tasks;
 //----------------------------------------------------------------------
 std::string TskMng::selectAgent()
 {
-/*
-    // Select agent with smaller number of running tasks
-    int nRunTasks = -1;
-    int agIdx;
-    for (unsigned int i = 0; i < agents.size(); ++i) {
-        Peer * p = agents.at(i);
-        AgentInfo & agInfo = agentInfo[p];
-        if ((nRunTasks < 0) || (nRunTasks > agInfo.runningTasks)) {
-            nRunTasks = agInfo.runningTasks;
-            agIdx = i;
-        }
-    }
-*/
-
-    // Select agent with lower weight (try to balance load)
-    /*
-    double weight = -1;
-    double newW;
-    int agIdx = 0;
-    for (unsigned int i = 0; i < agents.size(); ++i) {
-        std::string ag = agents.at(i);
-        AgentInfo & agInfo = agentInfo[ag];
-        newW = weightFunc(agInfo.load, agInfo.runningTasks);
-        if ((weight < 0) || (weight > newW)) {
-            weight = newW;
-            agIdx = i;
-        }
-        }*/
-    // Return agent peer
-    //return agents.at(agIdx);
     return std::string();
 }
 
@@ -392,67 +344,33 @@ std::string TskMng::selectAgent()
 // Send a TaskProcessingMsg to the Task Manager, requesting the
 // execution of a rule
 //----------------------------------------------------------------------
-bool TskMng::sendTaskAgMsg(MessageString & msg,
-                                std::string agName)
+bool TskMng::sendTaskAgMsg(MessageString & m,
+                           std::string agName)
 {
-    /*
-    MessageData msgDataToAg(new MessageString);
-    msgDataToAg.msg->setData(msg->getData());
-    setForwardTo(agName, msgDataToAg.msg->header);
-    PeerMessage * msgForAg = buildPeerMsg(msgDataToAg.msg->header.destination,
-                                          msgDataToAg.msg->getDataString(),
-                                          MSG_TASK_PROC);
-    registerMsg(selfPeer()->name, *msgForAg);
-    setTransmissionToPeer(agName, msgForAg);
-    */
     return true;
 }
 
 //----------------------------------------------------------------------
-// Method: sendTaskRes
-// Send a TaskResMsg to the Event Manager
+// Method: sendTskRepDistMsg
+// Send a HostInfo message to EvtMng/QPFHMI/DataMng
 //----------------------------------------------------------------------
-bool TskMng::sendTaskRes(MessageString & msg)
+bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)
 {
-    /*
-    // Send TASK_RES to all the recipients
-    // TODO: Deprecate this channel for EvtMng in favour of DB
-    std::vector<std::string> fwdRecip {"DataMng"}; //, "EvtMng"};
-    for (std::string & recip : fwdRecip) {
-        MessageData msgToRecip(new MessageString);
-        msgToRecip.msg->setData(msg->getData());
-        setForwardTo(recip, msgToRecip.msg->header);
-        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
-                                                 msgToRecip.msg->getDataString(),
-                                                 MSG_TASK_RES);
-        registerMsg(selfPeer()->name, *msgForRecip);
-        setTransmissionToPeer(recip, msgForRecip);
+    bool retVal = false;
+    // Set message header
+    Message<MsgBodyTSK> msg(m);
+    msg.buildHdr(ChnlTskRepDist, msgType, "1.0",
+                 compName, "*", "", "", "");
+    // Send msg
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    ChannelDescriptor chnl(ChnlTskRepDist);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
+        retVal = true;
     }
-    */
-    return true;
-}
-
-//----------------------------------------------------------------------
-// Method: sendMonitInfo
-// Send a TaskResMsg to the Event Manager
-//----------------------------------------------------------------------
-bool TskMng::sendMonitInfo(MessageString & msg)
-{
-    /*
-    // Send TASK_RES to all the recipients
-    // TODO: Deprecate this channel for EvtMng in favour of DB
-    std::array<std::string,1> fwdRecip = {"EvtMng"};
-    for (std::string & recip : fwdRecip) {
-        MessageData msgToRecip(new MessageString);
-        msgToRecip.msg->setData(msg->getData());
-        setForwardTo(recip, msgToRecip.msg->header);
-        PeerMessage * msgForRecip = buildPeerMsg(msgToRecip.msg->header.destination,
-                                                 msgToRecip.msg->getDataString(),
-                                                 MSG_MONIT_INFO);
-        //registerMsg(selfPeer()->name, *msgForRecip);
-        setTransmissionToPeer(recip, msgForRecip);
-    }*/
-    return true;
+    return retVal;
 }
 
 //}

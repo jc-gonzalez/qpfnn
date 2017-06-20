@@ -197,18 +197,14 @@ private:
     //----------------------------------------------------------------------
     // Method: sendTaskAgMsg
     //----------------------------------------------------------------------
-    bool sendTaskAgMsg(MessageString & msg,
+    bool sendTaskAgMsg(MessageString & m,
                        std::string agName);
 
     //----------------------------------------------------------------------
-    // Method: sendTaskRes
+    // Method: sendTskRepDistMsg
+    // Send a HostInfo message to EvtMng/QPFHMI/DataMng
     //----------------------------------------------------------------------
-    bool sendTaskRes(MessageString & msg);
-
-    //----------------------------------------------------------------------
-    // Method: sendMonitInfo
-    //----------------------------------------------------------------------
-    bool sendMonitInfo(MessageString & msg);
+    bool sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType);
 
 private:
     std::vector<std::string>         agents;
