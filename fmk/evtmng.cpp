@@ -138,7 +138,7 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (((iteration + 1) == 10000)) {
+    if (((iteration + 1) == 100)) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
         if (it != connections.end()) {

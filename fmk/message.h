@@ -154,13 +154,13 @@ public:
 
 typedef std::string MessageDescriptor;
 
-const MessageDescriptor MsgCmd        (ChannelAcronym[CHNL_CMD]);
-const MessageDescriptor MsgHMICmd     (ChannelAcronym[CHNL_HMICMD]);
-const MessageDescriptor MsgInData     (ChannelAcronym[CHNL_INDATA]);
-const MessageDescriptor MsgTskSched   (ChannelAcronym[CHNL_TSKSCHED]);
-const MessageDescriptor MsgTskProc    (ChannelAcronym[CHNL_TSKPROC]);
-const MessageDescriptor MsgTskRqst    (ChannelAcronym[CHNL_TSKRQST]);
-const MessageDescriptor MsgTskRep     (ChannelAcronym[CHNL_TSKREP]);
-const MessageDescriptor MsgTskRepDist (ChannelAcronym[CHNL_TSKREPDIST]);
+const MessageDescriptor MsgCmd        (ChannelAcronym[TX_ID_CMD]);
+const MessageDescriptor MsgHMICmd     (ChannelAcronym[TX_ID_HMICMD]);
+const MessageDescriptor MsgInData     (ChannelAcronym[TX_ID_INDATA]);
+const MessageDescriptor MsgTskSched   (ChannelAcronym[TX_ID_TSKSCHED]);
+const MessageDescriptor MsgTskProc    (ChannelAcronym[TX_ID_TSKPROC]);
+const MessageDescriptor MsgTskRqst    (ChannelAcronym[TX_ID_TSKRQST]);
+const MessageDescriptor MsgTskRep     (ChannelAcronym[TX_ID_TSKREP]);
+const MessageDescriptor MsgTskRepDist (ChannelAcronym[TX_ID_TSKREPDIST]);
 
 #endif
