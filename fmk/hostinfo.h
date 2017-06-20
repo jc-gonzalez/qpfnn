@@ -91,7 +91,7 @@ public:
         int workJiffies2;
         int totalJiffies2;
         int timeInterval;
-        float cpuLoad;
+        float computedLoad;
     };
 
     struct CPUInfo {
@@ -116,7 +116,8 @@ public:
 public:
     void update();
     std::string dump();
-    std::string json();
+    std::string toJsonStr();
+    void fromStr(std::string s);
 
 private:
     void getLoadAvg(LoadAvg & l);

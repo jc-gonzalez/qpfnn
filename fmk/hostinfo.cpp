@@ -40,6 +40,8 @@
 
 #include "hostinfo.h"
 
+#include "datatypes.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -83,12 +85,12 @@ std::string HostInfo::dump()
       << c.numCoresPerSocket << " cores per socket and "
       << c.numThreadsPerCore << " threads per core "
       << "[hyperthreading:" << (c.hyperthreading ? "ON" : "OFF") << "]\n"
-      << "Overall CPU Load: " << c.overallCpuLoad.cpuLoad
+      << "Overall CPU Load: " << c.overallCpuLoad.computedLoad
       << "% over " << c.overallCpuLoad.timeInterval << "s\n";
     return s.str();
 }
 
-std::string HostInfo::json()
+std::string HostInfo::toJsonStr()
 {
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
@@ -103,9 +105,9 @@ std::string HostInfo::json()
       << "\"lastPid\":" << l.lastPid << "},";
 
     s << "\"cpuInfo\":{"
-      << "\"vendor\":" << c.vendor << ","
-      << "\"modelName\":" << c.modelName << ","
-      << "\"architecture\":" << c.architecture << ","
+      << "\"vendor\":\"" << c.vendor << "\","
+      << "\"modelName\":\"" << c.modelName << "\","
+      << "\"architecture\":\"" << c.architecture << "\","
       << "\"cpuFreq\":" << c.cpuFreq << "," // MHz
       << "\"numCpus\":" << c.numCpus << ","
       << "\"numPhysicalCpus\":" << c.numPhysicalCpus << ","
@@ -120,7 +122,8 @@ std::string HostInfo::json()
       << o.totalJiffies << ","
       << o.workJiffies2 << ","
       << o.totalJiffies2 << "],"
-      << "\"timeInterval\":" << o.timeInterval << "},"
+      << "\"timeInterval\":" << o.timeInterval << ","
+      << "\"computedLoad\":" << o.computedLoad << "},"
       << "\"cpuLoad\":[";
 
     for (int i = 0; i < c.numCpus; ++i) {
@@ -131,12 +134,61 @@ std::string HostInfo::json()
           << o.workJiffies2 << ","
           << o.totalJiffies2 << "],"
           << "\"timeInterval\":" << o.timeInterval << ","
-          << "\"cpuLoad\":" << o.cpuLoad << "}";
+          << "\"computedLoad\":" << o.computedLoad << "}";
         if (i < (c.numCpus - 1)) { s << ","; }
     }
     s << "]}}";
 
     return s.str();
+}
+
+void HostInfo::fromStr(std::string s)
+{
+    LoadAvg & l = loadAvg;
+    CPUInfo & c = cpuInfo;
+
+    JValue h(s);
+
+    JValue hl(h["loadAvg"]);
+    l.load1min  = hl["load1min"].asFloat();
+    l.load5min  = hl["load5min"].asFloat();
+    l.load15min = hl["load15min"].asFloat();
+    l.runProc   = hl["runProc"].asInt();
+    l.totalProc = hl["totalProc"].asInt();
+    l.lastPid   = hl["lastPid"].asInt();
+
+    JValue hc(h["cpuInfo"]);
+    c.vendor            = hc["vendor"].asString();
+    c.modelName         = hc["modelName"].asString();
+    c.architecture      = hc["architecture"].asString();
+    c.cpuFreq           = hc["cpuFreq"].asFloat(); // MHz
+    c.numCpus           = hc["numCpus"].asInt();
+    c.numPhysicalCpus   = hc["numPhysicalCpus"].asInt();
+    c.numCoresPerSocket = hc["numCoresPerSocket"].asInt();
+    c.numThreadsPerCore = hc["numThreadsPerCore"].asInt();
+    c.cacheSize         = hc["cacheSize"].asInt();
+    c.hyperthreading    = hc["hyperthreading"].asBool();;
+
+    CPULoad & co = c.overallCpuLoad;
+    JValue hco(hc["overallCpuLoad"]);
+    co.workJiffies   = hco["jiffies"][0].asInt();
+    co.totalJiffies  = hco["jiffies"][1].asInt();
+    co.workJiffies2  = hco["jiffies"][2].asInt();
+    co.totalJiffies2 = hco["jiffies"][3].asInt();
+    co.timeInterval  = hco["timeInterval"].asInt();
+    co.computedLoad  = hco["computedLoad"].asFloat();
+
+    for (int i = 0; i < c.numCpus; ++i) {
+        c.cpuLoad.push_back(CPULoad({0, 0, 0, 0, 0, 0.}));
+        CPULoad & co = c.cpuLoad[i];
+        JValue hco(hc["cpuLoad"][i]);
+        co.workJiffies   = hco["jiffies"][0].asInt();
+        co.totalJiffies  = hco["jiffies"][1].asInt();
+        co.workJiffies2  = hco["jiffies"][2].asInt();
+        co.totalJiffies2 = hco["jiffies"][3].asInt();
+        co.timeInterval  = hco["timeInterval"].asInt();
+        co.computedLoad  = hco["computedLoad"].asFloat();
+    }
 }
 
 void HostInfo::getLoadAvg(LoadAvg & l)
@@ -178,7 +230,7 @@ void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
     if (c.timeInterval != 0) {
         float workCPU  = c.workJiffies2  - c.workJiffies;
         float totalCPU = c.totalJiffies2 - c.totalJiffies;
-        c.cpuLoad  = (workCPU / totalCPU) * 100.;
+        c.computedLoad  = (workCPU / totalCPU) * 100.;
     }
 
     c.timeInterval = interval;

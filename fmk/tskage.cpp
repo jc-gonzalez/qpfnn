@@ -148,9 +148,11 @@ void TskAge::runEachIteration()
 //----------------------------------------------------------------------
 void TskAge::runEachIterationForContainers()
 {
+    // Declare status
     InfoMsg("Status is " + ProcStatusName[pStatus] +
             " at iteration " + str::toStr<int>(iteration));
 
+    // Upon status, perform the required action
     switch (pStatus) {
     case IDLE:
         ++idleCycles;
@@ -197,9 +199,35 @@ void TskAge::runEachIterationForContainers()
         break;
     }
 
-    if (compName.substr(compName.size() - 3) == "_01") {
-        if ((iteration % 10) == 0) {
+    // Every 10 iterations, check if this is the first agent in the
+    // host, and if it is update the hostInfo structure, and send it
+    // to the TskMng
+    if ((iteration % 10) == 0) {
+        if (compName.substr(compName.size() - 3) == "_01") {
+            // Update host information
             hostInfo.update();
+
+            // Prepare message and send it
+            // Define and set task object
+            Message<MsgBodyTSK> msg;
+            MsgBodyTSK & body = msg.body;
+
+            JValue hostInfoValue(hostInfo.toJsonStr());
+            body["hostinfo"] = hostInfoValue.val();
+
+            msg.buildHdr(ChnlTskProc, MsgHostMon, "1.0",
+                         compName, "TskMng",
+                         "", "", "");
+            msg.buildBody(body);
+
+            // Send msg
+            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+            std::string chnl(ChnlTskProc + "_" + compName);
+            it = connections.find(chnl);
+            if (it != connections.end()) {
+                ScalabilityProtocolRole * conn = it->second;
+                conn->setMsgOut(msg.str());
+            }
         }
     }
 }

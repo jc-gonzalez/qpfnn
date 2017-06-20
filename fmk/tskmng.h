@@ -176,6 +176,12 @@ protected:
     //----------------------------------------------------------------------
     void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m);
 
+    //----------------------------------------------------------------------
+    // Method: processHostMonMsg
+    //----------------------------------------------------------------------
+    void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+
 private:
     //----------------------------------------------------------------------
     // Method: execTask

@@ -48,6 +48,7 @@
 #include "log.h"
 #include "tools.h"
 #include "config.h"
+#include "hostinfo.h"
 
 using Configuration::cfg;
 
@@ -139,6 +140,7 @@ void TskMng::processIncommingMessages()
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
             else if (type == MsgTskRqst)   { processTskRqstMsg(conn, m); }
             else if (type == MsgTskRep)    { processTskRepMsg(conn, m); }
+            else if (type == MsgHostMon)   { processHostMonMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
@@ -304,6 +306,19 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     if (taskStatus == TASK_FINISHED) {
         InfoMsg("Finished task " + taskName);
     }
+}
+
+//----------------------------------------------------------------------
+// Method: processHostMonMsg
+//----------------------------------------------------------------------
+void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+
+    HostInfo hostInfo;
+    hostInfo.fromStr(body.info());
+    DBG(hostInfo.dump() + "\n");
 }
 
 //----------------------------------------------------------------------
