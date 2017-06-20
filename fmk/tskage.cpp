@@ -202,7 +202,7 @@ void TskAge::runEachIterationForContainers()
     // Every 10 iterations, check if this is the first agent in the
     // host, and if it is update the hostInfo structure, and send it
     // to the TskMng
-    if ((iteration % 10) == 0) {
+    if ((iteration % 50) == 0) {
         if (compName.substr(compName.size() - 3) == "_01") {
             // Update host information
             hostInfo.update();
@@ -213,7 +213,7 @@ void TskAge::runEachIterationForContainers()
             MsgBodyTSK & body = msg.body;
 
             JValue hostInfoValue(hostInfo.toJsonStr());
-            body["hostinfo"] = hostInfoValue.val();
+            body["info"] = hostInfoValue.val();
 
             msg.buildHdr(ChnlTskProc, MsgHostMon, "1.0",
                          compName, "TskMng",
