@@ -315,9 +315,11 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
+    JValue hostInfoData(body["info"]);
 
     HostInfo hostInfo;
-    hostInfo.fromStr(body.info());
+    hostInfo.fromStr(hostInfoData.str());
+
     DBG(hostInfo.dump() + "\n");
 }
 
