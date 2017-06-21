@@ -335,40 +335,30 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     bool result = true;
     bool mustUpdate = true;
 
-    if (!checkTask(task.taskName())) {
-        // Check if name provided by Orc is present
-        std::string initialName = task["taskData"]["NameOrc"].asString();
-
-        if (!checkTask(initialName)) {
-            // not present, must be first time this tast is requested to be
-            // updated -> store it
-            result = storeTask(task);
-            // Since it is stored for the first time, no update is done
-            mustUpdate = false;
-        } else {
-            // Present, so this is task registered with old name,
-            // that must change its name
-            result = updateTable<std::string>("tasks_info",
-                                              "task_id=" + str::quoted(initialName),
-                                              "task_id", task.taskName());
-            // Once changed the task_id, the update must still be done
-        }
+    std::string taskName = task.taskName().substr(15);
+    json taskData  = task["taskData"];
+    std::string id = taskData["Id"].asString();
+    if (checkTask(taskName)) {
+        // Present, so this is task registered with old name as ID,
+        // that must change to the actual ID
+        result = updateTable<std::string>("tasks_info",
+                                          "task_id=" + str::quoted(taskName),
+                                          "task_id", id);
+        // Once changed the task_id, the update must still be done
     }
 
-    if (mustUpdate) {
-        std::string filter("task_id=" + str::quoted(task.taskName()));
-        result &= updateTable<int>("tasks_info", filter,
-                                   "task_status_id", (int)(task.taskStatus()));
+    std::string filter("task_id=" + str::quoted(id));
+    result &= updateTable<int>("tasks_info", filter,
+                               "task_status_id", (int)(task.taskStatus()));
+    result &= updateTable<std::string>("tasks_info", filter,
+                                       "start_time", task.taskStart());
+    if (!task.taskEnd().empty()) {
         result &= updateTable<std::string>("tasks_info", filter,
-                                           "start_time", task.taskStart());
-        if (!task.taskEnd().empty()) {
-            result &= updateTable<std::string>("tasks_info", filter,
-                                               "end_time", task.taskEnd());
-        }
-        result &= updateTable<Json::Value>("tasks_info", filter,
-                                           "task_data", task.taskData());
-        PQclear(res);
+                                           "end_time", task.taskEnd());
     }
+    //result &= updateTable<Json::Value>("tasks_info", filter,
+    //                                   "task_data", task.taskData());
+    PQclear(res);
 
     return result;
 }

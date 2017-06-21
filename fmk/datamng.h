@@ -115,9 +115,14 @@ protected:
     virtual void processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: processTskRepMsg
+    // Method: processTskRepDistMsg
     //----------------------------------------------------------------------
-    virtual void processTskRepMsg(ScalabilityProtocolRole * conn, MessageString & m);
+    virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+    //----------------------------------------------------------------------
+    // Method: processHostMonMsg
+    //----------------------------------------------------------------------
+    virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 protected:
 

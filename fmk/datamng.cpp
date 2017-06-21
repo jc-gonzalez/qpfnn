@@ -60,6 +60,7 @@
 #include "channels.h"
 #include "message.h"
 #include "config.h"
+#include "hostinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -131,12 +132,36 @@ void DataMng::processTskSchedMsg(ScalabilityProtocolRole * conn, MessageString &
 }
 
 //----------------------------------------------------------------------
-// Method: processTskRepMsg
+// Method: processTskRepDistMsg
 //----------------------------------------------------------------------
-void DataMng::processTskRepMsg(ScalabilityProtocolRole * conn, MessageString & m)
+void DataMng::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // Save task to DB
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    TaskInfo task(body["info"]);
+
+    std::string taskName  = task.taskName();
+    TaskStatus taskStatus = TaskStatus(task.taskStatus());
+
+    TRC("DataMng: Processing TaskReport: " << taskName
+        << " has status " << TaskStatusName[taskStatus]);
+
     saveTaskToDB(m);
+}
+
+//----------------------------------------------------------------------
+// Method: processHostMonMsg
+//----------------------------------------------------------------------
+void DataMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    JValue hostInfoData(body["info"]);
+
+    HostInfo hostInfo;
+    hostInfo.fromStr(hostInfoData.str());
+
+    DBG(hostInfo.dump() + "\n");
 }
 
 //----------------------------------------------------------------------
@@ -166,10 +191,13 @@ void DataMng::initializeDB()
 //----------------------------------------------------------------------
 void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
 {
+    // Ensure 0-ended char arrays
     if (m.at(m.size() - 1) < 32) { m[m.size() - 1] = 0; }
 
+    //DBG("SAVE-TASK-TO-DB:\n" + m); return;
     Message<MsgBodyTSK> msg(m);
-    TaskInfo taskInfo(msg.body["info"]);
+    MsgBodyTSK & body = msg.body;
+    TaskInfo taskInfo(body["info"]);
 
     // Save task information in task_info table
     std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
@@ -193,13 +221,16 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
     // In case the task has finished, save output products metadata
     if (taskInfo.taskStatus() == TASK_FINISHED) {
 
+        DBG("TASK FINISHED at " + msg.header.source() +
+            ": Storing outputs into local archive...");
+
         URLHandler urlh;
 
         // Check version of products in gateway against DB
+        TRC("Will try to sanitize product versions:\n" + m);
         sanitizeProductVersions(taskInfo.outputs);
 
         // Move products to local archive
-        DBG("Preparing to send new INDATA with outputs to TskOrc...");
         for (auto & m : taskInfo.outputs.products) {
             urlh.setProduct(m);
             m = urlh.fromGateway2LocalArch();
@@ -239,6 +270,7 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
 
         for (auto & m : prodList.products) {
             std::string sgnt = m.signature();
+            m.dump();
             std::cerr << "Checking signature " << sgnt << std::endl;
             if (dbHdl->checkSignature(sgnt, ver)) {
                 // Version exists: change minor version number

@@ -372,32 +372,28 @@ void TskAge::sendTaskReport()
     TaskInfo & task = (*runningTask);
 
     std::stringstream info;
-    if (dckMng->getInfo(containerId, info)) {
+    while (!dckMng->getInfo(containerId, info)) {}
 
-        JValue jinfo(info.str());
-        json taskData = jinfo.val()[0];
-        task["taskData"] = taskData;
+    JValue jinfo(info.str());
+    json taskData = jinfo.val()[0];
+    task["taskData"] = taskData;
 
-        json jstate = taskData["State"];
-        std::string inspStatus = jstate["Status"].asString();
-        int         inspCode   = jstate["ExitCode"].asInt();
+    json jstate = taskData["State"];
+    std::string inspStatus = jstate["Status"].asString();
+    int         inspCode   = jstate["ExitCode"].asInt();
 
-        if      (inspStatus == "running") {
-            taskStatus = TASK_RUNNING;
-        } else if (inspStatus == "paused") {
-            taskStatus = TASK_PAUSED;
-        } else if (inspStatus == "created") {
-            taskStatus = TASK_STOPPED;
-        } else if (inspStatus == "dead") {
-            taskStatus = TASK_STOPPED;
-        } else if (inspStatus == "exited") {
-            taskStatus = (inspCode == 0) ? TASK_FINISHED : TASK_FAILED;
-        } else {
-            taskStatus = TASK_UNKNOWN_STATE;
-        }
-
+    if      (inspStatus == "running") {
+        taskStatus = TASK_RUNNING;
+    } else if (inspStatus == "paused") {
+        taskStatus = TASK_PAUSED;
+    } else if (inspStatus == "created") {
+        taskStatus = TASK_STOPPED;
+    } else if (inspStatus == "dead") {
+        taskStatus = TASK_STOPPED;
+    } else if (inspStatus == "exited") {
+        taskStatus = (inspCode == 0) ? TASK_FINISHED : TASK_FAILED;
     } else {
-        taskStatus = TASK_FAILED;
+        taskStatus = TASK_UNKNOWN_STATE;
     }
 
     if ((taskStatus == TASK_STOPPED) ||
