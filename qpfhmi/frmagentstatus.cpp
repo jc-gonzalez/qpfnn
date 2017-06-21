@@ -57,6 +57,7 @@ FrmAgentStatus::~FrmAgentStatus()
 
 void FrmAgentStatus::updateInfo(TaskAgentInfo & d)
 {
+    /*
     ui->lblTaskAgentName->setText(QString::fromStdString(d.name()));
     ui->lblTotalTasks->setText(QString("%1").arg(d.total()));
 
@@ -88,7 +89,7 @@ void FrmAgentStatus::updateInfo(TaskAgentInfo & d)
         ui->frmStatusBar->setVisible(true);
     } else {
         ui->frmStatusBar->setVisible(false);
-    }
+        }*/
 }
 
 }
