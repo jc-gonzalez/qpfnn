@@ -36,7 +36,12 @@ if [ "$first" == "dummy.cfg" ]; then
         files="in/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.fits"
         dd if=/dev/random of=$files count=4
     fi
-    output=out/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.json
+    output=$(echo $files |\
+                 sed -e 's#in/#out/#g' \
+                     -e 's#EUC_\(LE1\|SIM\)_\(.*\).fits#EUC_QLA_\1-\2.json#g' \
+                     -e 's#EUC_\(SOC\)_\(.*\).fits#EUC_LE1_\2.fits#g')
+    log=log/$(basename $(basename $output .fits) .json).log
+    #out/EUC_QLA_TEST-${theObsId}-1_${theDate}.0Z_01.00.json
 else
     files="$*"
     output=/dev/stdout
@@ -55,6 +60,8 @@ echo "" >> $output
 sleep 4
 
 date >> $output
+
+cat $output > $log
 
 exit 0
 
