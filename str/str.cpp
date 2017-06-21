@@ -140,6 +140,7 @@ std::string mid(std::string & s, int from, int howmany)
     } catch (...) {
         std::cerr << "ERROR: s:'" << s << "', from:" << from
                   << ", howmany:" << howmany << std::endl;
+        exit(-1);
         showBacktrace();
         throw;
     }
