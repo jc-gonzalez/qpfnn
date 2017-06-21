@@ -356,8 +356,8 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
         result &= updateTable<std::string>("tasks_info", filter,
                                            "end_time", task.taskEnd());
     }
-    //result &= updateTable<Json::Value>("tasks_info", filter,
-    //                                   "task_data", task.taskData());
+    result &= updateTable<Json::Value>("tasks_info", filter,
+                                       "task_data", task["taskData"]);
     PQclear(res);
 
     return result;

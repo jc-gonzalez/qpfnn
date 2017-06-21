@@ -411,7 +411,10 @@ void TskAge::sendTaskReport()
         retrieveOutputProducts();
     }
 
+    // Put declared status in task info structure...
     task["taskStatus"] = taskStatus;
+    // ... and add it as well to the taskData JSON structure
+    task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
     // Define and set task object
     Message<MsgBodyTSK> msg(origMsgString);
