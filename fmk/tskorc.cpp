@@ -51,6 +51,7 @@
 #include "channels.h"
 #include "message.h"
 #include "config.h"
+#include "uuidxx.h"
 
 using Configuration::cfg;
 
@@ -308,7 +309,7 @@ bool TskOrc::checkRulesForProductType(std::string prodType,
                 // a. Include the condition in the condition string
                 condStr += rule->condition;
                 // b. Evaluate condition
-                std::cerr << "Evaluating condition: " << condStr << std::endl;
+                TRC("Evaluating condition: " << condStr << std::endl);
                 ev.clear();
                 ev.set(condStr);
                 try {
@@ -346,7 +347,9 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
     TaskInfo task;
 
     DateTime epoch = timeTag();
-    task["taskName"]     = rule->name + "_" + epoch;
+    UUID uuid;
+    uuid.generate_random();
+    task["taskName"]     = rule->name + "_" + epoch + "_" + uuid.asLowerString();
     task["taskPath"]     = rule->processingElement;
     task["taskStart"]    = epoch;
     task["taskEnd"]      = "";

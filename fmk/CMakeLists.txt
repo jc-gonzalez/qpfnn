@@ -76,8 +76,10 @@ target_include_directories (fmk PUBLIC .
   ${PSQLLIBDIR}
   ${MONGOOSEDIR})
 target_link_libraries (fmk
-  json infix str log tools uuid nncomm
-  nanomsg mongoose ${PCRE2LIB} ${PSQLLIB} pthread)
+  json infix str log tools uuidxx nncomm
+  nanomsg mongoose
+  ${PCRE2LIB} ${PSQLLIB}
+  uuid pthread)
 set_target_properties (fmk PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS fmk
          RUNTIME DESTINATION bin

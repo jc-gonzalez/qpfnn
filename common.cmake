@@ -18,7 +18,7 @@ set (NNMSG_ROOT_DIR /usr/local)
 
 set (UUIDINCDIR /usr/include)
 set (UUIDLIBDIR /usr/lib64)
-set (UUIDLIB uuid)
+set (UUIDLIB uuidxx)
 
 set (PCRE2INCDIR /usr/include)
 set (PCRE2LIBDIR /usr/lib64)
