@@ -41,8 +41,18 @@
 #include <sys/time.h>
 #include "httpserver.h"
 
+using Configuration::cfg;
+
 int main(int argc, char * argv[])
 {
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <cfgFile>\n";
+        exit(-1);
+    }
+
+    cfg.init(std::string(argv[1]));
+    Log::setLogBaseDir(Config::PATHSession);
+
     // Launch the HTTP Server for Docker Swarm Services, and to
     // serve information through HTML pages. We activate the service to
     // provide data files only if we do really need it (swarm services)
