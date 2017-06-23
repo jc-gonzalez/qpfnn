@@ -42,13 +42,16 @@
 #define FRMAGENTSTATUS_H
 
 #include <QFrame>
-#include "datatypes.h"
+//#include "datatypes.h"
+#include "procinfo.h"
 
 namespace Ui {
 class FrmAgentStatus;
 }
 
 namespace QPF {
+
+struct TaskAgentInfo {};
 
 class FrmAgentStatus : public QFrame
 {
@@ -58,7 +61,7 @@ public:
     explicit FrmAgentStatus(QWidget *parent = 0);
     ~FrmAgentStatus();
 
-    void updateInfo(TaskAgentInfo &d);
+    void updateInfo(AgentInfo & a);
 
 private:
     Ui::FrmAgentStatus *ui;

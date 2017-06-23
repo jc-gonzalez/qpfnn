@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>94</width>
-    <height>188</height>
+    <width>81</width>
+    <height>173</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="spacing">
-    <number>2</number>
+    <number>1</number>
    </property>
    <property name="leftMargin">
     <number>2</number>
@@ -39,6 +39,7 @@
     <widget class="QLabel" name="lblTaskAgentName">
      <property name="font">
       <font>
+       <pointsize>8</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -53,6 +54,11 @@
    </item>
    <item>
     <widget class="QLabel" name="lblTaskAgentMode">
+     <property name="font">
+      <font>
+       <pointsize>7</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>CONTAINER</string>
      </property>
@@ -64,12 +70,17 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="vlyLabels">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
         <widget class="QLabel" name="label_5">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#0000ff;&quot;&gt;Run&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -77,6 +88,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_11">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#008b8b;&quot;&gt;Wait&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -84,6 +100,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_12">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffa500;&quot;&gt;Pau&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -91,6 +112,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_13">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#808080;&quot;&gt;Sto&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -98,6 +124,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_14">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fail:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -105,6 +136,11 @@
        </item>
        <item>
         <widget class="QLabel" name="label_15">
+         <property name="font">
+          <font>
+           <pointsize>8</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#21ca21;&quot;&gt;Fin&lt;/span&gt;:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -113,7 +149,7 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="vlyNumbers">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -121,8 +157,7 @@
         <widget class="QLabel" name="lblRun">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -140,8 +175,7 @@
         <widget class="QLabel" name="lblWait">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -159,8 +193,7 @@
         <widget class="QLabel" name="lblPau">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -178,8 +211,7 @@
         <widget class="QLabel" name="lblSto">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -197,8 +229,7 @@
         <widget class="QLabel" name="lblFail">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -216,8 +247,7 @@
         <widget class="QLabel" name="lblFin">
          <property name="font">
           <font>
-           <weight>75</weight>
-           <bold>true</bold>
+           <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
@@ -234,14 +264,14 @@
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,1,1,1,1">
+      <layout class="QVBoxLayout" name="vlyStatus" stretch="1,1,1,1,1,1">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
         <widget class="QFrame" name="frmRunning">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -250,6 +280,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -269,7 +305,7 @@
        <item>
         <widget class="QFrame" name="frmWaiting_">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -278,6 +314,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -297,7 +339,7 @@
        <item>
         <widget class="QFrame" name="frmPaused">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -306,6 +348,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -325,7 +373,7 @@
        <item>
         <widget class="QFrame" name="frmStopped">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -334,6 +382,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -353,7 +407,7 @@
        <item>
         <widget class="QFrame" name="frmFailed">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -362,6 +416,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -381,7 +441,7 @@
        <item>
         <widget class="QFrame" name="frmFinished">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -390,6 +450,12 @@
           <size>
            <width>6</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>6</width>
+           <height>16777215</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -414,6 +480,11 @@
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>Total:</string>
        </property>
@@ -423,6 +494,7 @@
       <widget class="QLabel" name="lblTotalTasks">
        <property name="font">
         <font>
+         <pointsize>8</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>

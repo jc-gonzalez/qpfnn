@@ -179,7 +179,7 @@ void HostInfo::fromStr(std::string s)
     co.computedLoad  = hco["computedLoad"].asFloat();
 
     for (int i = 0; i < c.numCpus; ++i) {
-        c.cpuLoad.push_back(CPULoad({0, 0, 0, 0, 0, 0.}));
+        c.cpuLoad.push_back(CPULoad());
         CPULoad & co = c.cpuLoad[i];
         JValue hco(hc["cpuLoad"][i]);
         co.workJiffies   = hco["jiffies"][0].asInt();

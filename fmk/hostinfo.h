@@ -86,6 +86,13 @@ public:
     };
 
     struct CPULoad {
+        CPULoad() :
+            workJiffies(0),
+            totalJiffies(0),
+            workJiffies2(0),
+            totalJiffies2(0),
+            timeInterval(0),
+            computedLoad(0.) {}
         int workJiffies;
         int totalJiffies;
         int workJiffies2;
