@@ -68,6 +68,7 @@
 #include "productsmodel.h"
 #include "txtblmodel.h"
 #include "filters.h"
+#include "procfmkmonit.h"
 
 namespace Ui {
     class MainWindow;
@@ -310,7 +311,7 @@ private:
     bool isThereActiveCores;
 
     HMIProxy * hmiNode;
-    
+
     QString  fileInDataParams;
     QTimer * taskMonitTimer;
 
@@ -346,6 +347,9 @@ private:
     ProcAlertModel *      procAlertModel;
     ProductsModel *       productsModel;
     TxTableModel *        txModel;
+
+    ProcessingFrameworkInfo procFmkInfo;
+    ProcFmkMonitor *        procFmkMonit;
 
     QMap<QString,QString> nodeStates;
 

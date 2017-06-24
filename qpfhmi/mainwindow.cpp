@@ -68,6 +68,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <QTimer>
 #include <QFileDialog>
+#include <QScrollArea>
 #include <QMessageBox>
 #include <QDomDocument>
 #include <QDesktopServices>
@@ -160,6 +161,7 @@ MainWindow::MainWindow(QString url, QString sessionName,
     // Set-up UI
     ui->setupUi(this);
     manualSetupUI();
+
     defineValidTransitions();
 
     std::string msg = QString("masterAddress: %1    startingPort:  %2").arg(masterAddress).arg(startingPort).toStdString();
@@ -333,6 +335,11 @@ void MainWindow::manualSetupUI()
     // 5. Transmissions Model
     txModel = new TxTableModel(nodeNames);
     ui->tblvwTx->setModel(txModel);
+
+    //== Setup processing hosts monitoring widgets ===================
+    procFmkMonit = new ProcFmkMonitor(new QScrollArea);
+    procFmkMonit->setupHostsInfo(procFmkInfo);
+
 }
 
 //----------------------------------------------------------------------

@@ -16,6 +16,7 @@ set (libfmk_hdr
   datatypes.h
   message.h
   config.h
+  procinfo.h
   infixeval.h
   filenamespec.h
   component.h

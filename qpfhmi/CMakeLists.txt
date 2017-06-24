@@ -3,7 +3,7 @@
 # QPF - Prototype of QLA Processing Framework
 # qpfgui - QPF HMI Application
 #======================================================================
-# Author: J C Gonzalez - 2015,2016,2017 
+# Author: J C Gonzalez - 2015,2016,2017
 # Copyright (C) 2015,2016,2017  Euclid SOC Team at ESAC
 #======================================================================
 include (../common.cmake)
@@ -30,16 +30,19 @@ set (qpfGuiLib_src
   frm_filter.cpp
   frm_filterset.cpp
   frmagentstatus.cpp
+  frmhostinfo.cpp
   hmipxy.cpp
   logframe.cpp
   logwatcher.cpp
   mainwindow.cpp
+  procfmkmonit.cpp
   procalertmodel.cpp
   proctskstatmodel.cpp
   productsmodel.cpp
   progbardlg.cpp
   qjsonitem.cpp
   qjsonmodel.cpp
+  qsimpletickergraph.cpp
   sysalertmodel.cpp
   textview.cpp
   txtblmodel.cpp
@@ -66,18 +69,21 @@ set (qpfGuiLib_hdr
   frm_filter.h
   frm_filterset.h
   frmagentstatus.h
+  frmhostinfo.h
   hmipxy.h
   hmitypes.h
   init.h
   logframe.h
   logwatcher.h
   mainwindow.h
+  procfmkmonit.h
   procalertmodel.h
   proctskstatmodel.h
   productsmodel.h
   progbardlg.h
   qjsonitem.h
   qjsonmodel.h
+  qsimpletickergraph.h
   sysalertmodel.h
   textview.h
   txtblmodel.h
@@ -101,6 +107,7 @@ set (qpfGuiLib_ui
   frm_filterset.ui
   frm_filter.ui
   frmagentstatus.ui
+  frmhostinfo.ui
   verbleveldlg.ui
   logframe.ui
   txitem.ui)

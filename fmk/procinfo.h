@@ -102,7 +102,7 @@ struct SwarmInfo {
     TaskStatusSpectra taskStatus;
 };
 
-struct QPFInfo {
+struct ProcessingFrameworkInfo {
     std::vector<ProcessingHostInfo> hostsInfo;
     SwarmInfo                       swarmInfo;
     int                             numSrvTasks;
