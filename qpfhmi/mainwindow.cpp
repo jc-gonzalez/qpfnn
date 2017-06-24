@@ -988,7 +988,7 @@ void MainWindow::quitAllQPF()
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),
                              MessageDelay);
     sleep(1);
-    
+
     qApp->closeAllWindows();
     qApp->quit();
 }
@@ -1078,7 +1078,7 @@ void MainWindow::init()
     QString msg = QString("Connecting to %1:%2").arg(masterAddress).arg(startingPort);
     std::string smsg = msg.toStdString();
     TRC(smsg);
-    
+
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     std::string chnl     = ChnlHMICmd;
@@ -1407,7 +1407,7 @@ void MainWindow::initLocalArchiveView()
     fld = Field("end_time"          , DATETIME); products[fld.name] = fld;
     fld = Field("registration_time" , DATETIME); products[fld.name] = fld;
     fld = Field("url"               , STRING); products[fld.name] = fld;
-    
+
     QStringList flds {"product_id", "product_type", "product_version", "signature",
                       "instrument_id", "product_size", "product_status_id", "creator_id",
                       "obsmode_id", "start_time", "end_time", "registration_time", "url"};
@@ -1656,14 +1656,14 @@ void MainWindow::showArchiveTableContextMenu(const QPoint & p)
     static const int NumOfProdTypeCol = 1;
 
     if (isProductsCustomFilterActive) { return; }
-    
+
     QModelIndex m = ui->treevwArchive->indexAt(p);
     //if (m.parent() == QModelIndex()) { return; }
 
     QModelIndex m2 = m.model()->index(m.row(), NumOfProdTypeCol, m.parent());
     if (!m2.data().isValid()) { return; }
     QString productType = m2.data().toString();
-        
+
     QList<QAction *> actions;
     if (m.isValid()) {
         foreach (QString key, userDefTools.keys()) {
@@ -2340,7 +2340,7 @@ void MainWindow::initAlertsTables()
 void MainWindow::showAlertsContextMenu(const QPoint & p)
 {
     if (isAlertsCustomFilterActive) { return; }
-    
+
     QList<QAction *> actions;
     QTableView * tblvw = qobject_cast<QTableView*>(sender());
     if (tblvw->indexAt(p).isValid()) {
@@ -2520,6 +2520,7 @@ void MainWindow::updateAgentsMonitPanel()
     // 3. Update view
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
+        TaskAgentInfo & taInfoRef = *taInfo;
         FrmAgentStatus * panel = 0;
         std::map<std::string, FrmAgentStatus*>::iterator it = taskAgentsInfoPanel.find(kv.first);
         if (it == taskAgentsInfoPanel.end()) {
@@ -2531,7 +2532,7 @@ void MainWindow::updateAgentsMonitPanel()
         } else {
             panel = it->second;
         }
-        panel->updateInfo(*taInfo);
+        // panel->updateInfo(taInfoRef);
     }
 }
 

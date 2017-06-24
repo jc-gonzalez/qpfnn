@@ -282,7 +282,7 @@ void HostInfo::getCPUInfo(CPUInfo & info)
     if (info.overallCpuLoad.timeInterval < 1) {
         getCPULoad(info.overallCpuLoad, numSeconds);
         for (int i = 0; i < info.numCpus; ++i) {
-            info.cpuLoad.push_back(CPULoad({0, 0, 0, 0, 0, 0.}));
+            info.cpuLoad.push_back(CPULoad());
             getCPULoad(info.cpuLoad[i], numSeconds);
         }
         sleep(numSeconds);

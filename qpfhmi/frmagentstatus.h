@@ -51,7 +51,7 @@ class FrmAgentStatus;
 
 namespace QPF {
 
-struct TaskAgentInfo {};
+//struct TaskAgentInfo {};
 
 class FrmAgentStatus : public QFrame
 {
