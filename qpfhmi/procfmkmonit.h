@@ -43,10 +43,12 @@
 
 #include <QScrollArea>
 #include <QTimer>
+#include <QVector>
 
 #include "qsimpletickergraph.h"
 #include "procinfo.h"
 #include "frmhostinfo.h"
+//#include "datatypes.h"
 
 namespace QPF {
 

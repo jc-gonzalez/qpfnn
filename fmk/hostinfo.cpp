@@ -231,10 +231,12 @@ void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
     c.totalJiffies2 = j1 + j2 + j3 + j4 + j5 + j6 + j7;
     c.workJiffies2  = j1 + j2 + j3;
 
-    if (c.timeInterval != 0) {
+    if ((c.timeInterval != 0) && (c.totalJiffies2 != c.totalJiffies)) {
         float workCPU  = c.workJiffies2  - c.workJiffies;
         float totalCPU = c.totalJiffies2 - c.totalJiffies;
         c.computedLoad  = (workCPU / totalCPU) * 100.;
+    } else {
+        c.computedLoad = 0.;
     }
 
     c.timeInterval = interval;

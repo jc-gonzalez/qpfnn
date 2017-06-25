@@ -176,6 +176,8 @@ private:
     std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;
 
     HttpServer * httpSrv;
+
+    ProcessingFrameworkInfo procFmkInfo;
 };
 
 //}

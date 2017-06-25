@@ -25,7 +25,7 @@ void FrmHostInfo::update(ProcessingHostInfo & ph)
     QString load = QString("Load Avg: %1 / %2 / %3")
             .arg(l.load1min,0,'g',2)
             .arg(l.load5min,0,'g',2).arg(l.load15min,0,'g',2);
-    QString cpu  = QString("Overall CPU load: 1% over %2 s")
+    QString cpu  = QString("Overall CPU load: %1 over %2 s")
             .arg(c.overallCpuLoad.computedLoad,0,'g',2)
             .arg(c.overallCpuLoad.timeInterval);
     QString arch = QString("%1\n%2 (%3)\n"

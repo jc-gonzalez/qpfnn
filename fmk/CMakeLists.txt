@@ -41,6 +41,7 @@ set (libfmk_hdr
 
 set (libfmk_src
   config.cpp
+  procinfo.cpp
   datatypes.cpp
   filenamespec.cpp
   component.cpp

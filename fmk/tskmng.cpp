@@ -81,21 +81,14 @@ TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)
 void TskMng::fromRunningToOperational()
 {
     // Create Agents Info. table
-    /*
     AgentInfo emptyInfo;
-    int i = 0;
     for (auto & a : cfg.agentNames) {
         agents.push_back(a);
-        emptyInfo.idx           = i;
-        emptyInfo.runningTasks  = 0;
-        emptyInfo.failedTasks   = 0;
-        emptyInfo.finishedTasks = 0;
-        emptyInfo.launchedTasks = 0;
-        emptyInfo.load          = 0;
+        emptyInfo.name = a;
+        emptyInfo.load = 0.0;
         agentInfo[a] = emptyInfo;
-        ++i;
     }
-    */
+
     // Initialize Task Status maps
     for (int k = TASK_SCHEDULED; k != TASK_UNKNOWN_STATE; ++k) {
         TaskStatus status = TaskStatus(k);
