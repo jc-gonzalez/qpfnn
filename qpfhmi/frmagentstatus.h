@@ -42,7 +42,7 @@
 #define FRMAGENTSTATUS_H
 
 #include <QFrame>
-//#include "datatypes.h"
+
 #include "procinfo.h"
 
 namespace Ui {

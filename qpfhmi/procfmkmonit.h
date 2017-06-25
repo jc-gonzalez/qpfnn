@@ -46,6 +46,7 @@
 
 #include "qsimpletickergraph.h"
 #include "procinfo.h"
+#include "frmhostinfo.h"
 
 namespace QPF {
 
@@ -82,6 +83,7 @@ private:
     double mSpeed;
 
     QVector<Graphs> graphs;
+    QVector<FrmHostInfo *> panels;
 };
 
 }

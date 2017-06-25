@@ -40,7 +40,6 @@
 
 #include "procfmkmonit.h"
 
-#include "frmhostinfo.h"
 #include "frmagentstatus.h"
 
 #include <QVBoxLayout>
@@ -94,6 +93,7 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
         g.tasksGraph->setBackgroundBrush(QBrush(QColor(80, 10, 12)));
 
         panel->update(ph);
+        panels.append(panel);
         graphs.append(g);
 
     }
@@ -112,21 +112,27 @@ void ProcFmkMonitor::timeout()
     mTemperature += 0.5 - double(qrand() % 1000) / 1000.0 + 0.02 * (20.0 - mTemperature);
     mSpeed += 4.9 - double(qrand() % 1000) / 100.0 + 0.02 * (100.0 - mSpeed + 0.3 * mVoltage);
     */
+
     int k = 0;
     for (auto & kv : procFmkInfo->hostsInfo) {
         ProcessingHostInfo & ph = (*(kv.second));
-        const Graphs & g= graphs.at(k);
 
+        // Put new data on graphs
+        const Graphs & g= graphs.at(k);
         double mLoad  = ph.hostInfo.loadAvg.load1min;
         double mCpu   = ph.hostInfo.cpuInfo.overallCpuLoad.computedLoad;
         double mTasks = ph.numTasks;
-
         g.loadGraph->appendPoint(mLoad);
         g.cpuGraph->appendPoint(mCpu);
         g.tasksGraph->appendPoint(mTasks);
 
+        // Update Host Agents statistics
+        panels.at(k)->update(ph);
+
         ++k;
     }
+
+
 }
 
 }
