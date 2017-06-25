@@ -121,6 +121,7 @@ void TskAge::fromRunningToOperational()
     }
 
     numTask = 0;
+    runningTask = 0;
 
     // Get initial values for Host Info structure
     hostInfo.hostIp = compAddress;
@@ -192,6 +193,10 @@ void TskAge::runEachIterationForContainers()
         sendTaskReport();
         break;
     case FINISHING:
+        if (runningTask != 0) {
+            delete runningTask;
+            runningTask = 0;
+        }
         pStatus = IDLE;
         InfoMsg("Switching back to status " + ProcStatusName[pStatus]);
         idleCycles = 0;
@@ -296,6 +301,9 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
         MsgBodyTSK & body = msg.body;
         runningTask = new TaskInfo(body["info"]);
         TaskInfo & task = (*runningTask);
+
+        task["taskHost"]  = compAddress;
+        task["taskAgent"] = compName;
 
         assert(compName == msg.header.target());
         DBG(">>>>>>>>>> " << compName

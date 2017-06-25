@@ -16,6 +16,7 @@
         T(TSKRQST),                             \
         T(TSKREP),                              \
         T(HOSTMON),                             \
+        T(FMKMON),                              \
         T(TSKREPDIST)
 
 #define T(x) TX_ID_ ## x

@@ -638,6 +638,42 @@ void Deployer::createElementsNetwork()
         c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
+    //------------------------------------------------------------
+    // Build procFmkInfo structure
+    //------------------------------------------------------------
+    Config::procFmkInfo->numContTasks = 0;
+    HostInfo hi;
+    hi.update();
+
+    for (auto & kv : cfg.network.processingNodes()) {
+        int numOfTskAgents = kv.second;
+        hi.update();
+
+        ProcessingHostInfo * ph = new ProcessingHostInfo;
+        ph->name = kv.first;
+        ph->numAgents = numOfTskAgents;
+        ph->hostInfo = hi;
+        ph->numTasks = 0;
+
+        for (int i = 0; i << ph->numAgents; ++i) {
+            AgentInfo agInfo;
+            agInfo.name = agName.at(i);
+            agInfo.taskStatus = TaskStatusSpectra(rand() % 10, rand() % 10, rand() % 4,
+                                                  rand() % 3, rand() % 3, rand() % 10);
+            agInfo.load = (rand() % 1000) * 0.01;
+            ph->agInfo.push_back(agInfo);
+            ph->numTasks += (agInfo.taskStatus.running +
+                            agInfo.taskStatus.scheduled +
+                            agInfo.taskStatus.paused +
+                            agInfo.taskStatus.stopped +
+                            agInfo.taskStatus.failed +
+                            agInfo.taskStatus.finished);
+        }
+
+        Config::procFmkInfo->hostsInfo[ph->name] = ph;
+        Config::procFmkInfo->numContTasks += ph->numTasks;
+    }
+
 }
 
 //}

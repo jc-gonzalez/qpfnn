@@ -229,6 +229,7 @@ protected:
     virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
+    virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
 
 private:
     //----------------------------------------------------------------------

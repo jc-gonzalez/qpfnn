@@ -346,11 +346,8 @@ void MainWindow::manualSetupUI()
 
     int h = 1;
     for (auto & kv : cfg.network.processingNodes()) {
-
         int numOfTskAgents = kv.second;
-
         hi.update();
-
 
         ProcessingHostInfo * ph = new ProcessingHostInfo;
         ph->name = kv.first;
@@ -363,8 +360,7 @@ void MainWindow::manualSetupUI()
             agInfo.name = QString("TskAgent_%1_%2")
                 .arg(h, 2, 10, QLatin1Char('0'))
                 .arg(i, 2, 10, QLatin1Char('0')).toStdString();
-            agInfo.taskStatus = TaskStatusSpectra({rand() % 10, rand() % 10, rand() % 4,
-                        rand() % 3, rand() % 3, rand() % 10});
+            agInfo.taskStatus = TaskStatusSpectra();
             agInfo.load = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
             ph->numTasks += (agInfo.taskStatus.running +
@@ -381,8 +377,7 @@ void MainWindow::manualSetupUI()
     }
 
     procFmkMonit = new ProcFmkMonitor(ui->scrollAreaAgents);
-    procFmkMonit->setupHostsInfo(&procFmkInfo);
-
+    procFmkMonit->setupHostsInfo(Config::procFmkInfo);
 }
 
 //----------------------------------------------------------------------
@@ -1143,9 +1138,6 @@ void MainWindow::init()
     qconnAddr = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + 2);
     connAddr  = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
-
-    // Define holder of Processing Hosts information
-    hmiNode->defineProcFmkInfoHolder(&procFmkInfo);
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));

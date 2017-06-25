@@ -113,9 +113,9 @@ void HMIProxy::processIncommingMessages()
             if ((tgt != "*") && (tgt != compName)) { continue; }
             std::string type(msg.header.type());
             DBG(compName << " received the message [" << m << "] through the channel " + chnl);
-            if      (chnl == ChnlHMICmd)  { processHMICmdMsg(conn, m); }
-            else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
-            else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
+            if      (chnl == ChnlHMICmd)    { processHMICmdMsg(conn, m); }
+            else if (type == MsgFmkMon)     { processFmkMonMsg(conn, m); }
+            else if (type == MsgTskRepDist) { processTskRepDistMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
     }
@@ -146,34 +146,18 @@ void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & 
 }
 
 //----------------------------------------------------------------------
-// Method: processHostMonMsg
+// Method: processFmkMonMsg
 //----------------------------------------------------------------------
-void HMIProxy::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
+void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
-    JValue hostInfoData(body["info"]);
+    JValue fmkInfoData(body["info"]);
 
     TRC("HMIPXY received [" + m + "]");
-    TRC("  with hostinfo [" + hostInfoData.str() + "]");
+    TRC("  with fmkinfo [" + fmkInfoData.str() + "]");
 
-    HostInfo hostInfo;
-    hostInfo.fromStr(hostInfoData.str());
-    std::string hostIp = hostInfo.hostIp;
-
-    std::map<std::string,
-             ProcessingHostInfo*>::iterator it = procFmkInfo->hostsInfo.find(hostIp);
-    if (it != procFmkInfo->hostsInfo.end()) {
-        it->second->hostInfo = hostInfo;
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: defineProcFmkInfoHolder
-//----------------------------------------------------------------------
-void HMIProxy::defineProcFmkInfoHolder(ProcessingFrameworkInfo * p)
-{
-    procFmkInfo = p;
+    Config::procFmkInfo->fromStr(fmkInfoData.str());
 }
 
 //----------------------------------------------------------------------

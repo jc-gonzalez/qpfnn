@@ -459,4 +459,6 @@ mode_t Config::PATHMode = 0755;
 
 bool Config::isLive = false;
 
+ProcessingFrameworkInfo * Config::procFmkInfo = new ProcessingFrameworkInfo;
+
 //}

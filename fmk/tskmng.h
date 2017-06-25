@@ -150,6 +150,24 @@ private:
     std::string selectAgent();
 
     //----------------------------------------------------------------------
+    // Method: consolidateMonitInfo
+    // Consolidates the monitoring info retrieved from the processing hosts
+    //----------------------------------------------------------------------
+    void consolidateMonitInfo(MessageString & m);
+
+    //----------------------------------------------------------------------
+    // Method: armProcFmkInfoMsgTimer
+    // Arm new timer for sending ProcessingFrameworkInfo updates
+    //----------------------------------------------------------------------
+    void armProcFmkInfoMsgTimer();
+
+    //----------------------------------------------------------------------
+    // Method: convertTaskStatusToSpectra
+    // Convert set of status for an agent to a spectra tuple
+    //----------------------------------------------------------------------
+    TaskStatusSpectra convertTaskStatusToSpectra(std::string & agName);
+
+    //----------------------------------------------------------------------
     // Method: sendTaskAgMsg
     //----------------------------------------------------------------------
     bool sendTaskAgMsg(MessageString & m,
@@ -160,6 +178,12 @@ private:
     // Send a HostInfo message to EvtMng/QPFHMI/DataMng
     //----------------------------------------------------------------------
     bool sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType);
+
+    //----------------------------------------------------------------------
+    // Method: sendProcFmkInfoUpdate
+    // Send an update on the ProcessingFrameworkInfo structure
+    //----------------------------------------------------------------------
+    void sendProcFmkInfoUpdate();
 
 private:
     std::vector<std::string>         agents;
@@ -177,7 +201,8 @@ private:
 
     HttpServer * httpSrv;
 
-    ProcessingFrameworkInfo procFmkInfo;
+    bool sendingPeriodicFmkInfo;
+
 };
 
 //}

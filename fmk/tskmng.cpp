@@ -48,6 +48,7 @@
 #include "log.h"
 #include "tools.h"
 #include "config.h"
+#include "timer.h"
 
 using Configuration::cfg;
 
@@ -107,6 +108,9 @@ void TskMng::fromRunningToOperational()
     httpSrv = new HttpServer("httpSrv",
                              "cfg.network.httpServerAddress()",
                              cfg.network.serviceNodes().size() > 0);
+
+    // Deactivate sending ProcessingFrameworkInfo updates
+    sendingPeriodicFmkInfo = false;
 
     // Transit to Operational
     transitTo(OPERATIONAL);
@@ -270,6 +274,7 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
     TaskInfo task(body["info"]);
 
     std::string taskName  = task.taskName();
+    std::string agName    = task.taskAgent();
 
     TaskStatus taskStatus = TaskStatus(task.taskStatus());
     TaskStatus oldStatus  = taskRegistry[taskName];
@@ -287,11 +292,19 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
             containerTaskStatus[oldStatus]--;
             containerTaskStatus[taskStatus]++;
             std::pair<std::string, TaskStatus> oldPair =
-                std::make_pair(taskName, oldStatus);
+                std::make_pair(agName, oldStatus);
             std::pair<std::string, TaskStatus> tskPair =
-                std::make_pair(taskName, taskStatus);
+                std::make_pair(agName, taskStatus);
             containerTaskStatusPerAgent[oldPair]--;
             containerTaskStatusPerAgent[tskPair]++;
+
+            TaskStatusSpectra spec = convertTaskStatusToSpectra(agName);
+
+            const std::string & hostIp = task.taskHost();
+            ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
+            for (auto & agi : procHostInfo->agInfo) {
+                if (agi.name == hostIp) { agi.taskStatus = spec; }
+            }
         }
     }
 
@@ -307,7 +320,64 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    sendTskRepDistMsg(m, MsgHostMon);
+    // Place new information in general structure
+    consolidateMonitInfo(m);
+    //sendTskRepDistMsg(m, MsgHostMon);
+
+    // If sending updates is not yet activated, activate it
+    if (!sendingPeriodicFmkInfo) {
+        sendingPeriodicFmkInfo = true;
+        armProcFmkInfoMsgTimer();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: armProcFmkInfoMsgTimer
+// Arm new timer for sending ProcessingFrameworkInfo updates
+//----------------------------------------------------------------------
+void TskMng::armProcFmkInfoMsgTimer()
+{
+    Timer * fmkSender = new Timer(5000, true,
+                                  &TskMng::sendProcFmkInfoUpdate, this);
+}
+
+//----------------------------------------------------------------------
+// Method: convertTaskStatusToSpectra
+// Convert set of status for an agent to a spectra tuple
+//----------------------------------------------------------------------
+TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
+{
+    TaskStatusSpectra spec;
+
+    /*auto portnum = [](int start, int h, int i) -> int
+        { return start + 10 * (h - 1) + i; };
+    */
+    std::map<std::pair<std::string, TaskStatus>, int>::iterator
+        nonValid = containerTaskStatusPerAgent.end();
+    std::map<std::pair<std::string, TaskStatus>, int>::iterator
+        it;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_SCHEDULED));
+    spec.scheduled = (it == nonValid) ? 0 : it->second;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_RUNNING));
+    spec.running   = (it == nonValid) ? 0 : it->second;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_PAUSED));
+    spec.paused    = (it == nonValid) ? 0 : it->second;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_STOPPED));
+    spec.stopped   = (it == nonValid) ? 0 : it->second;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_FAILED));
+    spec.failed    = (it == nonValid) ? 0 : it->second;
+
+    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_FINISHED));
+    spec.finished  = (it == nonValid) ? 0 : it->second;
+
+    spec.sum();
+
+    return spec;
 }
 
 //----------------------------------------------------------------------
@@ -330,6 +400,24 @@ inline double weightFunc(double load, double tasks) {
 std::string TskMng::selectAgent()
 {
     return std::string();
+}
+
+//----------------------------------------------------------------------
+// Method: consolidateMonitInfo
+// Consolidates the monitoring info retrieved from the processing hosts
+//----------------------------------------------------------------------
+void TskMng::consolidateMonitInfo(MessageString & m)
+{
+    Message<MsgBodyTSK> msg(m);
+    MsgBodyTSK & body = msg.body;
+    JValue hostInfoData(body["info"]);
+
+    HostInfo hostInfo;
+    hostInfo.fromStr(hostInfoData.str());
+    std::string hostIp = hostInfo.hostIp;
+
+    ProcessingHostInfo* procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
+    procHostInfo->hostInfo = hostInfo;
 }
 
 //----------------------------------------------------------------------
@@ -365,5 +453,37 @@ bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgT
     }
     return retVal;
 }
+
+//----------------------------------------------------------------------
+// Method: sendProcFmkInfoUpdate
+// Send an update on the ProcessingFrameworkInfo structure
+//----------------------------------------------------------------------
+void TskMng::sendProcFmkInfoUpdate()
+{
+    // Prepare message and send it
+    Message<MsgBodyTSK> msg;
+    MsgBodyTSK & body = msg.body;
+
+    JValue fmkInfoValue(Config::procFmkInfo->toJsonStr());
+    body["info"] = fmkInfoValue.val();
+
+    // Set message header
+    msg.buildHdr(ChnlTskRepDist, MsgFmkMon, "1.0",
+                 compName, "*", "", "", "");
+    // Send msg
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    ChannelDescriptor chnl(ChnlTskRepDist);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
+    } else {
+        ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
+    }
+
+    // Arm new timer
+    if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
+}
+
 
 //}

@@ -111,11 +111,6 @@ public:
     //----------------------------------------------------------------------
     void sendNewCfgInfo();
 
-    //----------------------------------------------------------------------
-    // Method: defineProcFmkInfoHolder
-    //----------------------------------------------------------------------
-    void defineProcFmkInfoHolder(ProcessingFrameworkInfo * p);
-
 protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
@@ -139,12 +134,9 @@ protected:
     virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m);
 
     //----------------------------------------------------------------------
-    // Method: processHostMonMsg
+    // Method: processFmkMonMsg
     //----------------------------------------------------------------------
-    virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-private:
-    ProcessingFrameworkInfo * procFmkInfo;
+    virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m);
 };
 
 //}

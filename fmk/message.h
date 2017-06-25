@@ -162,6 +162,7 @@ const MessageDescriptor MsgTskProc    (ChannelAcronym[TX_ID_TSKPROC]);
 const MessageDescriptor MsgTskRqst    (ChannelAcronym[TX_ID_TSKRQST]);
 const MessageDescriptor MsgTskRep     (ChannelAcronym[TX_ID_TSKREP]);
 const MessageDescriptor MsgHostMon    (ChannelAcronym[TX_ID_HOSTMON]);
+const MessageDescriptor MsgFmkMon     (ChannelAcronym[TX_ID_FMKMON]);
 const MessageDescriptor MsgTskRepDist (ChannelAcronym[TX_ID_TSKREPDIST]);
 
 #endif

@@ -48,6 +48,12 @@
                      std::string("\":\"") + a + std::string("\""))
 #define COMMA       std::string(", ")
 
+void TaskStatusSpectra::sum()
+{
+    total = (running + scheduled + paused  +
+             stopped + failed    + finished);
+}
+
 std::string TaskStatusSpectra::toJsonStr()
 {
     total = (running + scheduled + paused +

@@ -83,6 +83,7 @@ struct TaskStatusSpectra : public BasicInfoContainer {
     int    failed;
     int    finished;
     int    total;
+    void sum();
     virtual std::string toJsonStr();
     virtual void fromStr(std::string s);
 };

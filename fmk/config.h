@@ -49,6 +49,7 @@
 // Topic: Project dependencies
 //------------------------------------------------------------
 #include "datatypes.h"
+#include "procinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -381,6 +382,9 @@ public:
     static mode_t         PATHMode;
 
     static bool           isLive;
+
+    static ProcessingFrameworkInfo * procFmkInfo;
+
 };
 
 namespace Configuration {

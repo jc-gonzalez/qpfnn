@@ -379,6 +379,8 @@ struct TaskInfo : public JRecord {
     virtual void dump() {
         DUMPJSTR(taskName);
         DUMPJSTR(taskPath);
+        DUMPJSTR(taskHost);
+        DUMPJSTR(taskAgent);
         DUMPJSTR(taskStart);
         DUMPJSTR(taskEnd);
         DUMPJINT(taskExitCode);
@@ -392,6 +394,8 @@ struct TaskInfo : public JRecord {
     }
     JSTR(taskName);
     JSTR(taskPath);
+    JSTR(taskHost);
+    JSTR(taskAgent);
     JSTR(taskStart);
     JSTR(taskEnd);
     JINT(taskExitCode);
