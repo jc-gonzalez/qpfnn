@@ -112,9 +112,9 @@ public:
     void sendNewCfgInfo();
 
     //----------------------------------------------------------------------
-    // Method: defineProcHostInfoHolder
+    // Method: defineProcFmkInfoHolder
     //----------------------------------------------------------------------
-    void defineProcHostInfoHolder(ProcessingFrameworkInfo * p);
+    void defineProcFmkInfoHolder(ProcessingFrameworkInfo * p);
 
 protected:
     //----------------------------------------------------------------------

@@ -630,7 +630,8 @@ void Deployer::createElementsNetwork()
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "inproc://" + chnl;
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + 2);
+    //bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c: std::vector<CommNode*> {m.datMng, m.evtMng}) {

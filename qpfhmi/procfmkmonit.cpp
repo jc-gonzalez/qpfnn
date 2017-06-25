@@ -48,7 +48,7 @@
 
 namespace QPF {
 
-const int GRAPH_UPDATE_PERIOD = 100;
+const int GRAPH_UPDATE_PERIOD = 1000;
 
 ProcFmkMonitor::ProcFmkMonitor(QScrollArea * scrl) :
     scrollArea(scrl), mTimer(new QTimer())

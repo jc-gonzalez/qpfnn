@@ -96,6 +96,7 @@
 #include "dlgalert.h"
 
 #include "reqrep.h"
+#include "pubsub.h"
 
 using Configuration::cfg;
 
@@ -1131,11 +1132,20 @@ void MainWindow::init()
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     std::string chnl     = ChnlHMICmd;
-    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort);
+    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + 1);
     std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 
-    hmiNode->defineProcHostInfoHolder(&procFmkInfo);
+    // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
+    // - Publisher: TskMng
+    // - Subscriber: DataMng EvtMng QPFHMI
+    chnl      = ChnlTskRepDist;
+    qconnAddr = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + 2);
+    connAddr  = qconnAddr.toStdString();
+    hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+
+    // Define holder of Processing Hosts information
+    hmiNode->defineProcFmkInfoHolder(&procFmkInfo);
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
