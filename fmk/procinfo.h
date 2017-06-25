@@ -64,52 +64,64 @@
 //------------------------------------------------------------
 #include "hostinfo.h"
 
-/*
-  struct AgentInfo {
-  int    idx;
-  int    runningTasks;
-  int    failedTasks;
-  int    finishedTasks;
-  int    launchedTasks;
-  double load;
-  };*/
+struct BasicInfoContainer {
+    virtual std::string toJsonStr() = 0;
+    virtual void fromStr(std::string s) = 0;
+};
 
-struct TaskStatusSpectra {
+struct TaskStatusSpectra : public BasicInfoContainer {
+    TaskStatusSpectra() :
+        running(0), scheduled(0), paused(0),
+        stopped(0), failed(0), finished(0), total(0) {}
+    TaskStatusSpectra(int r, int s, int p, int st, int fl, int f) :
+        running(r), scheduled(s), paused(p),
+        stopped(st), failed(fl), finished(f), total(r+s+p+st+fl+f) {}
     int    running;
     int    scheduled;
     int    paused;
     int    stopped;
     int    failed;
     int    finished;
+    int    total;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
 };
 
-struct AgentInfo {
+struct AgentInfo : public BasicInfoContainer {
     std::string       name;
     TaskStatusSpectra taskStatus;
     float             load;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
 };
 
-struct ProcessingHostInfo {
+struct ProcessingHostInfo : public BasicInfoContainer {
     std::string            name;
-    int                    numAgents;
     HostInfo               hostInfo;
+    int                    numAgents;
     std::vector<AgentInfo> agInfo;
     int                    numTasks;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
 };
 
-struct SwarmInfo {
+struct SwarmInfo : public BasicInfoContainer {
     std::string       name;
-    std::string       scale;
+    int               scale;
     HostInfo          hostInfo;
     TaskStatusSpectra taskStatus;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
 };
 
-struct ProcessingFrameworkInfo {
+struct ProcessingFrameworkInfo : public BasicInfoContainer {
     std::map<std::string,
         ProcessingHostInfo*>        hostsInfo;
     SwarmInfo                       swarmInfo;
     int                             numSrvTasks;
     int                             numContTasks;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
 };
 
 #endif // PROCINFO_H
