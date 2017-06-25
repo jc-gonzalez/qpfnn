@@ -348,7 +348,6 @@ private:
     ProductsModel *       productsModel;
     TxTableModel *        txModel;
 
-    ProcessingFrameworkInfo procFmkInfo;
     ProcFmkMonitor *        procFmkMonit;
 
     QMap<QString,QString> nodeStates;

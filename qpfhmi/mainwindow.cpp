@@ -340,7 +340,7 @@ void MainWindow::manualSetupUI()
 
     //== Setup processing hosts monitoring widgets ===================
 
-    procFmkInfo.numContTasks = 0;
+    Config::procFmkInfo->numContTasks = 0;
     HostInfo hi;
     hi.update();
 
@@ -360,7 +360,8 @@ void MainWindow::manualSetupUI()
             agInfo.name = QString("TskAgent_%1_%2")
                 .arg(h, 2, 10, QLatin1Char('0'))
                 .arg(i, 2, 10, QLatin1Char('0')).toStdString();
-            agInfo.taskStatus = TaskStatusSpectra();
+            agInfo.taskStatus = TaskStatusSpectra(rand() % 10, rand() % 10, rand() % 4,
+                                                  rand() % 3, rand() % 3, rand() % 10);
             agInfo.load = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
             ph->numTasks += (agInfo.taskStatus.running +
@@ -371,8 +372,8 @@ void MainWindow::manualSetupUI()
                             agInfo.taskStatus.finished);
         }
 
-        procFmkInfo.hostsInfo[ph->name] = ph;
-        procFmkInfo.numContTasks += ph->numTasks;
+        Config::procFmkInfo->hostsInfo[ph->name] = ph;
+        Config::procFmkInfo->numContTasks += ph->numTasks;
         ++h;
     }
 

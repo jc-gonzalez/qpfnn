@@ -642,6 +642,7 @@ void Deployer::createElementsNetwork()
     // Build procFmkInfo structure
     //------------------------------------------------------------
     Config::procFmkInfo->numContTasks = 0;
+    Config::procFmkInfo->numSrvTasks = 0;
     HostInfo hi;
     hi.update();
 
