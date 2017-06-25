@@ -48,8 +48,10 @@
 //------------------------------------------------------------
 // Topic: System headers
 //   - vector
+//   - map
 //------------------------------------------------------------
 #include <vector>
+#include <map>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -103,7 +105,8 @@ struct SwarmInfo {
 };
 
 struct ProcessingFrameworkInfo {
-    std::vector<ProcessingHostInfo> hostsInfo;
+    std::map<std::string,
+        ProcessingHostInfo*>        hostsInfo;
     SwarmInfo                       swarmInfo;
     int                             numSrvTasks;
     int                             numContTasks;

@@ -58,44 +58,18 @@ class ServiceMng : public DockerMng {ServiceMng78,1974
     std::vector<std::string> workerAddrs;workerAddrs138,4644
     std::string workerToken;workerToken139,4686
 
-fmk/tskmng.h,2113
+fmk/tskmng.h,753
 #define TSKMNG_HTSKMNG_H42,818
-class TskMng : public Component {TskMng82,2069
-    struct TaskStatusSpectra {TaskStatusSpectra106,2832
-        int    running;running107,2863
-        int    scheduled;scheduled108,2887
-        int    paused;paused109,2913
-        int    stopped;stopped110,2936
-        int    failed;failed111,2960
-        int    finished;finished112,2983
-    struct AgentInfo {AgentInfo115,3016
-        std::string       name;name116,3039
-        TaskStatusSpectra taskStatus;taskStatus117,3071
-        float             load;load118,3109
-    struct ProcessingHostInfo {ProcessingHostInfo121,3149
-        std::string            name;name122,3181
-        std::string            numAgents;numAgents123,3218
-        HostInfo               hostInfo;hostInfo124,3260
-        std::vector<AgentInfo> agInfo;agInfo125,3301
-    struct SwarmInfo {SwarmInfo128,3348
-        std::string       name;name129,3371
-        std::string       scale;scale130,3403
-        HostInfo          hostInfo;hostInfo131,3436
-        TaskStatusSpectra taskStatus;taskStatus132,3472
-    struct QPFInfo {QPFInfo135,3518
-        std::vector<ProcessingHostInfo> hostsInfo;hostsInfo136,3539
-        SwarmInfo                       swarmInfo;swarmInfo137,3590
-        int                             numSrvTasks;numSrvTasks138,3641
-        int                             numContTasks;numContTasks139,3694
-    std::vector<std::string>         agents;agents210,6878
-    std::map<std::string, AgentInfo> agentInfo;agentInfo211,6923
-    std::list<TaskInfo>              serviceTasks;serviceTasks213,6972
-    std::list<TaskInfo>              containerTasks;containerTasks214,7023
-    std::map<std::string, TaskStatus> taskRegistry;taskRegistry216,7077
-    std::map<TaskStatus, int> containerTaskStatus;containerTaskStatus218,7130
-    std::map<TaskStatus, int> serviceTaskStatus;serviceTaskStatus219,7181
-    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;containerTaskStatusPerAgent221,7231
-    HttpServer * httpSrv;httpSrv223,7315
+class TskMng : public Component {TskMng83,2093
+    std::vector<std::string>         agents;agents165,5776
+    std::map<std::string, AgentInfo> agentInfo;agentInfo166,5821
+    std::list<TaskInfo>              serviceTasks;serviceTasks168,5870
+    std::list<TaskInfo>              containerTasks;containerTasks169,5921
+    std::map<std::string, TaskStatus> taskRegistry;taskRegistry171,5975
+    std::map<TaskStatus, int> containerTaskStatus;containerTaskStatus173,6028
+    std::map<TaskStatus, int> serviceTaskStatus;serviceTaskStatus174,6079
+    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;containerTaskStatusPerAgent176,6129
+    HttpServer * httpSrv;httpSrv178,6213
 
 fmk/tskorc.cpp,788
 TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s)TskOrc69,1474
@@ -407,7 +381,7 @@ std::string TskMng::selectAgent()selectAgent337,11484
 bool TskMng::sendTaskAgMsg(MessageString & m,sendTaskAgMsg347,11807
 bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)sendTskRepDistMsg357,12149
 
-fmk/hostinfo.h,1438
+fmk/hostinfo.h,1478
 #define HOSTINFO_HHOSTINFO_H42,815
 class HostInfo {HostInfo76,1939
     struct LoadAvg {LoadAvg79,1965
@@ -440,16 +414,17 @@ class HostInfo {HostInfo76,1939
         std::vector<CPULoad> cpuLoad;cpuLoad116,2862
     CPUInfo cpuInfo;cpuInfo120,2916
     LoadAvg loadAvg;loadAvg121,2937
+    std::string hostIp;hostIp122,2958
 
 fmk/hostinfo.cpp,442
 void HostInfo::update()update61,1180
 std::string HostInfo::dump()dump66,1228
-std::string HostInfo::toJsonStr()toJsonStr93,2220
-void HostInfo::fromStr(std::string s)fromStr145,4037
-void HostInfo::getLoadAvg(LoadAvg & l)getLoadAvg194,5899
-void HostInfo::getCPULoad(CPULoad & c, int interval, int line)getCPULoad207,6214
-void HostInfo::getCPUInfo(CPUInfo & info)getCPUInfo239,7137
-void HostInfo::getHostInfo()getHostInfo302,9428
+std::string HostInfo::toJsonStr()toJsonStr94,2256
+void HostInfo::fromStr(std::string s)fromStr147,4119
+void HostInfo::getLoadAvg(LoadAvg & l)getLoadAvg198,6015
+void HostInfo::getCPULoad(CPULoad & c, int interval, int line)getCPULoad211,6330
+void HostInfo::getCPUInfo(CPUInfo & info)getCPUInfo243,7253
+void HostInfo::getHostInfo()getHostInfo306,9544
 
 fmk/cntrmng.h,96
 #define CNTRMNG_HCNTRMNG_H42,821
@@ -796,14 +771,14 @@ fmk/tskage.cpp,907
 TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,TskAge75,1539
 TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,TskAge85,1935
 void TskAge::fromRunningToOperational()fromRunningToOperational95,2350
-void TskAge::runEachIteration()runEachIteration137,3636
-void TskAge::runEachIterationForContainers()runEachIterationForContainers149,3993
-void TskAge::runEachIterationForServices()runEachIterationForServices239,7181
-void TskAge::processIncommingMessages()processIncommingMessages246,7411
-void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg271,8469
-void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg289,9032
-void TskAge::sendTaskReport()sendTaskReport369,11737
-void TskAge::retrieveOutputProducts()retrieveOutputProducts444,14123
+void TskAge::runEachIteration()runEachIteration138,3671
+void TskAge::runEachIterationForContainers()runEachIterationForContainers150,4028
+void TskAge::runEachIterationForServices()runEachIterationForServices240,7216
+void TskAge::processIncommingMessages()processIncommingMessages247,7446
+void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg272,8504
+void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg290,9067
+void TskAge::sendTaskReport()sendTaskReport370,11772
+void TskAge::retrieveOutputProducts()retrieveOutputProducts445,14158
 
 fmk/tskage.h,2319
 #define TSKAGE_HTSKAGE_H42,807
@@ -847,6 +822,36 @@ class TskAge : public Component {TskAge81,2042
     int                      workingDuring;workingDuring189,6188
     URLHandler               urlh;urlh191,6233
     HostInfo                 hostInfo;hostInfo193,6269
+
+fmk/procinfo.h,1361
+#define PROCINFO_HPROCINFO_H42,820
+struct TaskStatusSpectra {TaskStatusSpectra75,1695
+    int    running;running76,1722
+    int    scheduled;scheduled77,1742
+    int    paused;paused78,1764
+    int    stopped;stopped79,1783
+    int    failed;failed80,1803
+    int    finished;finished81,1822
+struct AgentInfo {AgentInfo84,1847
+    std::string       name;name85,1866
+    TaskStatusSpectra taskStatus;taskStatus86,1894
+    float             load;load87,1928
+struct ProcessingHostInfo {ProcessingHostInfo90,1960
+    std::string            name;name91,1988
+    int                    numAgents;numAgents92,2021
+    HostInfo               hostInfo;hostInfo93,2059
+    std::vector<AgentInfo> agInfo;agInfo94,2096
+    int                    numTasks;numTasks95,2131
+struct SwarmInfo {SwarmInfo98,2172
+    std::string       name;name99,2191
+    std::string       scale;scale100,2219
+    HostInfo          hostInfo;hostInfo101,2248
+    TaskStatusSpectra taskStatus;taskStatus102,2280
+struct ProcessingFrameworkInfo {ProcessingFrameworkInfo105,2318
+    std::vector<ProcessingHostInfo> hostsInfo;hostsInfo106,2351
+    SwarmInfo                       swarmInfo;swarmInfo107,2398
+    int                             numSrvTasks;numSrvTasks108,2445
+    int                             numContTasks;numContTasks109,2494
 
 infix/infixeval.h,2237
 #define INFIXEVAL_HINFIXEVAL_H42,842
@@ -2793,9 +2798,10 @@ class TxItemTxItem53,901
     QString name;name74,1383
     QJsonObject content;content75,1401
 
-qpfhmi/hmipxy.h,86
+qpfhmi/hmipxy.h,145
 #define HMIPXY_HHMIPXY_H42,811
-class HMIProxy : public Component {HMIProxy77,1964
+class HMIProxy : public Component {HMIProxy79,2004
+    ProcessingHostInfo * procFmkInfo;procFmkInfo148,5159
 
 qpfhmi/xmlsyntaxhighlight.h,874
 #define BASIC_XML_SYNTAX_HIGHLIGHTER_HBASIC_XML_SYNTAX_HIGHLIGHTER_H42,875
@@ -3309,7 +3315,7 @@ void ExtToolsDef::removeTool()removeTool159,4897
 void ExtToolsDef::cancelDlg()cancelDlg180,5771
 void ExtToolsDef::getTools(MapOfUserDefTools & userTools)getTools185,5839
 
-qpfhmi/hmipxy.cpp,937
+qpfhmi/hmipxy.cpp,1035
 HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)HMIProxy61,1336
 HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)HMIProxy69,1608
 void HMIProxy::runEachIteration()runEachIteration77,1891
@@ -3317,10 +3323,11 @@ void HMIProxy::processIncommingMessages()processIncommingMessages104,2824
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg127,3852
 void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepDistMsg135,4171
 void HMIProxy::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)processHostMonMsg151,4751
-void HMIProxy::log(std::string s, Log::LogLevel lvl)log167,5250
-void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd176,5550
-void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel184,5844
-void HMIProxy::sendNewCfgInfo()sendNewCfgInfo192,6128
+void HMIProxy::defineProcHostInfoHolder(ProcessingHostInfo * p)defineProcHostInfoHolder166,5199
+void HMIProxy::log(std::string s, Log::LogLevel lvl)log175,5498
+void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd184,5798
+void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel192,6092
+void HMIProxy::sendNewCfgInfo()sendNewCfgInfo200,6376
 
 qpfhmi/dlgshowtaskinfo.cpp,277
 DlgShowTaskInfo::DlgShowTaskInfo(QWidget *parent) :DlgShowTaskInfo43,843
@@ -3375,105 +3382,107 @@ void sayHello()sayHello96,2684
 void ctrlMsg(QSplashScreen & splash, int k = 0)ctrlMsg121,3627
 int main(int argc, char *argv[])main146,4710
 
-qpfhmi/mainwindow.h,5105
+qpfhmi/mainwindow.h,5231
 #define MAINWINDOW_HMAINWINDOW_H42,811
-namespace Ui {Ui72,1375
-namespace QPF {QPF76,1415
-class MainWindow : public QMainWindow, StateMachineMainWindow80,1451
-    static const int ERROR;ERROR85,1547
-    static const int OFF;OFF86,1575
-    static const int INITIALISED;INITIALISED87,1601
-    static const int RUNNING;RUNNING88,1635
-    static const int OPERATIONAL;OPERATIONAL89,1665
-    static const std::string ERROR_StateName;ERROR_StateName92,1728
-    static const std::string OFF_StateName;OFF_StateName93,1774
-    static const std::string INITIALISED_StateName;INITIALISED_StateName94,1818
-    static const std::string RUNNING_StateName;RUNNING_StateName95,1870
-    static const std::string OPERATIONAL_StateName;OPERATIONAL_StateName96,1918
-    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE108,2360
-    Ui::MainWindow *ui;ui244,6232
-    QString dbUrl;dbUrl246,6257
-    QString sessionId;sessionId247,6276
-    QString masterAddress;masterAddress248,6299
-    int     startingPort;startingPort249,6326
-    QSignalMapper *windowMapper;windowMapper251,6353
-    bool updateProductsModel;updateProductsModel253,6387
-    bool expandProductsModel;expandProductsModel254,6417
-    bool resizeProductsModel;resizeProductsModel255,6447
-    QMenu *fileMenu;fileMenu257,6478
-    QMenu *editMenu;editMenu258,6499
-    QMenu *windowMenu;windowMenu259,6520
-    QMenu *toolsMenu;toolsMenu260,6543
-    QMenu *sessionInfoMenu;sessionInfoMenu261,6565
-    QMenu *helpMenu;helpMenu262,6593
-    QToolBar *fileToolBar;fileToolBar263,6614
-    QToolBar *editToolBar;editToolBar264,6641
-    QAction *processPathAct;processPathAct266,6669
-    QAction *saveAsAct;saveAsAct267,6698
-    QAction *stopTaskAct;stopTaskAct269,6723
-    QAction *restartTaskAct;restartTaskAct270,6749
-    QAction *restartAct;restartAct272,6779
-    QAction *quitAct;quitAct273,6804
-    QAction *quitAllAct;quitAllAct274,6826
-    QAction *cutAct;cutAct276,6875
-    QAction *copyAct;copyAct277,6896
-    QAction *pasteAct;pasteAct278,6918
-    QAction *configToolAct;configToolAct281,6949
-    QAction *browseDBAct;browseDBAct282,6977
-    QAction *extToolsAct;extToolsAct283,7003
-    QAction *verbosityAct;verbosityAct284,7029
-    QAction *execTestRunAct;execTestRunAct285,7056
-    QAction *acDefault;acDefault287,7086
-    QAction *acReprocess;acReprocess288,7110
-    QAction *navigAct;navigAct290,7137
-    QAction *closeAct;closeAct291,7160
-    QAction *closeAllAct;closeAllAct292,7183
-    QAction *tileAct;tileAct293,7209
-    QAction *cascadeAct;cascadeAct294,7231
-    QAction *nextAct;nextAct295,7256
-    QAction *previousAct;previousAct296,7278
-    QAction *separatorAct;separatorAct297,7304
-    QAction *aboutAct;aboutAct298,7331
-    QAction *aboutQtAct;aboutQtAct299,7354
-    bool isMenuForTabWidget;isMenuForTabWidget301,7380
-    QPoint menuPt;menuPt302,7409
-    QAction * tabCloseAct;tabCloseAct303,7428
-    QAction * tabCloseAllAct;tabCloseAllAct304,7455
-    QAction * tabCloseOtherAct;tabCloseOtherAct305,7485
-    QVector<LogWatcher*> nodeLogs;nodeLogs307,7518
-    QStringList nodeNames;nodeNames308,7553
-    QVector<QString> activeNodes;activeNodes309,7580
-    bool isThereActiveCores;isThereActiveCores310,7614
-    HMIProxy * hmiNode;hmiNode312,7644
-    QString  fileInDataParams;fileInDataParams314,7673
-    QTimer * taskMonitTimer;taskMonitTimer315,7704
-    QString inboxDirName;inboxDirName317,7734
-    QAction * acWorkDir;acWorkDir319,7761
-    QAction * acShowTaskInfo;acShowTaskInfo320,7786
-    QAction * acRestartTask;acRestartTask321,7816
-    QAction * acStopTask;acStopTask322,7845
-    QAction * acShowMsgInfo;acShowMsgInfo324,7872
-    QAction * acShowAlert;acShowAlert326,7902
-    QAction * acAckAlert;acAckAlert327,7929
-    QAction * acArchiveShow;acArchiveShow329,7956
-    QMenu *   acArchiveOpenExt;acArchiveOpenExt330,7985
-    QList<QAction *> acArchiveOpenExtTools;acArchiveOpenExtTools331,8017
-    QMap<QString, QAction *> acUserTools;acUserTools332,8061
-    QVBoxLayout * vlyFrmAgents;vlyFrmAgents334,8104
-    QSpacerItem * spacerFrmAgents;spacerFrmAgents335,8136
-    std::map<std::string, TaskAgentInfo*> taskAgentsInfo;taskAgentsInfo337,8172
-    std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;taskAgentsInfoPanel338,8230
-    MapOfUserDefTools userDefTools;userDefTools341,8321
-    QStringList       userDefProdTypes;userDefProdTypes342,8357
-    ProcTaskStatusModel * procTaskStatusModel;procTaskStatusModel344,8398
-    SysAlertModel *       sysAlertModel;sysAlertModel345,8445
-    ProcAlertModel *      procAlertModel;procAlertModel346,8486
-    ProductsModel *       productsModel;productsModel347,8528
-    TxTableModel *        txModel;txModel348,8569
-    QMap<QString,QString> nodeStates;nodeStates350,8605
-    QPoint pointOfAction;pointOfAction352,8644
-    bool isProductsCustomFilterActive;isProductsCustomFilterActive355,8702
-    bool isAlertsCustomFilterActive;isAlertsCustomFilterActive356,8741
+namespace Ui {Ui73,1401
+namespace QPF {QPF77,1441
+class MainWindow : public QMainWindow, StateMachineMainWindow81,1477
+    static const int ERROR;ERROR86,1573
+    static const int OFF;OFF87,1601
+    static const int INITIALISED;INITIALISED88,1627
+    static const int RUNNING;RUNNING89,1661
+    static const int OPERATIONAL;OPERATIONAL90,1691
+    static const std::string ERROR_StateName;ERROR_StateName93,1754
+    static const std::string OFF_StateName;OFF_StateName94,1800
+    static const std::string INITIALISED_StateName;INITIALISED_StateName95,1844
+    static const std::string RUNNING_StateName;RUNNING_StateName96,1896
+    static const std::string OPERATIONAL_StateName;OPERATIONAL_StateName97,1944
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;Q_DECL_OVERRIDE109,2386
+    Ui::MainWindow *ui;ui245,6258
+    QString dbUrl;dbUrl247,6283
+    QString sessionId;sessionId248,6302
+    QString masterAddress;masterAddress249,6325
+    int     startingPort;startingPort250,6352
+    QSignalMapper *windowMapper;windowMapper252,6379
+    bool updateProductsModel;updateProductsModel254,6413
+    bool expandProductsModel;expandProductsModel255,6443
+    bool resizeProductsModel;resizeProductsModel256,6473
+    QMenu *fileMenu;fileMenu258,6504
+    QMenu *editMenu;editMenu259,6525
+    QMenu *windowMenu;windowMenu260,6546
+    QMenu *toolsMenu;toolsMenu261,6569
+    QMenu *sessionInfoMenu;sessionInfoMenu262,6591
+    QMenu *helpMenu;helpMenu263,6619
+    QToolBar *fileToolBar;fileToolBar264,6640
+    QToolBar *editToolBar;editToolBar265,6667
+    QAction *processPathAct;processPathAct267,6695
+    QAction *saveAsAct;saveAsAct268,6724
+    QAction *stopTaskAct;stopTaskAct270,6749
+    QAction *restartTaskAct;restartTaskAct271,6775
+    QAction *restartAct;restartAct273,6805
+    QAction *quitAct;quitAct274,6830
+    QAction *quitAllAct;quitAllAct275,6852
+    QAction *cutAct;cutAct277,6901
+    QAction *copyAct;copyAct278,6922
+    QAction *pasteAct;pasteAct279,6944
+    QAction *configToolAct;configToolAct282,6975
+    QAction *browseDBAct;browseDBAct283,7003
+    QAction *extToolsAct;extToolsAct284,7029
+    QAction *verbosityAct;verbosityAct285,7055
+    QAction *execTestRunAct;execTestRunAct286,7082
+    QAction *acDefault;acDefault288,7112
+    QAction *acReprocess;acReprocess289,7136
+    QAction *navigAct;navigAct291,7163
+    QAction *closeAct;closeAct292,7186
+    QAction *closeAllAct;closeAllAct293,7209
+    QAction *tileAct;tileAct294,7235
+    QAction *cascadeAct;cascadeAct295,7257
+    QAction *nextAct;nextAct296,7282
+    QAction *previousAct;previousAct297,7304
+    QAction *separatorAct;separatorAct298,7330
+    QAction *aboutAct;aboutAct299,7357
+    QAction *aboutQtAct;aboutQtAct300,7380
+    bool isMenuForTabWidget;isMenuForTabWidget302,7406
+    QPoint menuPt;menuPt303,7435
+    QAction * tabCloseAct;tabCloseAct304,7454
+    QAction * tabCloseAllAct;tabCloseAllAct305,7481
+    QAction * tabCloseOtherAct;tabCloseOtherAct306,7511
+    QVector<LogWatcher*> nodeLogs;nodeLogs308,7544
+    QStringList nodeNames;nodeNames309,7579
+    QVector<QString> activeNodes;activeNodes310,7606
+    bool isThereActiveCores;isThereActiveCores311,7640
+    HMIProxy * hmiNode;hmiNode313,7670
+    QString  fileInDataParams;fileInDataParams315,7695
+    QTimer * taskMonitTimer;taskMonitTimer316,7726
+    QString inboxDirName;inboxDirName318,7756
+    QAction * acWorkDir;acWorkDir320,7783
+    QAction * acShowTaskInfo;acShowTaskInfo321,7808
+    QAction * acRestartTask;acRestartTask322,7838
+    QAction * acStopTask;acStopTask323,7867
+    QAction * acShowMsgInfo;acShowMsgInfo325,7894
+    QAction * acShowAlert;acShowAlert327,7924
+    QAction * acAckAlert;acAckAlert328,7951
+    QAction * acArchiveShow;acArchiveShow330,7978
+    QMenu *   acArchiveOpenExt;acArchiveOpenExt331,8007
+    QList<QAction *> acArchiveOpenExtTools;acArchiveOpenExtTools332,8039
+    QMap<QString, QAction *> acUserTools;acUserTools333,8083
+    QVBoxLayout * vlyFrmAgents;vlyFrmAgents335,8126
+    QSpacerItem * spacerFrmAgents;spacerFrmAgents336,8158
+    std::map<std::string, TaskAgentInfo*> taskAgentsInfo;taskAgentsInfo338,8194
+    std::map<std::string, FrmAgentStatus*> taskAgentsInfoPanel;taskAgentsInfoPanel339,8252
+    MapOfUserDefTools userDefTools;userDefTools342,8343
+    QStringList       userDefProdTypes;userDefProdTypes343,8379
+    ProcTaskStatusModel * procTaskStatusModel;procTaskStatusModel345,8420
+    SysAlertModel *       sysAlertModel;sysAlertModel346,8467
+    ProcAlertModel *      procAlertModel;procAlertModel347,8508
+    ProductsModel *       productsModel;productsModel348,8550
+    TxTableModel *        txModel;txModel349,8591
+    ProcessingFrameworkInfo procFmkInfo;procFmkInfo351,8627
+    ProcFmkMonitor *        procFmkMonit;procFmkMonit352,8668
+    QMap<QString,QString> nodeStates;nodeStates354,8711
+    QPoint pointOfAction;pointOfAction356,8750
+    bool isProductsCustomFilterActive;isProductsCustomFilterActive359,8808
+    bool isAlertsCustomFilterActive;isAlertsCustomFilterActive360,8847
 
 qpfhmi/procalertmodel.cpp,151
 namespace QPF {QPF43,864
@@ -3607,126 +3616,126 @@ qpfhmi/dlgdataing.cpp,141
 DlgDataIngestion::DlgDataIngestion(QWidget *parent) :DlgDataIngestion44,862
 DlgDataIngestion::~DlgDataIngestion()~DlgDataIngestion51,998
 
-qpfhmi/mainwindow.cpp,7944
-namespace QPF {QPF103,1905
-static const int MessageDelay = 2000;MessageDelay105,1922
-static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle106,1960
-const int MainWindow::ERROR        = -1;ERROR109,2057
-const int MainWindow::OFF          =  0;OFF110,2098
-const int MainWindow::INITIALISED  =  1;INITIALISED111,2139
-const int MainWindow::RUNNING      =  2;RUNNING112,2180
-const int MainWindow::OPERATIONAL  =  3;OPERATIONAL113,2221
-#define TMsg(TMsg116,2283
-#define DMsg(DMsg117,2328
-#define IMsg(IMsg118,2373
-#define WMsg(WMsg119,2417
-#define EMsg(EMsg120,2464
-#define FMsg(FMsg121,2509
-MainWindow::MainWindow(QString url, QString sessionName,MainWindow133,3060
-MainWindow::~MainWindow()~MainWindow202,5362
-void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo212,5652
-void MainWindow::manualSetupUI()manualSetupUI221,6010
-void MainWindow::readConfig(QString dbUrl)readConfig342,10558
-void MainWindow::closeEvent(QCloseEvent *event)closeEvent394,12335
-void MainWindow::saveAs()saveAs409,12754
-void MainWindow::processPath()processPath419,13139
-void MainWindow::cut()cut429,13435
-void MainWindow::copy()copy434,13531
-void MainWindow::paste()paste439,13629
-void MainWindow::about()about449,13927
-#define BUILD_ID BUILD_ID452,13971
-void MainWindow::updateMenus()updateMenus472,14597
-void MainWindow::updateWindowMenu()updateWindowMenu500,15567
-TextView *MainWindow::createTextView()createTextView540,16961
-void MainWindow::createActions()createActions557,17517
-void MainWindow::createMenus()createMenus699,24112
-void MainWindow::createToolBars()createToolBars752,25808
-void MainWindow::createStatusBar()createStatusBar769,26347
-void MainWindow::readSettings()readSettings778,26629
-void MainWindow::writeSettings()writeSettings791,27097
-QVariant MainWindow::getFromSettings(QString name)getFromSettings802,27486
-void MainWindow::putToSettings(QString name, QVariant value)putToSettings812,27842
-void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings822,28225
-void MainWindow::putUserToolsToSettings()putUserToolsToSettings849,29256
-TextView *MainWindow::activeTextView()activeTextView860,29528
-void MainWindow::switchLayoutDirection()switchLayoutDirection871,29934
-void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow882,30313
-void MainWindow::showConfigTool()showConfigTool892,30679
-void MainWindow::showDBBrowser()showDBBrowser908,31155
-void MainWindow::showExtToolsDef()showExtToolsDef919,31443
-void MainWindow::showVerbLevel()showVerbLevel934,31873
-void MainWindow::quitApp()quitApp951,32539
-void MainWindow::quitAllQPF()quitAllQPF972,33329
-void MainWindow::processProductsInPath(QString folder)processProductsInPath1000,34468
-void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder1036,35640
-void MainWindow::transitToOperational()transitToOperational1059,36512
-void MainWindow::init()init1067,36763
-void MainWindow::setLogWatch()setLogWatch1097,37955
-void MainWindow::processPendingEvents()processPendingEvents1157,40385
-void MainWindow::handleFinishedHMI()handleFinishedHMI1166,40679
-void MainWindow::defineValidTransitions()defineValidTransitions1175,41007
-QString MainWindow::getState()getState1202,42075
-void MainWindow::showState()showState1216,42589
-void MainWindow::updateSystemView()updateSystemView1307,46086
-void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1344,47158
-void MainWindow::selectRowInNav(int row)selectRowInNav1353,47484
-void MainWindow::removeRowInNav(int row)removeRowInNav1361,47739
-void MainWindow::initLocalArchiveView()initLocalArchiveView1373,48180
-void MainWindow::setUToolTasks()setUToolTasks1434,51333
-void MainWindow::localarchViewUpdate()localarchViewUpdate1450,51926
-void MainWindow::resizeLocalArch()resizeLocalArch1461,52260
-void MainWindow::updateLocalArchModel()updateLocalArchModel1472,52642
-void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1487,53101
-void MainWindow::setAutomaticExpandLocalArchModel(bool b)setAutomaticExpandLocalArchModel1496,53449
-void MainWindow::setAutomaticResizeLocalArchModel(bool b)setAutomaticResizeLocalArchModel1505,53797
-void MainWindow::openWithDefault()openWithDefault1513,54061
-void MainWindow::openWith()openWith1525,54490
-void MainWindow::reprocessProduct()reprocessProduct1624,58196
-void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1654,59388
-void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1702,61166
-void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1718,61671
-void MainWindow::closeTab(int n)closeTab1845,66770
-void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1855,67102
-void MainWindow::closeTabAction()closeTabAction1872,67648
-void MainWindow::closeAllTabAction()closeAllTabAction1890,68146
-void MainWindow::closeOtherTabAction()closeOtherTabAction1902,68538
-void MainWindow::showTabsListMenu()showTabsListMenu1922,69163
-void MainWindow::selectTabFromList()selectTabFromList1942,69912
-void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu1951,70241
-void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu1962,70713
-void MainWindow::jsontreeExpand()jsontreeExpand2002,72325
-void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree2013,72725
-void MainWindow::jsontreeExpandAll()jsontreeExpandAll2037,73432
-void MainWindow::jsontreeCollapse()jsontreeCollapse2048,73782
-void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree2059,74188
-void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll2074,74707
-void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren2084,75058
-void MainWindow::initTasksMonitView()initTasksMonitView2098,75656
-void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2128,77139
-void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2136,77410
-void MainWindow::showWorkDir()showWorkDir2154,78026
-void MainWindow::displayTaskInfo()displayTaskInfo2172,78733
-void MainWindow::restartTask()restartTask2187,79415
-void MainWindow::stopTask()stopTask2196,79703
-bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2205,80000
-void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2233,80963
-void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2249,81559
-void MainWindow::initAlertsTables()initAlertsTables2291,83136
-void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2340,85396
-void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)showAlertInfo2364,86263
-void MainWindow::showSysAlertInfo()showSysAlertInfo2378,86735
-void MainWindow::showProcAlertInfo()showProcAlertInfo2387,87050
-void MainWindow::initTxView()initTxView2399,87495
-void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2421,88348
-void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2429,88603
-void MainWindow::displayTxInfo()displayTxInfo2445,89086
-void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2467,90146
-void MainWindow::setProductsFilter(QString qry, QStringList hdr)setProductsFilter2542,93208
-void MainWindow::restartProductsFilter()restartProductsFilter2557,93821
-void MainWindow::setAlertFilter(QString qry, QStringList hdr)setAlertFilter2569,94295
-void MainWindow::restartAlertFilter()restartAlertFilter2581,94725
-void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2594,95182
-void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)storeQUTools2Cfg2675,97958
+qpfhmi/mainwindow.cpp,7945
+namespace QPF {QPF104,1928
+static const int MessageDelay = 2000;MessageDelay106,1945
+static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle107,1983
+const int MainWindow::ERROR        = -1;ERROR110,2080
+const int MainWindow::OFF          =  0;OFF111,2121
+const int MainWindow::INITIALISED  =  1;INITIALISED112,2162
+const int MainWindow::RUNNING      =  2;RUNNING113,2203
+const int MainWindow::OPERATIONAL  =  3;OPERATIONAL114,2244
+#define TMsg(TMsg117,2306
+#define DMsg(DMsg118,2351
+#define IMsg(IMsg119,2396
+#define WMsg(WMsg120,2440
+#define EMsg(EMsg121,2487
+#define FMsg(FMsg122,2532
+MainWindow::MainWindow(QString url, QString sessionName,MainWindow134,3083
+MainWindow::~MainWindow()~MainWindow204,5386
+void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo214,5676
+void MainWindow::manualSetupUI()manualSetupUI223,6034
+void MainWindow::readConfig(QString dbUrl)readConfig390,12079
+void MainWindow::closeEvent(QCloseEvent *event)closeEvent442,13856
+void MainWindow::saveAs()saveAs457,14275
+void MainWindow::processPath()processPath467,14660
+void MainWindow::cut()cut477,14956
+void MainWindow::copy()copy482,15052
+void MainWindow::paste()paste487,15150
+void MainWindow::about()about497,15448
+#define BUILD_ID BUILD_ID500,15492
+void MainWindow::updateMenus()updateMenus520,16118
+void MainWindow::updateWindowMenu()updateWindowMenu548,17088
+TextView *MainWindow::createTextView()createTextView588,18482
+void MainWindow::createActions()createActions605,19038
+void MainWindow::createMenus()createMenus747,25633
+void MainWindow::createToolBars()createToolBars800,27329
+void MainWindow::createStatusBar()createStatusBar817,27868
+void MainWindow::readSettings()readSettings826,28150
+void MainWindow::writeSettings()writeSettings839,28618
+QVariant MainWindow::getFromSettings(QString name)getFromSettings850,29007
+void MainWindow::putToSettings(QString name, QVariant value)putToSettings860,29363
+void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings870,29746
+void MainWindow::putUserToolsToSettings()putUserToolsToSettings897,30777
+TextView *MainWindow::activeTextView()activeTextView908,31049
+void MainWindow::switchLayoutDirection()switchLayoutDirection919,31455
+void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow930,31834
+void MainWindow::showConfigTool()showConfigTool940,32200
+void MainWindow::showDBBrowser()showDBBrowser956,32676
+void MainWindow::showExtToolsDef()showExtToolsDef967,32964
+void MainWindow::showVerbLevel()showVerbLevel982,33394
+void MainWindow::quitApp()quitApp999,34060
+void MainWindow::quitAllQPF()quitAllQPF1020,34850
+void MainWindow::processProductsInPath(QString folder)processProductsInPath1048,35989
+void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder1084,37161
+void MainWindow::transitToOperational()transitToOperational1107,38033
+void MainWindow::init()init1115,38284
+void MainWindow::setLogWatch()setLogWatch1147,39529
+void MainWindow::processPendingEvents()processPendingEvents1207,41959
+void MainWindow::handleFinishedHMI()handleFinishedHMI1216,42253
+void MainWindow::defineValidTransitions()defineValidTransitions1225,42581
+QString MainWindow::getState()getState1252,43649
+void MainWindow::showState()showState1266,44163
+void MainWindow::updateSystemView()updateSystemView1357,47660
+void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1394,48732
+void MainWindow::selectRowInNav(int row)selectRowInNav1403,49058
+void MainWindow::removeRowInNav(int row)removeRowInNav1411,49313
+void MainWindow::initLocalArchiveView()initLocalArchiveView1423,49754
+void MainWindow::setUToolTasks()setUToolTasks1484,52907
+void MainWindow::localarchViewUpdate()localarchViewUpdate1500,53500
+void MainWindow::resizeLocalArch()resizeLocalArch1511,53834
+void MainWindow::updateLocalArchModel()updateLocalArchModel1522,54216
+void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1537,54675
+void MainWindow::setAutomaticExpandLocalArchModel(bool b)setAutomaticExpandLocalArchModel1546,55023
+void MainWindow::setAutomaticResizeLocalArchModel(bool b)setAutomaticResizeLocalArchModel1555,55371
+void MainWindow::openWithDefault()openWithDefault1563,55635
+void MainWindow::openWith()openWith1575,56064
+void MainWindow::reprocessProduct()reprocessProduct1674,59770
+void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1704,60962
+void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1752,62740
+void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1768,63245
+void MainWindow::closeTab(int n)closeTab1895,68344
+void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1905,68676
+void MainWindow::closeTabAction()closeTabAction1922,69222
+void MainWindow::closeAllTabAction()closeAllTabAction1940,69720
+void MainWindow::closeOtherTabAction()closeOtherTabAction1952,70112
+void MainWindow::showTabsListMenu()showTabsListMenu1972,70737
+void MainWindow::selectTabFromList()selectTabFromList1992,71486
+void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu2001,71815
+void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu2012,72287
+void MainWindow::jsontreeExpand()jsontreeExpand2052,73899
+void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree2063,74299
+void MainWindow::jsontreeExpandAll()jsontreeExpandAll2087,75006
+void MainWindow::jsontreeCollapse()jsontreeCollapse2098,75356
+void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree2109,75762
+void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll2124,76281
+void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren2134,76632
+void MainWindow::initTasksMonitView()initTasksMonitView2148,77230
+void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2178,78713
+void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2186,78984
+void MainWindow::showWorkDir()showWorkDir2204,79600
+void MainWindow::displayTaskInfo()displayTaskInfo2222,80307
+void MainWindow::restartTask()restartTask2237,80989
+void MainWindow::stopTask()stopTask2246,81277
+bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2255,81574
+void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2283,82537
+void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2299,83133
+void MainWindow::initAlertsTables()initAlertsTables2341,84710
+void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2390,86970
+void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)showAlertInfo2414,87837
+void MainWindow::showSysAlertInfo()showSysAlertInfo2428,88309
+void MainWindow::showProcAlertInfo()showProcAlertInfo2437,88624
+void MainWindow::initTxView()initTxView2449,89069
+void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2471,89922
+void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2479,90177
+void MainWindow::displayTxInfo()displayTxInfo2495,90660
+void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2517,91720
+void MainWindow::setProductsFilter(QString qry, QStringList hdr)setProductsFilter2594,94792
+void MainWindow::restartProductsFilter()restartProductsFilter2609,95405
+void MainWindow::setAlertFilter(QString qry, QStringList hdr)setAlertFilter2621,95879
+void MainWindow::restartAlertFilter()restartAlertFilter2633,96309
+void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2646,96766
+void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)storeQUTools2Cfg2727,99542
 
 qpfhmi/verbleveldlg.cpp,363
 namespace QPF {QPF46,880
@@ -3815,35 +3824,30 @@ class QSimpleTickerGraph : public QWidgetQSimpleTickerGraph12,228
     QColor mLabelColor;mLabelColor84,1895
     QFont mLabelFont;mLabelFont85,1919
 
-qpfhmi/procinfo.h,1288
-#define PROCINFO_HPROCINFO_H2,19
-struct TaskStatusSpectra {TaskStatusSpectra7,80
-    int    running;running8,107
-    int    scheduled;scheduled9,127
-    int    paused;paused10,149
-    int    stopped;stopped11,168
-    int    failed;failed12,188
-    int    finished;finished13,207
-struct AgentInfo {AgentInfo16,232
-    std::string       name;name17,251
-    TaskStatusSpectra taskStatus;taskStatus18,279
-    float             load;load19,313
-struct ProcessingHostInfo {ProcessingHostInfo22,345
-    std::string            name;name23,373
-    int                    numAgents;numAgents24,406
-    HostInfo               hostInfo;hostInfo25,444
-    std::vector<AgentInfo> agInfo;agInfo26,481
-    int                    numTasks;numTasks27,516
-struct SwarmInfo {SwarmInfo30,557
-    std::string       name;name31,576
-    std::string       scale;scale32,604
-    HostInfo          hostInfo;hostInfo33,633
-    TaskStatusSpectra taskStatus;taskStatus34,665
-struct QPFInfo {QPFInfo37,703
-    std::vector<ProcessingHostInfo> hostsInfo;hostsInfo38,720
-    SwarmInfo                       swarmInfo;swarmInfo39,767
-    int                             numSrvTasks;numSrvTasks40,814
-    int                             numContTasks;numContTasks41,863
+qpfhmi/procfmkmonit.cpp,302
+namespace QPF {QPF49,942
+const int GRAPH_UPDATE_PERIOD = 100;GRAPH_UPDATE_PERIOD51,959
+ProcFmkMonitor::ProcFmkMonitor(QScrollArea * scrl) :ProcFmkMonitor53,997
+void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo & q)setupHostsInfo58,1098
+void ProcFmkMonitor::timeout()timeout107,2736
+
+qpfhmi/procfmkmonit.h,731
+#define PROCFMKMONIT_HPROCFMKMONIT_H42,835
+namespace QPF {QPF50,956
+struct Graphs {Graphs52,973
+    QSimpleTickerGraph * loadGraph;loadGraph53,989
+    QSimpleTickerGraph * cpuGraph;cpuGraph54,1025
+    QSimpleTickerGraph * tasksGraph;tasksGraph55,1060
+    double               lastLoad;lastLoad56,1097
+    double               lastCPU;lastCPU57,1132
+    double               lastTasks;lastTasks58,1166
+class ProcFmkMonitor : public QObjectProcFmkMonitor61,1206
+    QScrollArea * scrollArea;scrollArea75,1428
+    QTimer *      mTimer;mTimer76,1458
+    double mVoltage;mVoltage78,1485
+    double mTemperature;mTemperature79,1506
+    double mSpeed;mSpeed80,1531
+    QVector<Graphs> graphs;graphs82,1551
 
 build/CMakeFiles/2.8.11/CompilerIdC/CMakeCCompilerId.c,7022
 # define ID_VOID_MAINID_VOID_MAIN9,224
@@ -5413,6 +5417,96 @@ int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_icon)()qCleanupResources_icon204
        initializer() { QT_RCC_MANGLE_NAMESPACE(qInitResources_icon)(); }initializer20428,1665509
        ~initializer() { QT_RCC_MANGLE_NAMESPACE(qCleanupResources_icon)(); }~initializer20429,1665582
    } dummy;dummy20430,1665659
+
+build/qpfhmi/moc_frmhostinfo.cpp,893
+struct qt_meta_stringdata_FrmHostInfo_t {qt_meta_stringdata_FrmHostInfo_t21,786
+    QByteArrayData data[9];data22,828
+    char stringdata0[91];stringdata023,856
+#define QT_MOC_LITERAL(QT_MOC_LITERAL25,885
+static const qt_meta_stringdata_FrmHostInfo_t qt_meta_stringdata_FrmHostInfo = {qt_meta_stringdata_FrmHostInfo30,1117
+#undef QT_MOC_LITERALQT_MOC_LITERAL47,1707
+static const uint qt_meta_data_FrmHostInfo[] = {qt_meta_data_FrmHostInfo49,1730
+void FrmHostInfo::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)qt_static_metacall83,2745
+const QMetaObject FrmHostInfo::staticMetaObject = {staticMetaObject101,3425
+const QMetaObject *FrmHostInfo::metaObject() constmetaObject107,3628
+void *FrmHostInfo::qt_metacast(const char *_clname)qt_metacast112,3781
+int FrmHostInfo::qt_metacall(QMetaObject::Call _c, int _id, void **_a)qt_metacall120,4054
+
+build/qpfhmi/moc_procfmkmonit.cpp,985
+struct qt_meta_stringdata_QPF__ProcFmkMonitor_t {qt_meta_stringdata_QPF__ProcFmkMonitor_t21,789
+    QByteArrayData data[3];data22,839
+    char stringdata0[29];stringdata023,867
+#define QT_MOC_LITERAL(QT_MOC_LITERAL25,896
+static const qt_meta_stringdata_QPF__ProcFmkMonitor_t qt_meta_stringdata_QPF__ProcFmkMonitor = {qt_meta_stringdata_QPF__ProcFmkMonitor30,1136
+#undef QT_MOC_LITERALQT_MOC_LITERAL39,1408
+static const uint qt_meta_data_QPF__ProcFmkMonitor[] = {qt_meta_data_QPF__ProcFmkMonitor41,1431
+void QPF::ProcFmkMonitor::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)qt_static_metacall63,1932
+const QMetaObject QPF::ProcFmkMonitor::staticMetaObject = {staticMetaObject76,2283
+const QMetaObject *QPF::ProcFmkMonitor::metaObject() constmetaObject82,2510
+void *QPF::ProcFmkMonitor::qt_metacast(const char *_clname)qt_metacast87,2671
+int QPF::ProcFmkMonitor::qt_metacall(QMetaObject::Call _c, int _id, void **_a)qt_metacall95,2963
+
+build/qpfhmi/ui_frmhostinfo.h,2321
+#define UI_FRMHOSTINFO_HUI_FRMHOSTINFO_H10,389
+class Ui_FrmHostInfoUi_FrmHostInfo30,911
+    QHBoxLayout *horizontalLayout;horizontalLayout33,942
+    QFrame *frmHostInfo;frmHostInfo34,977
+    QVBoxLayout *verticalLayout_4;verticalLayout_435,1002
+    QStackedWidget *stckForm;stckForm36,1037
+    QWidget *pageData;pageData37,1067
+    QVBoxLayout *verticalLayout_7;verticalLayout_738,1090
+    QHBoxLayout *horizontalLayout_2;horizontalLayout_239,1125
+    QVBoxLayout *verticalLayout_2;verticalLayout_240,1162
+    QLabel *lblHostName;lblHostName41,1197
+    QLabel *lblTaskAgentMode;lblTaskAgentMode42,1222
+    QFrame *line;line43,1252
+    QVBoxLayout *verticalLayout_3;verticalLayout_344,1270
+    QLabel *lblLoadAvgs;lblLoadAvgs45,1305
+    QLabel *lblCPULoad;lblCPULoad46,1330
+    QFrame *line_2;line_247,1354
+    QStackedWidget *stckCharts;stckCharts48,1374
+    QWidget *pageLoad;pageLoad49,1406
+    QVBoxLayout *verticalLayout_11;verticalLayout_1150,1429
+    QLabel *label_3;label_351,1465
+    QSimpleTickerGraph *wdgChartLoad;wdgChartLoad52,1486
+    QWidget *pageCPU;pageCPU53,1524
+    QVBoxLayout *verticalLayout_10;verticalLayout_1054,1546
+    QLabel *label_2;label_255,1582
+    QSimpleTickerGraph *wdgChartCPU;wdgChartCPU56,1603
+    QWidget *pageTasks;pageTasks57,1640
+    QVBoxLayout *verticalLayout_9;verticalLayout_958,1664
+    QLabel *label;label59,1699
+    QSimpleTickerGraph *wdgChartTasks;wdgChartTasks60,1718
+    QWidget *pageInfo;pageInfo61,1757
+    QVBoxLayout *verticalLayout;verticalLayout62,1780
+    QLabel *lblInfo;lblInfo63,1813
+    QSpacerItem *verticalSpacer;verticalSpacer64,1834
+    QHBoxLayout *horizontalLayout_3;horizontalLayout_365,1867
+    QToolButton *tbtnLoad;tbtnLoad66,1904
+    QToolButton *tbtnCPU;tbtnCPU67,1931
+    QToolButton *tbtnTasks;tbtnTasks68,1957
+    QToolButton *tbtnInfo;tbtnInfo69,1985
+    QSpacerItem *horizontalSpacer;horizontalSpacer70,2012
+    QScrollArea *scrollTasksInfo;scrollTasksInfo71,2047
+    QWidget *scrollAreaWidgetContents;scrollAreaWidgetContents72,2081
+    void setupUi(QWidget *FrmHostInfo)setupUi74,2121
+    void retranslateUi(QWidget *FrmHostInfo)retranslateUi314,11758
+namespace Ui {Ui334,13034
+    class FrmHostInfo: public Ui_FrmHostInfo {};FrmHostInfo335,13049
+
+build/qpfhmi/moc_qsimpletickergraph.cpp,973
+struct qt_meta_stringdata_QSimpleTickerGraph_t {qt_meta_stringdata_QSimpleTickerGraph_t21,807
+    QByteArrayData data[1];data22,856
+    char stringdata0[19];stringdata023,884
+#define QT_MOC_LITERAL(QT_MOC_LITERAL25,913
+static const qt_meta_stringdata_QSimpleTickerGraph_t qt_meta_stringdata_QSimpleTickerGraph = {qt_meta_stringdata_QSimpleTickerGraph30,1152
+#undef QT_MOC_LITERALQT_MOC_LITERAL37,1338
+static const uint qt_meta_data_QSimpleTickerGraph[] = {qt_meta_data_QSimpleTickerGraph39,1361
+void QSimpleTickerGraph::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)qt_static_metacall55,1720
+const QMetaObject QSimpleTickerGraph::staticMetaObject = {staticMetaObject63,1897
+const QMetaObject *QSimpleTickerGraph::metaObject() constmetaObject69,2121
+void *QSimpleTickerGraph::qt_metacast(const char *_clname)qt_metacast74,2281
+int QSimpleTickerGraph::qt_metacall(QMetaObject::Call _c, int _id, void **_a)qt_metacall82,2575
 
 mongoose/examples/Makefile,422
 CFLAGS  = -W -Wall -I.. -pthread -g -pipe $(COPT)CFLAGS1,0

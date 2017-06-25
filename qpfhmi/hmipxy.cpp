@@ -156,8 +156,21 @@ void HMIProxy::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 
     HostInfo hostInfo;
     hostInfo.fromStr(hostInfoData.str());
+    std::string hostIp = hostInfo.hostIp;
 
-    DBG(hostInfo.dump() + "\n");
+    std::map<std::string,
+             ProcessingHostInfo*>::iterator it = procFmkInfo->hostsInfo.find(hostIp);
+    if (it != procFmkInfo->hostsInfo.end()) {
+        it->second->hostInfo = hostInfo;
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: defineProcHostInfoHolder
+//----------------------------------------------------------------------
+void HMIProxy::defineProcHostInfoHolder(ProcessingFrameworkInfo * p)
+{
+    procFmkInfo = p;
 }
 
 //----------------------------------------------------------------------

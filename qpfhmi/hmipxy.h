@@ -60,8 +60,10 @@
 //------------------------------------------------------------
 // Topic: Project headers
 //   - component.h
+//   - procinfo.h
 //------------------------------------------------------------
 #include "component.h"
+#include "procinfo.h"
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -109,6 +111,11 @@ public:
     //----------------------------------------------------------------------
     void sendNewCfgInfo();
 
+    //----------------------------------------------------------------------
+    // Method: defineProcHostInfoHolder
+    //----------------------------------------------------------------------
+    void defineProcHostInfoHolder(ProcessingFrameworkInfo * p);
+
 protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
@@ -136,6 +143,8 @@ protected:
     //----------------------------------------------------------------------
     virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m);
 
+private:
+    ProcessingFrameworkInfo * procFmkInfo;
 };
 
 //}

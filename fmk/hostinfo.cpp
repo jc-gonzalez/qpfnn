@@ -68,13 +68,7 @@ std::string HostInfo::dump()
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
     std::stringstream s;
-    s << "Load averages: "
-      << l.load1min << " / "
-      << l.load5min << " / "
-      << l.load15min << "\n"
-      << "Processes: " << l.runProc << " running of a total of "
-      << l.totalProc << "\n"
-      << "Last PID: " << l.lastPid << "\n"
+    s << "Host: " << hostIp << "\n"
       << "Hardware: " << c.modelName
       << " " << c.architecture
       << " (" << c.vendor << ")\n"
@@ -86,7 +80,14 @@ std::string HostInfo::dump()
       << c.numThreadsPerCore << " threads per core "
       << "[hyperthreading:" << (c.hyperthreading ? "ON" : "OFF") << "]\n"
       << "Overall CPU Load: " << c.overallCpuLoad.computedLoad
-      << "% over " << c.overallCpuLoad.timeInterval << "s\n";
+      << "% over " << c.overallCpuLoad.timeInterval << "s\n"
+      << "Load averages: "
+      << l.load1min << " / "
+      << l.load5min << " / "
+      << l.load15min << "\n"
+      << "Processes: " << l.runProc << " running of a total of "
+      << l.totalProc << "\n"
+      << "Last PID: " << l.lastPid << "\n";
     return s.str();
 }
 
@@ -95,8 +96,9 @@ std::string HostInfo::toJsonStr()
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
     std::stringstream s;
-    s << "{"
-      << "\"loadAvg\":{"
+    s << "{\"ip\":\"" << hostIp << "\",";
+
+    s << "\"loadAvg\":{"
       << "\"load1min\":" << l.load1min << ","
       << "\"load5min\":" << l.load5min << ","
       << "\"load15min\":" << l.load15min << ","
@@ -113,7 +115,7 @@ std::string HostInfo::toJsonStr()
       << "\"numPhysicalCpus\":" << c.numPhysicalCpus << ","
       << "\"numCoresPerSocket\":" << c.numCoresPerSocket << ","
       << "\"numThreadsPerCore\":" << c.numThreadsPerCore << ","
-      << "\"cacheSize\":" << c.cacheSize << ","
+      << "\"cacheSize\":" << c.cacheSize << "," // KB
       << "\"hyperthreading\":" << c.hyperthreading << ",";
 
     CPULoad & o = c.overallCpuLoad;
@@ -122,7 +124,7 @@ std::string HostInfo::toJsonStr()
       << o.totalJiffies << ","
       << o.workJiffies2 << ","
       << o.totalJiffies2 << "],"
-      << "\"timeInterval\":" << o.timeInterval << ","
+      << "\"timeInterval\":" << o.timeInterval << "," // s
       << "\"computedLoad\":" << o.computedLoad << "},"
       << "\"cpuLoad\":[";
 
@@ -133,7 +135,7 @@ std::string HostInfo::toJsonStr()
           << o.totalJiffies << ","
           << o.workJiffies2 << ","
           << o.totalJiffies2 << "],"
-          << "\"timeInterval\":" << o.timeInterval << ","
+          << "\"timeInterval\":" << o.timeInterval << "," // s
           << "\"computedLoad\":" << o.computedLoad << "}";
         if (i < (c.numCpus - 1)) { s << ","; }
     }
@@ -148,6 +150,8 @@ void HostInfo::fromStr(std::string s)
     CPUInfo & c = cpuInfo;
 
     JValue h(s);
+
+    hostIp = h["ip"].asString();
 
     JValue hl(h["loadAvg"]);
     l.load1min  = hl["load1min"].asFloat();

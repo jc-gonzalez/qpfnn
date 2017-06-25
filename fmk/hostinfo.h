@@ -119,6 +119,7 @@ public:
 public:
     CPUInfo cpuInfo;
     LoadAvg loadAvg;
+    std::string hostIp;
 
 public:
     void update();

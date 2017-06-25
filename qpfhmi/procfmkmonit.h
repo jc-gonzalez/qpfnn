@@ -66,7 +66,7 @@ public:
     explicit ProcFmkMonitor(QScrollArea * scrl);
 
 public:
-    void setupHostsInfo(ProcessingFrameworkInfo & q);
+    void setupHostsInfo(ProcessingFrameworkInfo * q);
 
 protected slots:
     void timeout();
@@ -74,6 +74,8 @@ protected slots:
 private:
     QScrollArea * scrollArea;
     QTimer *      mTimer;
+
+    ProcessingFrameworkInfo * procFmkInfo;
 
     double mVoltage;
     double mTemperature;

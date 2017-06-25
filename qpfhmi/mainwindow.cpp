@@ -248,6 +248,7 @@ void MainWindow::manualSetupUI()
     setUnifiedTitleAndToolBarOnMac(true);
     ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
 
+    /*
     QFrame * frm = new QFrame(0);
     vlyFrmAgents = new QVBoxLayout;
     frm->setLayout(vlyFrmAgents);
@@ -256,7 +257,7 @@ void MainWindow::manualSetupUI()
                                       QSizePolicy::Minimum,
                                       QSizePolicy::Expanding);
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);
-
+    */
     //== Tab panels handling ==========================================
 
     QTabBar * tb = ui->tabMainWgd->tabBar();
@@ -337,8 +338,49 @@ void MainWindow::manualSetupUI()
     ui->tblvwTx->setModel(txModel);
 
     //== Setup processing hosts monitoring widgets ===================
-    procFmkMonit = new ProcFmkMonitor(new QScrollArea);
-    procFmkMonit->setupHostsInfo(procFmkInfo);
+
+    procFmkInfo.numContTasks = 0;
+    HostInfo hi;
+    hi.update();
+
+    int h = 1;
+    for (auto & kv : cfg.network.processingNodes()) {
+
+        int numOfTskAgents = kv.second;
+
+        hi.update();
+
+
+        ProcessingHostInfo * ph = new ProcessingHostInfo;
+        ph->name = kv.first;
+        ph->numAgents = numOfTskAgents;
+        ph->hostInfo = hi;
+        ph->numTasks = 0;
+
+        for (int i = 1; i <= ph->numAgents; ++i) {
+            AgentInfo agInfo;
+            agInfo.name = QString("TskAgent_%1_%2")
+                .arg(h, 2, 10, QLatin1Char('0'))
+                .arg(i, 2, 10, QLatin1Char('0')).toStdString();
+            agInfo.taskStatus = TaskStatusSpectra({rand() % 10, rand() % 10, rand() % 4,
+                        rand() % 3, rand() % 3, rand() % 10});
+            agInfo.load = (rand() % 1000) * 0.01;
+            ph->agInfo.push_back(agInfo);
+            ph->numTasks += (agInfo.taskStatus.running +
+                            agInfo.taskStatus.scheduled +
+                            agInfo.taskStatus.paused +
+                            agInfo.taskStatus.stopped +
+                            agInfo.taskStatus.failed +
+                            agInfo.taskStatus.finished);
+        }
+
+        procFmkInfo.hostsInfo[ph->name] = ph;
+        procFmkInfo.numContTasks += ph->numTasks;
+        ++h;
+    }
+
+    procFmkMonit = new ProcFmkMonitor(ui->scrollAreaAgents);
+    procFmkMonit->setupHostsInfo(&procFmkInfo);
 
 }
 
@@ -1092,6 +1134,8 @@ void MainWindow::init()
     QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort);
     std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+
+    hmiNode->defineProcHostInfoHolder(&procFmkInfo);
 
     // START!
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -2498,33 +2542,34 @@ void MainWindow::updateAgentsMonitPanel()
                 TaskStatus st = TaskStatusValue[status];
                 switch (st) {
                 case TASK_RUNNING:
-                    (*taInfo)["running"] = taInfo->running() + 1;;
+                    (*taInfo)["running"]  = taInfo->running() + 1;;
                     break;
                 case TASK_FINISHED:
-                    (*taInfo)["finished"] = taInfo->finished() + 1;;
+                    (*taInfo)["finished"] = taInfo->finished() + 1;
                     break;
                 case TASK_FAILED:
-                    (*taInfo)["failed"] = taInfo->failed() + 1;;
+                    (*taInfo)["failed"]   = taInfo->failed() + 1;
                     break;
                 case TASK_SCHEDULED:
-                    (*taInfo)["waiting"] = taInfo->waiting() + 1;;
+                    (*taInfo)["waiting"]  = taInfo->waiting() + 1;
                     break;
                 case TASK_PAUSED:
-                    (*taInfo)["paused"] = taInfo->paused() + 1;;
+                    (*taInfo)["paused"]   = taInfo->paused() + 1;
                     break;
                 case TASK_STOPPED:
-                    (*taInfo)["stopped"] = taInfo->stopped() + 1;;
+                    (*taInfo)["stopped"]  = taInfo->stopped() + 1;
                     break;
                 default:
                     break;
                 }
-                (*taInfo)["total"] = taInfo->total() + 1;;
+                (*taInfo)["total"] = taInfo->total() + 1;
             }
         }
         numOfRows = currentNumOfRows;
     }
 
     // 3. Update view
+/*
     for (auto & kv : taskAgentsInfo) {
         TaskAgentInfo * taInfo = kv.second;
         TaskAgentInfo & taInfoRef = *taInfo;
@@ -2541,6 +2586,7 @@ void MainWindow::updateAgentsMonitPanel()
         }
         // panel->updateInfo(taInfoRef);
     }
+*/
 }
 
 //----------------------------------------------------------------------

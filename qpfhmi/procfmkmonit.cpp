@@ -51,51 +51,13 @@ namespace QPF {
 const int GRAPH_UPDATE_PERIOD = 100;
 
 ProcFmkMonitor::ProcFmkMonitor(QScrollArea * scrl) :
-    scrollArea(scrl)
+    scrollArea(scrl), mTimer(new QTimer())
 {
 }
 
-void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo & q)
+void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
 {
-    int k = 0;
-
-    /*
-    int numag[] = {10,8,12};
-
-    q.numContTasks = 0;
-    HostInfo hi;
-    hi.update();
-
-    for (auto & h : {"host1.name", "host2.name", "host3.name"}) {
-        hi.update();
-        ProcessingHostInfo ph;
-        ph.name = h;
-        ph.numAgents = numag[k];
-        ph.hostInfo = hi;
-        ph.numTasks = 0;
-
-        for (int i = 0; i < ph.numAgents; ++i) {
-            AgentInfo agInfo;
-            agInfo.name = QString("TskAge_%1_%2")
-                    .arg(k + 1, 2, 10, QLatin1Char('0'))
-                    .arg(i + 1, 2, 10, QLatin1Char('0')).toStdString();
-            agInfo.taskStatus = TaskStatusSpectra({rand() % 10, rand() % 10, rand() % 4,
-                                                   rand() % 3, rand() % 3, rand() % 10});
-            agInfo.load = (rand() % 1000) * 0.01;
-            ph.agInfo.push_back(agInfo);
-            ph.numTasks += (agInfo.taskStatus.running +
-                            agInfo.taskStatus.scheduled +
-                            agInfo.taskStatus.paused +
-                            agInfo.taskStatus.stopped +
-                            agInfo.taskStatus.failed +
-                            agInfo.taskStatus.finished);
-        }
-
-        q.hostsInfo.push_back(ph);
-        q.numContTasks += ph.numTasks;
-        k++;
-    }
-    */
+    procFmkInfo = q;
 
     QFrame * frm = new QFrame(0);
     QVBoxLayout * vlyFrmAgents = new QVBoxLayout;
@@ -108,7 +70,8 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo & q)
     //vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
     // Add widgets for hosts
-    for (auto & ph : q.hostsInfo) {
+    for (auto & kv : procFmkInfo->hostsInfo) {
+        ProcessingHostInfo & ph = (*(kv.second));
         FrmHostInfo * panel = new FrmHostInfo(0);
         vlyFrmAgents->addWidget(panel);
 
@@ -144,14 +107,25 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo & q)
 
 void ProcFmkMonitor::timeout()
 {
+    /*
     mVoltage += 9.0 - double(qrand() % 1000) / 50.0 + 0.02 * (100.0 - mVoltage);
     mTemperature += 0.5 - double(qrand() % 1000) / 1000.0 + 0.02 * (20.0 - mTemperature);
     mSpeed += 4.9 - double(qrand() % 1000) / 100.0 + 0.02 * (100.0 - mSpeed + 0.3 * mVoltage);
+    */
+    int k = 0;
+    for (auto & kv : procFmkInfo->hostsInfo) {
+        ProcessingHostInfo & ph = (*(kv.second));
+        const Graphs & g= graphs.at(k);
 
-    for (auto & g : graphs) {
-        g.loadGraph->appendPoint((mVoltage + 100.) / 25.);
-        g.cpuGraph->appendPoint(mSpeed * .75);
-        g.tasksGraph->appendPoint(int(mTemperature));
+        double mLoad  = ph.hostInfo.loadAvg.load1min;
+        double mCpu   = ph.hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        double mTasks = ph.numTasks;
+
+        g.loadGraph->appendPoint(mLoad);
+        g.cpuGraph->appendPoint(mCpu);
+        g.tasksGraph->appendPoint(mTasks);
+
+        ++k;
     }
 }
 

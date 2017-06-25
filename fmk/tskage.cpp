@@ -123,6 +123,7 @@ void TskAge::fromRunningToOperational()
     numTask = 0;
 
     // Get initial values for Host Info structure
+    hostInfo.hostIp = compAddress;
     hostInfo.cpuInfo.overallCpuLoad.timeInterval = 0;
     hostInfo.update();
     hostInfo.cpuInfo.overallCpuLoad.timeInterval = 10;
