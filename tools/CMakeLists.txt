@@ -18,6 +18,7 @@ set (libtools_hdr
   dwatcher.h
   metadatareader.h
   sm.h
+  timer.h
   tools.h
 )
 
@@ -25,6 +26,7 @@ set (libtools_src
   alert.cpp
   dwatcher.cpp
   sm.cpp
+  timer.cpp
   tools.cpp
 )
 
