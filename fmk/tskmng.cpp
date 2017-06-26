@@ -325,10 +325,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     //sendTskRepDistMsg(m, MsgHostMon);
 
     // If sending updates is not yet activated, activate it
-    if (!sendingPeriodicFmkInfo) {
-        sendingPeriodicFmkInfo = true;
-        armProcFmkInfoMsgTimer();
-    }
+    armProcFmkInfoMsgTimer();
 }
 
 //----------------------------------------------------------------------
@@ -337,7 +334,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::armProcFmkInfoMsgTimer()
 {
-    Timer * fmkSender = new Timer(5000, true,
+    Timer * fmkSender = new Timer(3000, true,
                                   &TskMng::sendProcFmkInfoUpdate, this);
 }
 
@@ -347,16 +344,16 @@ void TskMng::armProcFmkInfoMsgTimer()
 //----------------------------------------------------------------------
 TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
 {
-    TaskStatusSpectra spec;
+    //TaskStatusSpectra spec;
 
-    /*auto portnum = [](int start, int h, int i) -> int
-        { return start + 10 * (h - 1) + i; };
-    */
     std::map<std::pair<std::string, TaskStatus>, int>::iterator
         nonValid = containerTaskStatusPerAgent.end();
-    std::map<std::pair<std::string, TaskStatus>, int>::iterator
-        it;
 
+    auto getNumOf = [&] (TaskStatus s) -> int
+        { std::map<std::pair<std::string, TaskStatus>, int>::iterator
+          it = containerTaskStatusPerAgent.find(std::make_pair(agName, s));
+          return (it == nonValid) ? 0 : it->second; };
+/*
     it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_SCHEDULED));
     spec.scheduled = (it == nonValid) ? 0 : it->second;
 
@@ -374,10 +371,14 @@ TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
 
     it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_FINISHED));
     spec.finished  = (it == nonValid) ? 0 : it->second;
-
-    spec.sum();
-
-    return spec;
+*/
+    return TaskStatusSpectra(getNumOf(TASK_SCHEDULED),
+                             getNumOf(TASK_RUNNING),
+                             getNumOf(TASK_PAUSED),
+                             getNumOf(TASK_STOPPED),
+                             getNumOf(TASK_FAILED),
+                             getNumOf(TASK_FINISHED));
+    // return spec;
 }
 
 //----------------------------------------------------------------------
@@ -418,6 +419,7 @@ void TskMng::consolidateMonitInfo(MessageString & m)
 
     ProcessingHostInfo* procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
     procHostInfo->hostInfo = hostInfo;
+    TRC("@@@@@@@@@@ CONSOLIDATING FMK INFO @@@@@@@@@@");
 }
 
 //----------------------------------------------------------------------
@@ -477,12 +479,13 @@ void TskMng::sendProcFmkInfoUpdate()
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
+        TRC("@@@@@@@@@@ SENDING UOPDATE OF FMK INFO @@@@@@@@@@");
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
     }
 
     // Arm new timer
-    if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
+    armProcFmkInfoMsgTimer();
 }
 
 

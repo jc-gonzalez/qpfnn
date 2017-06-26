@@ -208,7 +208,7 @@ void TskAge::runEachIterationForContainers()
     // Every 10 iterations, check if this is the first agent in the
     // host, and if it is update the hostInfo structure, and send it
     // to the TskMng
-    if ((iteration % 100) == 0) {
+    if ((iteration % 20) == 0) {
         if (compName.substr(compName.size() - 3) == "_01") {
             // Update host information
             hostInfo.update();

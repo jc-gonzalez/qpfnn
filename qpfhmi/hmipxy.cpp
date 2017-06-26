@@ -154,10 +154,8 @@ void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     MsgBodyTSK & body = msg.body;
     JValue fmkInfoData(body["info"]);
 
-    TRC("HMIPXY received [" + m + "]");
-    TRC("  with fmkinfo [" + fmkInfoData.str() + "]");
-
     Config::procFmkInfo->fromStr(fmkInfoData.str());
+    TRC("@@@@@@@@@@ RECEIVED UOPDATE OF FMK INFO @@@@@@@@@@");
 }
 
 //----------------------------------------------------------------------
