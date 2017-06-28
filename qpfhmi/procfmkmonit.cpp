@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "procfmkmonit.h"
-
+#include <iostream>
 #include "frmagentstatus.h"
 
 #include <QVBoxLayout>
@@ -114,25 +114,24 @@ void ProcFmkMonitor::timeout()
     */
 
     int k = 0;
-    for (auto & kv : procFmkInfo->hostsInfo) {
-        ProcessingHostInfo & ph = (*(kv.second));
+    for (auto const & kv : procFmkInfo->hostsInfo) {
+        std::cerr << "UPDATING DATA FOR " << kv.first << "\n";
+        ProcessingHostInfo * ph = kv.second;
 
         // Put new data on graphs
-        const Graphs & g= graphs.at(k);
-        double mLoad  = ph.hostInfo.loadAvg.load1min;
-        double mCpu   = ph.hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        double mTasks = ph.numTasks;
+        const Graphs & g = graphs.at(k);
+        double mLoad  = ph->hostInfo.loadAvg.load1min;
+        double mCpu   = ph->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        double mTasks = ph->numTasks;
         g.loadGraph->appendPoint(mLoad);
         g.cpuGraph->appendPoint(mCpu);
         g.tasksGraph->appendPoint(mTasks);
 
         // Update Host Agents statistics
-        panels.at(k)->update(ph);
+        panels.at(k)->update(*ph);
 
         ++k;
     }
-
-
 }
 
 }

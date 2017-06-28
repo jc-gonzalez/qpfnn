@@ -132,6 +132,8 @@ private:
     void getCPULoad(CPULoad & c, int interval, int line = 0);
     void getCPUInfo(CPUInfo & info);
     void getHostInfo();
+
+    static long USER_HZ;
 };
 
 //}

@@ -186,6 +186,7 @@ private:
     void sendProcFmkInfoUpdate();
 
 private:
+    typedef std::pair<std::string, TaskStatus>  TaskStatusPerAgent;
     std::vector<std::string>         agents;
     std::map<std::string, AgentInfo> agentInfo;
 
@@ -197,7 +198,7 @@ private:
     std::map<TaskStatus, int> containerTaskStatus;
     std::map<TaskStatus, int> serviceTaskStatus;
 
-    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;
+    std::map<TaskStatusPerAgent, int> containerTaskStatusPerAgent;
 
     HttpServer * httpSrv;
 

@@ -2,6 +2,8 @@
 #define FRMHOSTINFO_H
 
 #include <QWidget>
+#include <QVector>
+#include "frmagentstatus.h"
 
 #include "procinfo.h"
 #include "qsimpletickergraph.h"
@@ -35,6 +37,8 @@ protected slots:
 
 private:
     Ui::FrmHostInfo *ui;
+    QVector<QPF::FrmAgentStatus*> panels;
+    bool initialization;
 };
 
 #endif // FRMHOSTINFO_H

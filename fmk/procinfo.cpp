@@ -39,7 +39,7 @@
  ******************************************************************************/
 
 #include "procinfo.h"
-
+#include "dbg.h"
 #include "datatypes.h"
 
 #define FIELDNUM(a) (std::string("\"") + std::string(#a) +      \
@@ -99,12 +99,15 @@ void AgentInfo::fromStr(std::string s)
 std::string ProcessingHostInfo::toJsonStr()
 {
     hostInfo.update();
+    std::string as("");
     numAgents = agInfo.size();
-    std::string as = "\"" + agInfo.at(0).name + "\": " +
-        agInfo.at(0).toJsonStr();
-    for (int i = 1; i < numAgents; ++i) {
-        as += COMMA + "\"" + agInfo.at(i).name + "\": " +
-            agInfo.at(i).toJsonStr();
+    if (numAgents > 0) {
+        as = "\"" + agInfo.at(0).name + "\": " +
+            agInfo.at(0).toJsonStr();
+        for (int i = 1; i < numAgents; ++i) {
+            as += COMMA + "\"" + agInfo.at(i).name + "\": " +
+                agInfo.at(i).toJsonStr();
+        }
     }
     return (std::string("{") +
             FIELDSTR(name) + COMMA +

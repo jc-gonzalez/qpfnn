@@ -5,7 +5,8 @@
 
 FrmHostInfo::FrmHostInfo(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::FrmHostInfo)
+    ui(new Ui::FrmHostInfo),
+    initialization(true)
 {
     ui->setupUi(this);
 }
@@ -23,10 +24,10 @@ void FrmHostInfo::update(ProcessingHostInfo & ph)
 
     // Update info
     QString load = QString("Load Avg: %1 / %2 / %3")
-            .arg(l.load1min,0,'g',2)
-            .arg(l.load5min,0,'g',2).arg(l.load15min,0,'g',2);
-    QString cpu  = QString("Overall CPU load: %1 over %2 s")
-            .arg(c.overallCpuLoad.computedLoad,0,'g',2)
+            .arg(l.load1min,0,'f',2)
+            .arg(l.load5min,0,'f',2).arg(l.load15min,0,'f',2);
+    QString cpu  = QString("Overall CPU load: %1% over %2 ms")
+            .arg(c.overallCpuLoad.computedLoad,0,'f',2)
             .arg(c.overallCpuLoad.timeInterval);
     QString arch = QString("%1\n%2 (%3)\n"
                            "%4 MHz / %5 KB\n"
@@ -36,7 +37,7 @@ void FrmHostInfo::update(ProcessingHostInfo & ph)
             .arg(QString::fromStdString(c.modelName))
             .arg(QString::fromStdString(c.architecture))
             .arg(QString::fromStdString(c.vendor))
-            .arg(c.cpuFreq,0,'g',2).arg(c.cacheSize)
+            .arg(c.cpuFreq,0,'f',2).arg(c.cacheSize)
             .arg(c.numPhysicalCpus).arg(c.numCoresPerSocket).arg(c.numThreadsPerCore);
     QString proc = QString("CPUs: %1 - Hyperthreading: %2\n"
                            "%3 running proc. of %4\n"
@@ -51,22 +52,32 @@ void FrmHostInfo::update(ProcessingHostInfo & ph)
     ui->lblCPULoad->setText(cpu);
     ui->lblInfo->setText(QString("%1\n%2").arg(arch).arg(proc));
 
-    // Create agent panels
-    QFrame * frm = new QFrame(0);
-    QHBoxLayout * hlyFrmAgents = new QHBoxLayout;
-    frm->setLayout(hlyFrmAgents);
-    ui->scrollTasksInfo->setWidget(frm);
+    if (initialization) {
+        // Create agent panels
+        QFrame * frm = new QFrame(0);
+        QHBoxLayout * hlyFrmAgents = new QHBoxLayout;
+        frm->setLayout(hlyFrmAgents);
+        ui->scrollTasksInfo->setWidget(frm);
 
-    QSpacerItem * spacerFrmAgents = new QSpacerItem(10, 10,
-                                                    QSizePolicy::Expanding,
-                                                    QSizePolicy::Minimum);
-    // Add widgets for hosts
-    for (auto & a : ph.agInfo) {
-        QPF::FrmAgentStatus * panel = new QPF::FrmAgentStatus(0);
-        panel->updateInfo(a);
-        hlyFrmAgents->addWidget(panel);
+        QSpacerItem * spacerFrmAgents = new QSpacerItem(10, 10,
+                                                        QSizePolicy::Expanding,
+                                                        QSizePolicy::Minimum);
+        // Add widgets for hosts
+        for (auto & a : ph.agInfo) {
+            QPF::FrmAgentStatus * panel = new QPF::FrmAgentStatus(0);
+            hlyFrmAgents->addWidget(panel);
+            panels.append(panel);
+        }
+        hlyFrmAgents->addSpacerItem(spacerFrmAgents);
+        initialization = false;
     }
-    hlyFrmAgents->addSpacerItem(spacerFrmAgents);
+    int k = 0;
+    for (auto & a : ph.agInfo) {
+        QPF::FrmAgentStatus * panel = panels.at(k);
+        panel->updateInfo(a);
+        a.taskStatus.sum();
+        ++k;
+    }
 }
 
 QSimpleTickerGraph * FrmHostInfo::getLoadGraph()  { return ui->wdgChartLoad; }

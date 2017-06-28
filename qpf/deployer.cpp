@@ -645,6 +645,7 @@ void Deployer::createElementsNetwork()
     Config::procFmkInfo->numSrvTasks = 0;
     HostInfo hi;
     hi.update();
+    int j = 0;
 
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
@@ -656,19 +657,13 @@ void Deployer::createElementsNetwork()
         ph->hostInfo = hi;
         ph->numTasks = 0;
 
-        for (int i = 0; i << ph->numAgents; ++i) {
+        for (int i = 0; i < ph->numAgents; ++i, ++j) {
             AgentInfo agInfo;
-            agInfo.name = agName.at(i);
-            agInfo.taskStatus = TaskStatusSpectra(rand() % 10, rand() % 10, rand() % 4,
-                                                  rand() % 3, rand() % 3, rand() % 10);
+            agInfo.name = agName.at(j);
+            agInfo.taskStatus = TaskStatusSpectra();
             agInfo.load = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
-            ph->numTasks += (agInfo.taskStatus.running +
-                            agInfo.taskStatus.scheduled +
-                            agInfo.taskStatus.paused +
-                            agInfo.taskStatus.stopped +
-                            agInfo.taskStatus.failed +
-                            agInfo.taskStatus.finished);
+            ph->numTasks += agInfo.taskStatus.total;
         }
 
         Config::procFmkInfo->hostsInfo[ph->name] = ph;

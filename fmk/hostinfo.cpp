@@ -58,6 +58,8 @@
 
 // -*- C++ -*-
 
+long HostInfo::USER_HZ = sysconf(_SC_CLK_TCK);
+
 void HostInfo::update()
 {
     getHostInfo();
@@ -231,15 +233,17 @@ void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
     c.totalJiffies2 = j1 + j2 + j3 + j4 + j5 + j6 + j7;
     c.workJiffies2  = j1 + j2 + j3;
 
-    if ((c.timeInterval != 0) && (c.totalJiffies2 != c.totalJiffies)) {
+    //if ((c.timeInterval != 0) && (c.totalJiffies2 != c.totalJiffies)) {
+    if (c.totalJiffies2 != c.totalJiffies) {
         float workCPU  = c.workJiffies2  - c.workJiffies;
         float totalCPU = c.totalJiffies2 - c.totalJiffies;
-        c.computedLoad  = (workCPU / totalCPU) * 100.;
+        c.computedLoad  = (workCPU * 100.) / totalCPU;
     } else {
         c.computedLoad = 0.;
     }
 
-    c.timeInterval = interval;
+    //c.timeInterval = interval;
+    c.timeInterval = (c.totalJiffies2 - c.totalJiffies) * 1000 / HostInfo::USER_HZ;
 }
 
 void HostInfo::getCPUInfo(CPUInfo & info)

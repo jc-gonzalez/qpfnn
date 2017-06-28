@@ -59,7 +59,6 @@ void FrmAgentStatus::updateInfo(AgentInfo & a)
 {
     ui->lblTaskAgentName->setText(QString::fromStdString(a.name));
 
-
     TaskStatusSpectra & d = a.taskStatus;
     ui->lblRun->setText(QString("%1").arg(d.running));
     ui->lblWait->setText(QString("%1").arg(d.scheduled));
@@ -68,10 +67,9 @@ void FrmAgentStatus::updateInfo(AgentInfo & a)
     ui->lblFail->setText(QString("%1").arg(d.failed));
     ui->lblFin->setText(QString("%1").arg(d.finished));
 
-    int total = d.running + d.scheduled + d.paused + d.stopped + d.failed + d.finished;
-    ui->lblTotalTasks->setText(QString("%1").arg(total));
+    ui->lblTotalTasks->setText(QString("%1").arg(d.total));
 
-    if (total > 0) {
+    if (d.total > 0) {
         QVBoxLayout * vb = qobject_cast<QVBoxLayout*>(ui->vlyStatus);
         vb->setStretch(0, d.running    * 1000);
         vb->setStretch(1, d.scheduled  * 1000);
@@ -79,9 +77,9 @@ void FrmAgentStatus::updateInfo(AgentInfo & a)
         vb->setStretch(3, d.stopped    * 1000);
         vb->setStretch(4, d.failed     * 1000);
         vb->setStretch(5, d.finished   * 1000);
-//        ui->vlyStatus->setVisible(true);
-//    } else {
-//        ui->vlyStatus->setVisible(false);
+        //ui->vlyStatus->setVisible(true);
+    } else {
+        //ui->vlyStatus->setVisible(false);
     }
 }
 

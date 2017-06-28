@@ -360,16 +360,10 @@ void MainWindow::manualSetupUI()
             agInfo.name = QString("TskAgent_%1_%2")
                 .arg(h, 2, 10, QLatin1Char('0'))
                 .arg(i, 2, 10, QLatin1Char('0')).toStdString();
-            agInfo.taskStatus = TaskStatusSpectra(rand() % 10, rand() % 10, rand() % 4,
-                                                  rand() % 3, rand() % 3, rand() % 10);
+            agInfo.taskStatus = TaskStatusSpectra();
             agInfo.load = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
-            ph->numTasks += (agInfo.taskStatus.running +
-                            agInfo.taskStatus.scheduled +
-                            agInfo.taskStatus.paused +
-                            agInfo.taskStatus.stopped +
-                            agInfo.taskStatus.failed +
-                            agInfo.taskStatus.finished);
+            ph->numTasks += agInfo.taskStatus.total;
         }
 
         Config::procFmkInfo->hostsInfo[ph->name] = ph;

@@ -32,13 +32,13 @@ fmk/channels.h,351
 #define CHANNELS_HCHANNELS_H4,35
 #undef TT8,76
 #define TLISTOF_TX_IDS TLISTOF_TX_IDS10,86
-#define T(T21,559
-enum TxId { TLISTOF_TX_IDS };TxId22,584
-enum TxId { TLISTOF_TX_IDS };TLISTOF_TX_IDS22,584
-#undef TT23,614
-#define T(T25,624
-const ChannelDescriptor ChannelAcronym[] = { TLISTOF_TX_IDS };ChannelAcronym26,655
-#undef TT27,718
+#define T(T22,609
+enum TxId { TLISTOF_TX_IDS };TxId23,634
+enum TxId { TLISTOF_TX_IDS };TLISTOF_TX_IDS23,634
+#undef TT24,664
+#define T(T26,674
+const ChannelDescriptor ChannelAcronym[] = { TLISTOF_TX_IDS };ChannelAcronym27,705
+#undef TT28,768
 
 fmk/srvmng.cpp,709
 ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)ServiceMng59,1276
@@ -58,18 +58,19 @@ class ServiceMng : public DockerMng {ServiceMng78,1974
     std::vector<std::string> workerAddrs;workerAddrs138,4644
     std::string workerToken;workerToken139,4686
 
-fmk/tskmng.h,753
+fmk/tskmng.h,818
 #define TSKMNG_HTSKMNG_H42,818
 class TskMng : public Component {TskMng83,2093
-    std::vector<std::string>         agents;agents165,5776
-    std::map<std::string, AgentInfo> agentInfo;agentInfo166,5821
-    std::list<TaskInfo>              serviceTasks;serviceTasks168,5870
-    std::list<TaskInfo>              containerTasks;containerTasks169,5921
-    std::map<std::string, TaskStatus> taskRegistry;taskRegistry171,5975
-    std::map<TaskStatus, int> containerTaskStatus;containerTaskStatus173,6028
-    std::map<TaskStatus, int> serviceTaskStatus;serviceTaskStatus174,6079
-    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;containerTaskStatusPerAgent176,6129
-    HttpServer * httpSrv;httpSrv178,6213
+    std::vector<std::string>         agents;agents189,7005
+    std::map<std::string, AgentInfo> agentInfo;agentInfo190,7050
+    std::list<TaskInfo>              serviceTasks;serviceTasks192,7099
+    std::list<TaskInfo>              containerTasks;containerTasks193,7150
+    std::map<std::string, TaskStatus> taskRegistry;taskRegistry195,7204
+    std::map<TaskStatus, int> containerTaskStatus;containerTaskStatus197,7257
+    std::map<TaskStatus, int> serviceTaskStatus;serviceTaskStatus198,7308
+    std::map<std::pair<std::string, TaskStatus>, int> containerTaskStatusPerAgent;containerTaskStatusPerAgent200,7358
+    HttpServer * httpSrv;httpSrv202,7442
+    bool sendingPeriodicFmkInfo;sendingPeriodicFmkInfo204,7469
 
 fmk/tskorc.cpp,788
 TskOrc::TskOrc(const char * name, const char * addr, Synchronizer * s)TskOrc69,1474
@@ -243,12 +244,12 @@ struct TaskInfo : public JRecord {TaskInfo373,13005
     TaskInfo() {}TaskInfo374,13040
     TaskInfo(json v) : JRecord(v) {TaskInfo375,13058
     virtual void dump() {dump379,13175
-struct TaskAgentInfo : public JRecord {TaskAgentInfo407,13821
-    TaskAgentInfo() {}TaskAgentInfo408,13861
-    TaskAgentInfo(json v) : JRecord(v) {}TaskAgentInfo409,13884
-    virtual void restart() {restart410,13926
-    virtual void dump() {dump421,14258
-#define UNUSED(UNUSED452,14904
+struct TaskAgentInfo : public JRecord {TaskAgentInfo411,13919
+    TaskAgentInfo() {}TaskAgentInfo412,13959
+    TaskAgentInfo(json v) : JRecord(v) {}TaskAgentInfo413,13982
+    virtual void restart() {restart414,14024
+    virtual void dump() {dump425,14356
+#define UNUSED(UNUSED456,15002
 
 fmk/filenamespec.cpp,1765
 FileNameSpec::FileNameSpec()FileNameSpec70,1486
@@ -272,7 +273,7 @@ std::map< char, std::string >     FileNameSpec::assignationsTpl;assignationsTpl
 std::string                       FileNameSpec::productIdTpl = "%M_%T_%S_%f_%v";productIdTpl417,12775
 bool                              FileNameSpec::initialized = false;initialized419,12857
 
-fmk/config.cpp,1722
+fmk/config.cpp,1821
 #define WRITE_MESSAGE_FILESWRITE_MESSAGE_FILES61,1093
 Config & Config::_()_71,1364
 void Config::init(json v)init81,1617
@@ -305,6 +306,7 @@ std::string Config::PATHTsk;PATHTsk455,14166
 std::string Config::PATHMsg;PATHMsg456,14195
 mode_t Config::PATHMode = 0755;PATHMode458,14225
 bool Config::isLive = false;isLive460,14258
+ProcessingFrameworkInfo * Config::procFmkInfo = new ProcessingFrameworkInfo;procFmkInfo462,14288
 
 fmk/message.h,1930
 #define MESSAGE_HMESSAGE_H4,34
@@ -364,22 +366,26 @@ int URLHandler::runlink(std::string & f)runlink481,14568
 void URLHandler::setRemoteCopyParams(std::string maddr, std::string raddr)setRemoteCopyParams495,14952
 void URLHandler::setProcElemRunDir(std::string wkDir, std::string tskDir)setProcElemRunDir506,15349
 
-fmk/tskmng.cpp,1272
-TskMng::TskMng(const char * name, const char * addr, Synchronizer * s)TskMng65,1378
-TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)TskMng73,1646
-void TskMng::fromRunningToOperational()fromRunningToOperational81,1933
-void TskMng::processIncommingMessages()processIncommingMessages126,3528
-void TskMng::runEachIteration()runEachIteration151,4662
-void TskMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)processCmdMsg177,6041
-void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)processTskSchedMsg190,6424
-void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRqstMsg210,7109
-void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg273,9280
-void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)processHostMonMsg315,10764
-void TskMng::execContainerTask()execContainerTask324,11102
-inline double weightFunc(double load, double tasks) {weightFunc328,11140
-std::string TskMng::selectAgent()selectAgent337,11484
-bool TskMng::sendTaskAgMsg(MessageString & m,sendTaskAgMsg347,11807
-bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)sendTskRepDistMsg357,12149
+fmk/tskmng.cpp,1608
+TskMng::TskMng(const char * name, const char * addr, Synchronizer * s)TskMng66,1397
+TskMng::TskMng(std::string name, std::string addr, Synchronizer * s)TskMng74,1665
+void TskMng::fromRunningToOperational()fromRunningToOperational82,1952
+void TskMng::processIncommingMessages()processIncommingMessages123,3437
+void TskMng::runEachIteration()runEachIteration148,4571
+void TskMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)processCmdMsg174,5950
+void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)processTskSchedMsg187,6333
+void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRqstMsg207,7018
+void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepMsg270,9189
+void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)processHostMonMsg321,11071
+void TskMng::armProcFmkInfoMsgTimer()armProcFmkInfoMsgTimer335,11605
+TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)convertTaskStatusToSpectra345,12010
+void TskMng::execContainerTask()execContainerTask388,13878
+inline double weightFunc(double load, double tasks) {weightFunc392,13916
+std::string TskMng::selectAgent()selectAgent401,14260
+void TskMng::consolidateMonitInfo(MessageString & m)consolidateMonitInfo410,14575
+bool TskMng::sendTaskAgMsg(MessageString & m,sendTaskAgMsg430,15280
+bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgType)sendTskRepDistMsg440,15622
+void TskMng::sendProcFmkInfoUpdate()sendProcFmkInfoUpdate463,16464
 
 fmk/hostinfo.h,1478
 #define HOSTINFO_HHOSTINFO_H42,815
@@ -423,14 +429,14 @@ std::string HostInfo::toJsonStr()toJsonStr94,2256
 void HostInfo::fromStr(std::string s)fromStr147,4119
 void HostInfo::getLoadAvg(LoadAvg & l)getLoadAvg198,6015
 void HostInfo::getCPULoad(CPULoad & c, int interval, int line)getCPULoad211,6330
-void HostInfo::getCPUInfo(CPUInfo & info)getCPUInfo243,7253
-void HostInfo::getHostInfo()getHostInfo306,9544
+void HostInfo::getCPUInfo(CPUInfo & info)getCPUInfo245,7336
+void HostInfo::getHostInfo()getHostInfo308,9627
 
 fmk/cntrmng.h,96
 #define CNTRMNG_HCNTRMNG_H42,821
 class ContainerMng : public DockerMng {ContainerMng79,1998
 
-fmk/component.h,2554
+fmk/component.h,2664
 #define COMPONENT_HCOMPONENT_H42,828
 #    undef LogMsgLogMsg81,1803
 #    undef TraceMsgTraceMsg82,1821
@@ -463,86 +469,88 @@ class Component : public CommNode, public StateMachine {Component118,3164
     virtual void processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m) {}processTskRepMsg229,8392
     virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m) {}processTskRepDistMsg230,8476
     virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}processHostMonMsg231,8564
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;connections245,9122
-    std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;periodicMsgs246,9193
-    std::string compName;compName248,9270
-    std::string compAddress;compAddress249,9296
-    std::mutex mtxStepSize;mtxStepSize251,9326
-    std::thread thrId;thrId253,9355
-    Synchronizer * synchro;synchro255,9379
-    int iteration;iteration256,9407
-    int stepSize;stepSize257,9426
+    virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}processFmkMonMsg232,8649
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*> connections;connections246,9206
+    std::map<ChannelDescriptor, std::map<int, MessageString>> periodicMsgs;periodicMsgs247,9277
+    std::string compName;compName249,9354
+    std::string compAddress;compAddress250,9380
+    std::mutex mtxStepSize;mtxStepSize252,9410
+    std::thread thrId;thrId254,9439
+    Synchronizer * synchro;synchro256,9463
+    int iteration;iteration257,9491
+    int stepSize;stepSize258,9510
 
-fmk/config.h,3724
+fmk/config.h,3796
 #define CONFIG_HCONFIG_H42,802
-#define DEFAULT_INITIAL_PORT DEFAULT_INITIAL_PORT61,1400
-class CfgGrpGeneral : public JRecord {CfgGrpGeneral66,1616
-    CfgGrpGeneral() {}CfgGrpGeneral68,1663
-    CfgGrpGeneral(json v) : JRecord(v) {}CfgGrpGeneral69,1686
-    virtual void dump() {dump70,1728
-class CfgGrpNetwork : public JRecord {CfgGrpNetwork85,2140
-    CfgGrpNetwork() {}CfgGrpNetwork87,2187
-    CfgGrpNetwork(json v) : JRecord(v) {}CfgGrpNetwork88,2210
-    virtual void dump() {dump89,2252
-class CfgGrpDB : public JRecord {CfgGrpDB105,2729
-    CfgGrpDB() {}CfgGrpDB107,2771
-    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB108,2789
-    virtual void dump() {dump109,2826
-class CfgGrpProducts : public JRecord {CfgGrpProducts126,3239
-    CfgGrpProducts() {}CfgGrpProducts128,3287
-    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts129,3311
-    virtual void dump() {dump130,3354
-class CfgGrpRulesList : public JRecord {CfgGrpRulesList147,3866
-    CfgGrpRulesList() {}CfgGrpRulesList149,3915
-    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList150,3940
-    virtual void dump() {dump155,4076
-class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration168,4475
-    CfgGrpOrchestration() {}CfgGrpOrchestration170,4528
-    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration171,4557
-    virtual void dump() {dump174,4651
-class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList185,4993
-    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList187,5049
-    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList188,5081
-    virtual void dump() {dump189,5132
-class CfgGrpFlags : public JRecord {CfgGrpFlags208,5687
-    CfgGrpFlags() {}CfgGrpFlags210,5732
-    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags211,5753
-    virtual void dump() {dump212,5793
-class Config : public JRecord {Config233,6472
-    virtual void dump() {dump265,7663
-    Config() {}Config339,10753
-    std::string           cfgFileName;cfgFileName347,10978
-    std::string           cfgFilePath;cfgFilePath348,11017
-    std::string           sessionId;sessionId349,11056
-    bool                  hmiPresent;hmiPresent350,11093
-    bool                  isActualFile;isActualFile351,11131
-    std::string           currentHostAddr;currentHostAddr352,11171
-    bool                  weAreOnMaster;weAreOnMaster353,11214
-    std::vector<std::string> agentNames;agentNames355,11256
-        std::string       inbox;inbox358,11311
-        std::string       archive;archive359,11344
-        std::string       gateway;gateway360,11379
-        std::string       userArea;userArea361,11414
-    } storage;storage362,11450
-    static std::string    DBHost;DBHost364,11466
-    static std::string    DBPort;DBPort365,11500
-    static std::string    DBName;DBName366,11534
-    static std::string    DBUser;DBUser367,11568
-    static std::string    DBPwd;DBPwd368,11602
-    static std::string    PATHBase;PATHBase370,11636
-    static std::string    PATHData;PATHData371,11672
-    static std::string    PATHRun;PATHRun372,11708
-    static std::string    PATHBin;PATHBin373,11743
-    static std::string    PATHSession;PATHSession374,11778
-    static std::string    PATHLog;PATHLog375,11817
-    static std::string    PATHRlog;PATHRlog376,11852
-    static std::string    PATHTmp;PATHTmp377,11888
-    static std::string    PATHTsk;PATHTsk378,11923
-    static std::string    PATHMsg;PATHMsg379,11958
-    static mode_t         PATHMode;PATHMode381,11994
-    static bool           isLive;isLive383,12031
-namespace Configuration {Configuration386,12069
-    static ::Config & cfg = ::Config::_();cfg387,12095
+#define DEFAULT_INITIAL_PORT DEFAULT_INITIAL_PORT62,1422
+class CfgGrpGeneral : public JRecord {CfgGrpGeneral67,1638
+    CfgGrpGeneral() {}CfgGrpGeneral69,1685
+    CfgGrpGeneral(json v) : JRecord(v) {}CfgGrpGeneral70,1708
+    virtual void dump() {dump71,1750
+class CfgGrpNetwork : public JRecord {CfgGrpNetwork86,2162
+    CfgGrpNetwork() {}CfgGrpNetwork88,2209
+    CfgGrpNetwork(json v) : JRecord(v) {}CfgGrpNetwork89,2232
+    virtual void dump() {dump90,2274
+class CfgGrpDB : public JRecord {CfgGrpDB106,2751
+    CfgGrpDB() {}CfgGrpDB108,2793
+    CfgGrpDB(json v) : JRecord(v) {}CfgGrpDB109,2811
+    virtual void dump() {dump110,2848
+class CfgGrpProducts : public JRecord {CfgGrpProducts127,3261
+    CfgGrpProducts() {}CfgGrpProducts129,3309
+    CfgGrpProducts(json v) : JRecord(v) {}CfgGrpProducts130,3333
+    virtual void dump() {dump131,3376
+class CfgGrpRulesList : public JRecord {CfgGrpRulesList148,3888
+    CfgGrpRulesList() {}CfgGrpRulesList150,3937
+    CfgGrpRulesList(json v) : JRecord(v) {}CfgGrpRulesList151,3962
+    virtual void dump() {dump156,4098
+class CfgGrpOrchestration : public JRecord {CfgGrpOrchestration169,4497
+    CfgGrpOrchestration() {}CfgGrpOrchestration171,4550
+    CfgGrpOrchestration(json v) : JRecord(v) {CfgGrpOrchestration172,4579
+    virtual void dump() {dump175,4673
+class CfgGrpUserDefToolsList : public JRecord {CfgGrpUserDefToolsList186,5015
+    CfgGrpUserDefToolsList() {}CfgGrpUserDefToolsList188,5071
+    CfgGrpUserDefToolsList(json v) : JRecord(v) {}CfgGrpUserDefToolsList189,5103
+    virtual void dump() {dump190,5154
+class CfgGrpFlags : public JRecord {CfgGrpFlags209,5709
+    CfgGrpFlags() {}CfgGrpFlags211,5754
+    CfgGrpFlags(json v) : JRecord(v) {}CfgGrpFlags212,5775
+    virtual void dump() {dump213,5815
+class Config : public JRecord {Config234,6494
+    virtual void dump() {dump266,7685
+    Config() {}Config340,10775
+    std::string           cfgFileName;cfgFileName348,11000
+    std::string           cfgFilePath;cfgFilePath349,11039
+    std::string           sessionId;sessionId350,11078
+    bool                  hmiPresent;hmiPresent351,11115
+    bool                  isActualFile;isActualFile352,11153
+    std::string           currentHostAddr;currentHostAddr353,11193
+    bool                  weAreOnMaster;weAreOnMaster354,11236
+    std::vector<std::string> agentNames;agentNames356,11278
+        std::string       inbox;inbox359,11333
+        std::string       archive;archive360,11366
+        std::string       gateway;gateway361,11401
+        std::string       userArea;userArea362,11436
+    } storage;storage363,11472
+    static std::string    DBHost;DBHost365,11488
+    static std::string    DBPort;DBPort366,11522
+    static std::string    DBName;DBName367,11556
+    static std::string    DBUser;DBUser368,11590
+    static std::string    DBPwd;DBPwd369,11624
+    static std::string    PATHBase;PATHBase371,11658
+    static std::string    PATHData;PATHData372,11694
+    static std::string    PATHRun;PATHRun373,11730
+    static std::string    PATHBin;PATHBin374,11765
+    static std::string    PATHSession;PATHSession375,11800
+    static std::string    PATHLog;PATHLog376,11839
+    static std::string    PATHRlog;PATHRlog377,11874
+    static std::string    PATHTmp;PATHTmp378,11910
+    static std::string    PATHTsk;PATHTsk379,11945
+    static std::string    PATHMsg;PATHMsg380,11980
+    static mode_t         PATHMode;PATHMode382,12016
+    static bool           isLive;isLive384,12053
+    static ProcessingFrameworkInfo * procFmkInfo;procFmkInfo386,12088
+namespace Configuration {Configuration390,12143
+    static ::Config & cfg = ::Config::_();cfg391,12169
 
 fmk/datamng.h,134
 #define DATAMNG_HDATAMNG_H42,819
@@ -771,14 +779,14 @@ fmk/tskage.cpp,907
 TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,TskAge75,1539
 TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,TskAge85,1935
 void TskAge::fromRunningToOperational()fromRunningToOperational95,2350
-void TskAge::runEachIteration()runEachIteration138,3671
-void TskAge::runEachIterationForContainers()runEachIterationForContainers150,4028
-void TskAge::runEachIterationForServices()runEachIterationForServices240,7216
-void TskAge::processIncommingMessages()processIncommingMessages247,7446
-void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg272,8504
-void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg290,9067
-void TskAge::sendTaskReport()sendTaskReport370,11772
-void TskAge::retrieveOutputProducts()retrieveOutputProducts445,14158
+void TskAge::runEachIteration()runEachIteration139,3692
+void TskAge::runEachIterationForContainers()runEachIterationForContainers151,4049
+void TskAge::runEachIterationForServices()runEachIterationForServices245,7340
+void TskAge::processIncommingMessages()processIncommingMessages252,7570
+void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)processCmdMsg277,8628
+void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)processTskProcMsg295,9191
+void TskAge::sendTaskReport()sendTaskReport378,11976
+void TskAge::retrieveOutputProducts()retrieveOutputProducts453,14362
 
 fmk/tskage.h,2319
 #define TSKAGE_HTSKAGE_H42,807
@@ -823,35 +831,55 @@ class TskAge : public Component {TskAge81,2042
     URLHandler               urlh;urlh191,6233
     HostInfo                 hostInfo;hostInfo193,6269
 
-fmk/procinfo.h,1361
+fmk/procinfo.h,1741
 #define PROCINFO_HPROCINFO_H42,820
-struct TaskStatusSpectra {TaskStatusSpectra75,1695
-    int    running;running76,1722
-    int    scheduled;scheduled77,1742
-    int    paused;paused78,1764
-    int    stopped;stopped79,1783
-    int    failed;failed80,1803
-    int    finished;finished81,1822
-struct AgentInfo {AgentInfo84,1847
-    std::string       name;name85,1866
-    TaskStatusSpectra taskStatus;taskStatus86,1894
-    float             load;load87,1928
-struct ProcessingHostInfo {ProcessingHostInfo90,1960
-    std::string            name;name91,1988
-    int                    numAgents;numAgents92,2021
-    HostInfo               hostInfo;hostInfo93,2059
-    std::vector<AgentInfo> agInfo;agInfo94,2096
-    int                    numTasks;numTasks95,2131
-struct SwarmInfo {SwarmInfo98,2172
-    std::string       name;name99,2191
-    std::string       scale;scale100,2219
-    HostInfo          hostInfo;hostInfo101,2248
-    TaskStatusSpectra taskStatus;taskStatus102,2280
-struct ProcessingFrameworkInfo {ProcessingFrameworkInfo105,2318
-    std::vector<ProcessingHostInfo> hostsInfo;hostsInfo106,2351
-    SwarmInfo                       swarmInfo;swarmInfo107,2398
-    int                             numSrvTasks;numSrvTasks108,2445
-    int                             numContTasks;numContTasks109,2494
+struct BasicInfoContainer {BasicInfoContainer67,1567
+struct TaskStatusSpectra : public BasicInfoContainer {TaskStatusSpectra72,1685
+    TaskStatusSpectra() :TaskStatusSpectra73,1740
+    TaskStatusSpectra(int r, int s, int p, int st, int fl, int f) :TaskStatusSpectra76,1867
+    int    running;running79,2050
+    int    scheduled;scheduled80,2070
+    int    paused;paused81,2092
+    int    stopped;stopped82,2111
+    int    failed;failed83,2131
+    int    finished;finished84,2150
+    int    total;total85,2171
+struct AgentInfo : public BasicInfoContainer {AgentInfo91,2287
+    std::string       name;name92,2334
+    TaskStatusSpectra taskStatus;taskStatus93,2362
+    float             load;load94,2396
+struct ProcessingHostInfo : public BasicInfoContainer {ProcessingHostInfo99,2506
+    std::string            name;name100,2562
+    HostInfo               hostInfo;hostInfo101,2595
+    int                    numAgents;numAgents102,2632
+    std::vector<AgentInfo> agInfo;agInfo103,2670
+    int                    numTasks;numTasks104,2705
+struct SwarmInfo : public BasicInfoContainer {SwarmInfo109,2824
+    std::string       name;name110,2871
+    int               scale;scale111,2899
+    HostInfo          hostInfo;hostInfo112,2928
+    TaskStatusSpectra taskStatus;taskStatus113,2960
+struct ProcessingFrameworkInfo : public BasicInfoContainer {ProcessingFrameworkInfo118,3076
+        ProcessingHostInfo*>        hostsInfo;hostsInfo120,3163
+    SwarmInfo                       swarmInfo;swarmInfo121,3210
+    int                             numSrvTasks;numSrvTasks122,3257
+    int                             numContTasks;numContTasks123,3306
+
+fmk/procinfo.cpp,746
+#define FIELDNUM(FIELDNUM45,848
+#define FIELDSTR(FIELDSTR47,975
+#define COMMA COMMA49,1116
+void TaskStatusSpectra::sum()sum51,1155
+std::string TaskStatusSpectra::toJsonStr()toJsonStr57,1281
+void TaskStatusSpectra::fromStr(std::string s)fromStr70,1853
+std::string AgentInfo::toJsonStr()toJsonStr82,2194
+void AgentInfo::fromStr(std::string s)fromStr90,2412
+std::string ProcessingHostInfo::toJsonStr()toJsonStr99,2626
+void ProcessingHostInfo::fromStr(std::string s)fromStr117,3241
+std::string SwarmInfo::toJsonStr()toJsonStr134,3747
+void SwarmInfo::fromStr(std::string s)fromStr144,4051
+std::string ProcessingFrameworkInfo::toJsonStr()toJsonStr154,4326
+void ProcessingFrameworkInfo::fromStr(std::string s)fromStr171,4936
 
 infix/infixeval.h,2237
 #define INFIXEVAL_HINFIXEVAL_H42,842
@@ -2224,6 +2252,18 @@ int main(int argc, char * argv[])main8,80
 tests/http/main.cpp,46
 int main(int argc, char * argv[])main46,859
 
+tests/procfmkinfo/main.cpp,47
+int main(int argc, char * argtv[])main10,100
+
+tests/timer/main.cpp,246
+class TimerTest {TimerTest11,111
+    TimerTest() {}TimerTest13,137
+    void run() {run15,164
+    void method(int meaning) {method19,284
+void func1()func126,541
+void func2(int a)func232,644
+int main(int arg, char * argv[])main38,782
+
 tools/PCRegEx.h,979
 #define PCREGEX_HPCREGEX_H2,18
 #define PCRE2_CODE_UNIT_WIDTH PCRE2_CODE_UNIT_WIDTH4,37
@@ -2560,6 +2600,13 @@ void DirWatcher::start()start107,2659
 void DirWatcher::stop()stop208,5940
 bool DirWatcher::nextEvent(DirWatchEvent & event)nextEvent216,6162
 
+tools/timer.h,145
+#define TIMER_HTIMER_H42,802
+class Timer {Timer72,1733
+        Timer(int after, bool async, callable&& f, arguments&&... args)Timer76,1806
+
+tools/timer.cpp,0
+
 uuid/uuidxx.cpp,975
 UUID::UUID()UUID51,1080
 void UUID::clear()clear57,1125
@@ -2798,10 +2845,9 @@ class TxItemTxItem53,901
     QString name;name74,1383
     QJsonObject content;content75,1401
 
-qpfhmi/hmipxy.h,145
+qpfhmi/hmipxy.h,86
 #define HMIPXY_HHMIPXY_H42,811
 class HMIProxy : public Component {HMIProxy79,2004
-    ProcessingHostInfo * procFmkInfo;procFmkInfo148,5159
 
 qpfhmi/xmlsyntaxhighlight.h,874
 #define BASIC_XML_SYNTAX_HIGHLIGHTER_HBASIC_XML_SYNTAX_HIGHLIGHTER_H42,875
@@ -3216,12 +3262,12 @@ struct FilterSet {FilterSet134,2811
     FiltersJoin      join;join140,2988
     bool evaluate(FieldSet fld) {evaluate141,3015
 
-qpfhmi/frmagentstatus.h,200
+qpfhmi/frmagentstatus.h,199
 #define FRMAGENTSTATUS_HFRMAGENTSTATUS_H42,831
-namespace Ui {Ui48,923
-namespace QPF {QPF52,963
-class FrmAgentStatus : public QFrameFrmAgentStatus56,1008
-    Ui::FrmAgentStatus *ui;ui67,1189
+namespace Ui {Ui48,899
+namespace QPF {QPF52,939
+class FrmAgentStatus : public QFrameFrmAgentStatus56,984
+    Ui::FrmAgentStatus *ui;ui67,1165
 
 qpfhmi/dbmng.cpp,1085
 namespace QPF {QPF43,837
@@ -3315,19 +3361,18 @@ void ExtToolsDef::removeTool()removeTool159,4897
 void ExtToolsDef::cancelDlg()cancelDlg180,5771
 void ExtToolsDef::getTools(MapOfUserDefTools & userTools)getTools185,5839
 
-qpfhmi/hmipxy.cpp,1035
+qpfhmi/hmipxy.cpp,935
 HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)HMIProxy61,1336
 HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)HMIProxy69,1608
 void HMIProxy::runEachIteration()runEachIteration77,1891
 void HMIProxy::processIncommingMessages()processIncommingMessages104,2824
-void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg127,3852
-void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepDistMsg135,4171
-void HMIProxy::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)processHostMonMsg151,4751
-void HMIProxy::defineProcHostInfoHolder(ProcessingHostInfo * p)defineProcHostInfoHolder166,5199
-void HMIProxy::log(std::string s, Log::LogLevel lvl)log175,5498
-void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd184,5798
-void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel192,6092
-void HMIProxy::sendNewCfgInfo()sendNewCfgInfo200,6376
+void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)processHMICmdMsg127,3851
+void HMIProxy::processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m)processTskRepDistMsg135,4170
+void HMIProxy::processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m)processFmkMonMsg151,4749
+void HMIProxy::log(std::string s, Log::LogLevel lvl)log165,5263
+void HMIProxy::sendCmd(std::string target, std::string what, std::string value)sendCmd174,5563
+void HMIProxy::sendMinLogLevel(std::string lvlStr)sendMinLogLevel182,5857
+void HMIProxy::sendNewCfgInfo()sendNewCfgInfo190,6141
 
 qpfhmi/dlgshowtaskinfo.cpp,277
 DlgShowTaskInfo::DlgShowTaskInfo(QWidget *parent) :DlgShowTaskInfo43,843
@@ -3382,7 +3427,7 @@ void sayHello()sayHello96,2684
 void ctrlMsg(QSplashScreen & splash, int k = 0)ctrlMsg121,3627
 int main(int argc, char *argv[])main146,4710
 
-qpfhmi/mainwindow.h,5231
+qpfhmi/mainwindow.h,5169
 #define MAINWINDOW_HMAINWINDOW_H42,811
 namespace Ui {Ui73,1401
 namespace QPF {QPF77,1441
@@ -3477,12 +3522,11 @@ class MainWindow : public QMainWindow, StateMachineMainWindow81,1477
     ProcAlertModel *      procAlertModel;procAlertModel347,8508
     ProductsModel *       productsModel;productsModel348,8550
     TxTableModel *        txModel;txModel349,8591
-    ProcessingFrameworkInfo procFmkInfo;procFmkInfo351,8627
-    ProcFmkMonitor *        procFmkMonit;procFmkMonit352,8668
-    QMap<QString,QString> nodeStates;nodeStates354,8711
-    QPoint pointOfAction;pointOfAction356,8750
-    bool isProductsCustomFilterActive;isProductsCustomFilterActive359,8808
-    bool isAlertsCustomFilterActive;isAlertsCustomFilterActive360,8847
+    ProcFmkMonitor *        procFmkMonit;procFmkMonit351,8627
+    QMap<QString,QString> nodeStates;nodeStates353,8670
+    QPoint pointOfAction;pointOfAction355,8709
+    bool isProductsCustomFilterActive;isProductsCustomFilterActive358,8767
+    bool isAlertsCustomFilterActive;isAlertsCustomFilterActive359,8806
 
 qpfhmi/procalertmodel.cpp,151
 namespace QPF {QPF43,864
@@ -3617,125 +3661,125 @@ DlgDataIngestion::DlgDataIngestion(QWidget *parent) :DlgDataIngestion44,862
 DlgDataIngestion::~DlgDataIngestion()~DlgDataIngestion51,998
 
 qpfhmi/mainwindow.cpp,7945
-namespace QPF {QPF104,1928
-static const int MessageDelay = 2000;MessageDelay106,1945
-static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle107,1983
-const int MainWindow::ERROR        = -1;ERROR110,2080
-const int MainWindow::OFF          =  0;OFF111,2121
-const int MainWindow::INITIALISED  =  1;INITIALISED112,2162
-const int MainWindow::RUNNING      =  2;RUNNING113,2203
-const int MainWindow::OPERATIONAL  =  3;OPERATIONAL114,2244
-#define TMsg(TMsg117,2306
-#define DMsg(DMsg118,2351
-#define IMsg(IMsg119,2396
-#define WMsg(WMsg120,2440
-#define EMsg(EMsg121,2487
-#define FMsg(FMsg122,2532
-MainWindow::MainWindow(QString url, QString sessionName,MainWindow134,3083
-MainWindow::~MainWindow()~MainWindow204,5386
-void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo214,5676
-void MainWindow::manualSetupUI()manualSetupUI223,6034
-void MainWindow::readConfig(QString dbUrl)readConfig390,12079
-void MainWindow::closeEvent(QCloseEvent *event)closeEvent442,13856
-void MainWindow::saveAs()saveAs457,14275
-void MainWindow::processPath()processPath467,14660
-void MainWindow::cut()cut477,14956
-void MainWindow::copy()copy482,15052
-void MainWindow::paste()paste487,15150
-void MainWindow::about()about497,15448
-#define BUILD_ID BUILD_ID500,15492
-void MainWindow::updateMenus()updateMenus520,16118
-void MainWindow::updateWindowMenu()updateWindowMenu548,17088
-TextView *MainWindow::createTextView()createTextView588,18482
-void MainWindow::createActions()createActions605,19038
-void MainWindow::createMenus()createMenus747,25633
-void MainWindow::createToolBars()createToolBars800,27329
-void MainWindow::createStatusBar()createStatusBar817,27868
-void MainWindow::readSettings()readSettings826,28150
-void MainWindow::writeSettings()writeSettings839,28618
-QVariant MainWindow::getFromSettings(QString name)getFromSettings850,29007
-void MainWindow::putToSettings(QString name, QVariant value)putToSettings860,29363
-void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings870,29746
-void MainWindow::putUserToolsToSettings()putUserToolsToSettings897,30777
-TextView *MainWindow::activeTextView()activeTextView908,31049
-void MainWindow::switchLayoutDirection()switchLayoutDirection919,31455
-void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow930,31834
-void MainWindow::showConfigTool()showConfigTool940,32200
-void MainWindow::showDBBrowser()showDBBrowser956,32676
-void MainWindow::showExtToolsDef()showExtToolsDef967,32964
-void MainWindow::showVerbLevel()showVerbLevel982,33394
-void MainWindow::quitApp()quitApp999,34060
-void MainWindow::quitAllQPF()quitAllQPF1020,34850
-void MainWindow::processProductsInPath(QString folder)processProductsInPath1048,35989
-void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder1084,37161
-void MainWindow::transitToOperational()transitToOperational1107,38033
-void MainWindow::init()init1115,38284
-void MainWindow::setLogWatch()setLogWatch1147,39529
-void MainWindow::processPendingEvents()processPendingEvents1207,41959
-void MainWindow::handleFinishedHMI()handleFinishedHMI1216,42253
-void MainWindow::defineValidTransitions()defineValidTransitions1225,42581
-QString MainWindow::getState()getState1252,43649
-void MainWindow::showState()showState1266,44163
-void MainWindow::updateSystemView()updateSystemView1357,47660
-void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1394,48732
-void MainWindow::selectRowInNav(int row)selectRowInNav1403,49058
-void MainWindow::removeRowInNav(int row)removeRowInNav1411,49313
-void MainWindow::initLocalArchiveView()initLocalArchiveView1423,49754
-void MainWindow::setUToolTasks()setUToolTasks1484,52907
-void MainWindow::localarchViewUpdate()localarchViewUpdate1500,53500
-void MainWindow::resizeLocalArch()resizeLocalArch1511,53834
-void MainWindow::updateLocalArchModel()updateLocalArchModel1522,54216
-void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1537,54675
-void MainWindow::setAutomaticExpandLocalArchModel(bool b)setAutomaticExpandLocalArchModel1546,55023
-void MainWindow::setAutomaticResizeLocalArchModel(bool b)setAutomaticResizeLocalArchModel1555,55371
-void MainWindow::openWithDefault()openWithDefault1563,55635
-void MainWindow::openWith()openWith1575,56064
-void MainWindow::reprocessProduct()reprocessProduct1674,59770
-void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1704,60962
-void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1752,62740
-void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1768,63245
-void MainWindow::closeTab(int n)closeTab1895,68344
-void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1905,68676
-void MainWindow::closeTabAction()closeTabAction1922,69222
-void MainWindow::closeAllTabAction()closeAllTabAction1940,69720
-void MainWindow::closeOtherTabAction()closeOtherTabAction1952,70112
-void MainWindow::showTabsListMenu()showTabsListMenu1972,70737
-void MainWindow::selectTabFromList()selectTabFromList1992,71486
-void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu2001,71815
-void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu2012,72287
-void MainWindow::jsontreeExpand()jsontreeExpand2052,73899
-void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree2063,74299
-void MainWindow::jsontreeExpandAll()jsontreeExpandAll2087,75006
-void MainWindow::jsontreeCollapse()jsontreeCollapse2098,75356
-void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree2109,75762
-void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll2124,76281
-void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren2134,76632
-void MainWindow::initTasksMonitView()initTasksMonitView2148,77230
-void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2178,78713
-void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2186,78984
-void MainWindow::showWorkDir()showWorkDir2204,79600
-void MainWindow::displayTaskInfo()displayTaskInfo2222,80307
-void MainWindow::restartTask()restartTask2237,80989
-void MainWindow::stopTask()stopTask2246,81277
-bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2255,81574
-void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2283,82537
-void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2299,83133
-void MainWindow::initAlertsTables()initAlertsTables2341,84710
-void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2390,86970
-void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)showAlertInfo2414,87837
-void MainWindow::showSysAlertInfo()showSysAlertInfo2428,88309
-void MainWindow::showProcAlertInfo()showProcAlertInfo2437,88624
-void MainWindow::initTxView()initTxView2449,89069
-void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2471,89922
-void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2479,90177
-void MainWindow::displayTxInfo()displayTxInfo2495,90660
-void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2517,91720
-void MainWindow::setProductsFilter(QString qry, QStringList hdr)setProductsFilter2594,94792
-void MainWindow::restartProductsFilter()restartProductsFilter2609,95405
-void MainWindow::setAlertFilter(QString qry, QStringList hdr)setAlertFilter2621,95879
-void MainWindow::restartAlertFilter()restartAlertFilter2633,96309
-void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2646,96766
-void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)storeQUTools2Cfg2727,99542
+namespace QPF {QPF105,1948
+static const int MessageDelay = 2000;MessageDelay107,1965
+static const char * FixedWidthStyle = "font: 8pt \"Droid Sans Mono\";";FixedWidthStyle108,2003
+const int MainWindow::ERROR        = -1;ERROR111,2100
+const int MainWindow::OFF          =  0;OFF112,2141
+const int MainWindow::INITIALISED  =  1;INITIALISED113,2182
+const int MainWindow::RUNNING      =  2;RUNNING114,2223
+const int MainWindow::OPERATIONAL  =  3;OPERATIONAL115,2264
+#define TMsg(TMsg118,2326
+#define DMsg(DMsg119,2371
+#define IMsg(IMsg120,2416
+#define WMsg(WMsg121,2460
+#define EMsg(EMsg122,2507
+#define FMsg(FMsg123,2552
+MainWindow::MainWindow(QString url, QString sessionName,MainWindow135,3103
+MainWindow::~MainWindow()~MainWindow205,5406
+void MainWindow::setAppInfo(QString name, QString rev, QString bld)setAppInfo215,5696
+void MainWindow::manualSetupUI()manualSetupUI224,6054
+void MainWindow::readConfig(QString dbUrl)readConfig388,12191
+void MainWindow::closeEvent(QCloseEvent *event)closeEvent440,13968
+void MainWindow::saveAs()saveAs455,14387
+void MainWindow::processPath()processPath465,14772
+void MainWindow::cut()cut475,15068
+void MainWindow::copy()copy480,15164
+void MainWindow::paste()paste485,15262
+void MainWindow::about()about495,15560
+#define BUILD_ID BUILD_ID498,15604
+void MainWindow::updateMenus()updateMenus518,16230
+void MainWindow::updateWindowMenu()updateWindowMenu546,17200
+TextView *MainWindow::createTextView()createTextView586,18594
+void MainWindow::createActions()createActions603,19150
+void MainWindow::createMenus()createMenus745,25745
+void MainWindow::createToolBars()createToolBars798,27441
+void MainWindow::createStatusBar()createStatusBar815,27980
+void MainWindow::readSettings()readSettings824,28262
+void MainWindow::writeSettings()writeSettings837,28730
+QVariant MainWindow::getFromSettings(QString name)getFromSettings848,29119
+void MainWindow::putToSettings(QString name, QVariant value)putToSettings858,29475
+void MainWindow::getUserToolsFromSettings()getUserToolsFromSettings868,29858
+void MainWindow::putUserToolsToSettings()putUserToolsToSettings895,30889
+TextView *MainWindow::activeTextView()activeTextView906,31161
+void MainWindow::switchLayoutDirection()switchLayoutDirection917,31567
+void MainWindow::setActiveSubWindow(QWidget *window)setActiveSubWindow928,31946
+void MainWindow::showConfigTool()showConfigTool938,32312
+void MainWindow::showDBBrowser()showDBBrowser954,32788
+void MainWindow::showExtToolsDef()showExtToolsDef965,33076
+void MainWindow::showVerbLevel()showVerbLevel980,33506
+void MainWindow::quitApp()quitApp997,34172
+void MainWindow::quitAllQPF()quitAllQPF1018,34962
+void MainWindow::processProductsInPath(QString folder)processProductsInPath1046,36101
+void MainWindow::getProductsInFolder(QString & path, QStringList & files, bool recursive)getProductsInFolder1082,37273
+void MainWindow::transitToOperational()transitToOperational1105,38145
+void MainWindow::init()init1113,38396
+void MainWindow::setLogWatch()setLogWatch1151,39933
+void MainWindow::processPendingEvents()processPendingEvents1211,42363
+void MainWindow::handleFinishedHMI()handleFinishedHMI1220,42657
+void MainWindow::defineValidTransitions()defineValidTransitions1229,42985
+QString MainWindow::getState()getState1256,44053
+void MainWindow::showState()showState1270,44567
+void MainWindow::updateSystemView()updateSystemView1361,48064
+void MainWindow::showSelectedInNav(QListWidgetItem* item)showSelectedInNav1398,49136
+void MainWindow::selectRowInNav(int row)selectRowInNav1407,49462
+void MainWindow::removeRowInNav(int row)removeRowInNav1415,49717
+void MainWindow::initLocalArchiveView()initLocalArchiveView1427,50158
+void MainWindow::setUToolTasks()setUToolTasks1488,53311
+void MainWindow::localarchViewUpdate()localarchViewUpdate1504,53904
+void MainWindow::resizeLocalArch()resizeLocalArch1515,54238
+void MainWindow::updateLocalArchModel()updateLocalArchModel1526,54620
+void MainWindow::setAutomaticUpdateLocalArchModel(bool b)setAutomaticUpdateLocalArchModel1541,55079
+void MainWindow::setAutomaticExpandLocalArchModel(bool b)setAutomaticExpandLocalArchModel1550,55427
+void MainWindow::setAutomaticResizeLocalArchModel(bool b)setAutomaticResizeLocalArchModel1559,55775
+void MainWindow::openWithDefault()openWithDefault1567,56039
+void MainWindow::openWith()openWith1579,56468
+void MainWindow::reprocessProduct()reprocessProduct1678,60174
+void MainWindow::showArchiveTableContextMenu(const QPoint & p)showArchiveTableContextMenu1708,61366
+void MainWindow::showJSONdata(QString title, QString & dataString)showJSONdata1756,63144
+void MainWindow::openLocalArchiveElement(QModelIndex idx)openLocalArchiveElement1772,63649
+void MainWindow::closeTab(int n)closeTab1899,68748
+void MainWindow::showTabsContextMenu(const QPoint & p)showTabsContextMenu1909,69080
+void MainWindow::closeTabAction()closeTabAction1926,69626
+void MainWindow::closeAllTabAction()closeAllTabAction1944,70124
+void MainWindow::closeOtherTabAction()closeOtherTabAction1956,70516
+void MainWindow::showTabsListMenu()showTabsListMenu1976,71141
+void MainWindow::selectTabFromList()selectTabFromList1996,71890
+void MainWindow::attachJsonPopUpMenu(QWidget * w)attachJsonPopUpMenu2005,72219
+void MainWindow::showJsonContextMenu(const QPoint & p)showJsonContextMenu2016,72691
+void MainWindow::jsontreeExpand()jsontreeExpand2056,74303
+void MainWindow::jsontreeExpandSubtree()jsontreeExpandSubtree2067,74703
+void MainWindow::jsontreeExpandAll()jsontreeExpandAll2091,75410
+void MainWindow::jsontreeCollapse()jsontreeCollapse2102,75760
+void MainWindow::jsontreeCollapseSubtree()jsontreeCollapseSubtree2113,76166
+void MainWindow::jsontreeCollapseAll()jsontreeCollapseAll2128,76685
+void MainWindow::getAllChildren(QModelIndex index, QModelIndexList &indices)getAllChildren2138,77036
+void MainWindow::initTasksMonitView()initTasksMonitView2152,77634
+void MainWindow::sortTaskViewByColumn(int c)sortTaskViewByColumn2182,79117
+void MainWindow::showTaskMonitContextMenu(const QPoint & p)showTaskMonitContextMenu2190,79388
+void MainWindow::showWorkDir()showWorkDir2208,80004
+void MainWindow::displayTaskInfo()displayTaskInfo2226,80711
+void MainWindow::restartTask()restartTask2241,81393
+void MainWindow::stopTask()stopTask2250,81681
+bool MainWindow::runDockerCmd(QModelIndex idx, QString cmd)runDockerCmd2259,81978
+void MainWindow::dumpTaskInfoToTree(QString taskName, const Json::Value & v, QTreeWidget * t)dumpTaskInfoToTree2287,82941
+void MainWindow::dumpToTree(const Json::Value & v, QTreeWidgetItem * t)dumpToTree2303,83537
+void MainWindow::initAlertsTables()initAlertsTables2345,85114
+void MainWindow::showAlertsContextMenu(const QPoint & p)showAlertsContextMenu2394,87374
+void MainWindow::showAlertInfo(QTableView * tblvw, DBTableModel * model)showAlertInfo2418,88241
+void MainWindow::showSysAlertInfo()showSysAlertInfo2432,88713
+void MainWindow::showProcAlertInfo()showProcAlertInfo2441,89028
+void MainWindow::initTxView()initTxView2453,89473
+void MainWindow::sortTxViewByColumn(int c)sortTxViewByColumn2475,90326
+void MainWindow::showTxContextMenu(const QPoint & p)showTxContextMenu2483,90581
+void MainWindow::displayTxInfo()displayTxInfo2499,91064
+void MainWindow::updateAgentsMonitPanel()updateAgentsMonitPanel2521,92124
+void MainWindow::setProductsFilter(QString qry, QStringList hdr)setProductsFilter2598,95196
+void MainWindow::restartProductsFilter()restartProductsFilter2613,95809
+void MainWindow::setAlertFilter(QString qry, QStringList hdr)setAlertFilter2625,96283
+void MainWindow::restartAlertFilter()restartAlertFilter2637,96713
+void MainWindow::binaryGetFITSHeader(QString fileName, QString & str)binaryGetFITSHeader2650,97170
+void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)storeQUTools2Cfg2731,99946
 
 qpfhmi/verbleveldlg.cpp,363
 namespace QPF {QPF46,880
@@ -3824,30 +3868,32 @@ class QSimpleTickerGraph : public QWidgetQSimpleTickerGraph12,228
     QColor mLabelColor;mLabelColor84,1895
     QFont mLabelFont;mLabelFont85,1919
 
-qpfhmi/procfmkmonit.cpp,302
-namespace QPF {QPF49,942
-const int GRAPH_UPDATE_PERIOD = 100;GRAPH_UPDATE_PERIOD51,959
-ProcFmkMonitor::ProcFmkMonitor(QScrollArea * scrl) :ProcFmkMonitor53,997
-void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo & q)setupHostsInfo58,1098
-void ProcFmkMonitor::timeout()timeout107,2736
+qpfhmi/procfmkmonit.cpp,303
+namespace QPF {QPF48,917
+const int GRAPH_UPDATE_PERIOD = 1000;GRAPH_UPDATE_PERIOD50,934
+ProcFmkMonitor::ProcFmkMonitor(QScrollArea * scrl) :ProcFmkMonitor52,973
+void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)setupHostsInfo57,1074
+void ProcFmkMonitor::timeout()timeout108,2809
 
-qpfhmi/procfmkmonit.h,731
+qpfhmi/procfmkmonit.h,847
 #define PROCFMKMONIT_HPROCFMKMONIT_H42,835
-namespace QPF {QPF50,956
-struct Graphs {Graphs52,973
-    QSimpleTickerGraph * loadGraph;loadGraph53,989
-    QSimpleTickerGraph * cpuGraph;cpuGraph54,1025
-    QSimpleTickerGraph * tasksGraph;tasksGraph55,1060
-    double               lastLoad;lastLoad56,1097
-    double               lastCPU;lastCPU57,1132
-    double               lastTasks;lastTasks58,1166
-class ProcFmkMonitor : public QObjectProcFmkMonitor61,1206
-    QScrollArea * scrollArea;scrollArea75,1428
-    QTimer *      mTimer;mTimer76,1458
-    double mVoltage;mVoltage78,1485
-    double mTemperature;mTemperature79,1506
-    double mSpeed;mSpeed80,1531
-    QVector<Graphs> graphs;graphs82,1551
+namespace QPF {QPF53,1025
+struct Graphs {Graphs55,1042
+    QSimpleTickerGraph * loadGraph;loadGraph56,1058
+    QSimpleTickerGraph * cpuGraph;cpuGraph57,1094
+    QSimpleTickerGraph * tasksGraph;tasksGraph58,1129
+    double               lastLoad;lastLoad59,1166
+    double               lastCPU;lastCPU60,1201
+    double               lastTasks;lastTasks61,1235
+class ProcFmkMonitor : public QObjectProcFmkMonitor64,1275
+    QScrollArea * scrollArea;scrollArea78,1497
+    QTimer *      mTimer;mTimer79,1527
+    ProcessingFrameworkInfo * procFmkInfo;procFmkInfo81,1554
+    double mVoltage;mVoltage83,1598
+    double mTemperature;mTemperature84,1619
+    double mSpeed;mSpeed85,1644
+    QVector<Graphs> graphs;graphs87,1664
+    QVector<FrmHostInfo *> panels;panels88,1692
 
 build/CMakeFiles/2.8.11/CompilerIdC/CMakeCCompilerId.c,7022
 # define ID_VOID_MAINID_VOID_MAIN9,224
@@ -4268,6 +4314,26 @@ CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
 CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
 
 build/tests/http/Makefile,396
+SUFFIXES =SUFFIXES15,456
+SHELL = /bin/shSHELL30,811
+CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
+RM = /usr/bin/cmake -E remove -fRM36,916
+EQUALS = =EQUALS39,985
+CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
+CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
+CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
+
+build/tests/timer/Makefile,396
+SUFFIXES =SUFFIXES15,456
+SHELL = /bin/shSHELL30,811
+CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852
+RM = /usr/bin/cmake -E remove -fRM36,916
+EQUALS = =EQUALS39,985
+CMAKE_EDIT_COMMAND = /usr/bin/ccmakeCMAKE_EDIT_COMMAND42,1037
+CMAKE_SOURCE_DIR = /home/eucops/Work/Euclid/QPFnnCMAKE_SOURCE_DIR45,1132
+CMAKE_BINARY_DIR = /home/eucops/Work/Euclid/QPFnn/buildCMAKE_BINARY_DIR48,1239
+
+build/tests/procfmkinfo/Makefile,396
 SUFFIXES =SUFFIXES15,456
 SHELL = /bin/shSHELL30,811
 CMAKE_COMMAND = /usr/bin/cmakeCMAKE_COMMAND33,852

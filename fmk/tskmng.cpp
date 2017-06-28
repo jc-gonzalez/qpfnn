@@ -96,8 +96,7 @@ void TskMng::fromRunningToOperational()
         serviceTaskStatus[status]   = 0;
         containerTaskStatus[status] = 0;
         for (auto & a : cfg.agentNames) {
-            std::pair<std::string,
-                      TaskStatus> tskPair = std::make_pair(a, status);
+            TaskStatusPerAgent tskPair = std::make_pair(a, status);
             containerTaskStatusPerAgent[tskPair] = 0;
         }
     }
@@ -232,7 +231,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
         taskName = ((isSrvRqst ? "Swarm" : agName) + "_" +
                     taskInfoData["taskName"].asString());
         taskInfoData["taskName"] = taskName;
-        taskStatus = TaskStatus(taskInfoData["taskStatus"].asInt());
+        taskStatus = TASK_SCHEDULED; //TaskStatus(taskInfoData["taskStatus"].asInt());
         body["info"] = taskInfoData;
         listOfTasks->pop_front();
 
@@ -247,19 +246,17 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
             conn->setMsgOut(msg.str());
             isTaskSent = true;
         }
-        TRC("Task " + taskName + "sent to " << agName);
     }
 
     // Task info is sent, register the task and status
     if (isTaskSent) {
+        TRC("Task " + taskName + "sent to " << agName);
         taskRegistry[taskName] = taskStatus;
         if (isSrvRqst) {
             serviceTaskStatus[taskStatus]++;
         } else {
             containerTaskStatus[taskStatus]++;
-            std::pair<std::string, TaskStatus> tskPair =
-                std::make_pair(taskName, taskStatus);
-            containerTaskStatusPerAgent[tskPair]++;
+            containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
         }
     }
 }
@@ -291,19 +288,21 @@ void TskMng::processTskRepMsg(ScalabilityProtocolRole* c, MessageString & m)
         } else {
             containerTaskStatus[oldStatus]--;
             containerTaskStatus[taskStatus]++;
-            std::pair<std::string, TaskStatus> oldPair =
-                std::make_pair(agName, oldStatus);
-            std::pair<std::string, TaskStatus> tskPair =
-                std::make_pair(agName, taskStatus);
-            containerTaskStatusPerAgent[oldPair]--;
-            containerTaskStatusPerAgent[tskPair]++;
+            containerTaskStatusPerAgent[std::make_pair(agName, oldStatus)]--;
+            containerTaskStatusPerAgent[std::make_pair(agName, taskStatus)]++;
 
             TaskStatusSpectra spec = convertTaskStatusToSpectra(agName);
 
             const std::string & hostIp = task.taskHost();
             ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
+            TRC("HOSTIP: " + hostIp);
             for (auto & agi : procHostInfo->agInfo) {
-                if (agi.name == hostIp) { agi.taskStatus = spec; }
+                TRC("-- AGNAME: " + agi.name);
+                if (agi.name == agName) {
+                    agi.taskStatus = spec;
+                    TRC("Placing spectrum " + spec.toJsonStr() +
+                        " placed for " + agName);
+                }
             }
         }
     }
@@ -325,7 +324,10 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
     //sendTskRepDistMsg(m, MsgHostMon);
 
     // If sending updates is not yet activated, activate it
-    armProcFmkInfoMsgTimer();
+    if (!sendingPeriodicFmkInfo) {
+        sendingPeriodicFmkInfo = true;
+        armProcFmkInfoMsgTimer();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -334,7 +336,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::armProcFmkInfoMsgTimer()
 {
-    Timer * fmkSender = new Timer(3000, true,
+    Timer * fmkSender = new Timer(5000, true,
                                   &TskMng::sendProcFmkInfoUpdate, this);
 }
 
@@ -346,38 +348,31 @@ TaskStatusSpectra TskMng::convertTaskStatusToSpectra(std::string & agName)
 {
     //TaskStatusSpectra spec;
 
-    std::map<std::pair<std::string, TaskStatus>, int>::iterator
+    std::map<TaskStatusPerAgent, int>::iterator
         nonValid = containerTaskStatusPerAgent.end();
 
     auto getNumOf = [&] (TaskStatus s) -> int
-        { std::map<std::pair<std::string, TaskStatus>, int>::iterator
+        { std::map<TaskStatusPerAgent, int>::iterator
           it = containerTaskStatusPerAgent.find(std::make_pair(agName, s));
           return (it == nonValid) ? 0 : it->second; };
-/*
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_SCHEDULED));
-    spec.scheduled = (it == nonValid) ? 0 : it->second;
 
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_RUNNING));
-    spec.running   = (it == nonValid) ? 0 : it->second;
+    TaskStatusSpectra spec(getNumOf(TASK_RUNNING),
+                           getNumOf(TASK_SCHEDULED),
+                           getNumOf(TASK_PAUSED),
+                           getNumOf(TASK_STOPPED),
+                           getNumOf(TASK_FAILED),
+                           getNumOf(TASK_FINISHED));
+    TRC("~~~~~> " << agName << ": "
+        << spec.scheduled << ", "
+        << spec.running << ", "
+        << spec.paused << ", "
+        << spec.stopped << ", "
+        << spec.failed << ", "
+        << spec.finished << " = "
+        << spec.total);
 
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_PAUSED));
-    spec.paused    = (it == nonValid) ? 0 : it->second;
+    return spec;
 
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_STOPPED));
-    spec.stopped   = (it == nonValid) ? 0 : it->second;
-
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_FAILED));
-    spec.failed    = (it == nonValid) ? 0 : it->second;
-
-    it = containerTaskStatusPerAgent.find(std::make_pair(agName, TASK_FINISHED));
-    spec.finished  = (it == nonValid) ? 0 : it->second;
-*/
-    return TaskStatusSpectra(getNumOf(TASK_SCHEDULED),
-                             getNumOf(TASK_RUNNING),
-                             getNumOf(TASK_PAUSED),
-                             getNumOf(TASK_STOPPED),
-                             getNumOf(TASK_FAILED),
-                             getNumOf(TASK_FINISHED));
     // return spec;
 }
 
@@ -411,13 +406,13 @@ void TskMng::consolidateMonitInfo(MessageString & m)
 {
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
-    JValue hostInfoData(body["info"]);
-
+    Json::FastWriter fastWriter;
+    std::string s(fastWriter.write(body["info"]));
     HostInfo hostInfo;
-    hostInfo.fromStr(hostInfoData.str());
+    hostInfo.fromStr(s);
     std::string hostIp = hostInfo.hostIp;
-
-    ProcessingHostInfo* procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
+    TRC("Consolidating " + s + " for host " + hostIp);
+    ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
     procHostInfo->hostInfo = hostInfo;
     TRC("@@@@@@@@@@ CONSOLIDATING FMK INFO @@@@@@@@@@");
 }
@@ -464,10 +459,12 @@ void TskMng::sendProcFmkInfoUpdate()
 {
     // Prepare message and send it
     Message<MsgBodyTSK> msg;
-    MsgBodyTSK & body = msg.body;
+    MsgBodyTSK body;
 
-    JValue fmkInfoValue(Config::procFmkInfo->toJsonStr());
+    std::string s = Config::procFmkInfo->toJsonStr();
+    JValue fmkInfoValue(s);
     body["info"] = fmkInfoValue.val();
+    msg.buildBody(body);
 
     // Set message header
     msg.buildHdr(ChnlTskRepDist, MsgFmkMon, "1.0",
@@ -479,13 +476,13 @@ void TskMng::sendProcFmkInfoUpdate()
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
-        TRC("@@@@@@@@@@ SENDING UOPDATE OF FMK INFO @@@@@@@@@@");
+        TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
     }
 
     // Arm new timer
-    armProcFmkInfoMsgTimer();
+    if (sendingPeriodicFmkInfo) { armProcFmkInfoMsgTimer(); }
 }
 
 
