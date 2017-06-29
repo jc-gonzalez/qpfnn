@@ -60,6 +60,11 @@
 
 long HostInfo::USER_HZ = sysconf(_SC_CLK_TCK);
 
+HostInfo::HostInfo()
+{
+    cpuInfo.overallCpuLoad.timeInterval = 0;
+}
+
 void HostInfo::update()
 {
     getHostInfo();
@@ -210,7 +215,7 @@ void HostInfo::getLoadAvg(LoadAvg & l)
     }
 }
 
-void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
+void HostInfo::getCPULoad(CPULoad & c, int line)
 {
     std::string tag;
     //int j1, j2, j3, j4, j5, j6, j7;
@@ -269,20 +274,16 @@ void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
     float workCPU  = c.workJiffies2  - c.workJiffies;
     float totalCPU = c.totalJiffies2 - c.totalJiffies;
 
-    //if ((c.timeInterval != 0) && (c.totalJiffies2 != c.totalJiffies)) {
-    if (c.totalJiffies2 != c.totalJiffies) {
+    if (c.totalJiffies2 > c.totalJiffies) {
         c.computedLoad  = (workCPU * 100.) / totalCPU;
+        c.timeInterval = (int)(totalCPU * 1000) / HostInfo::USER_HZ;
     } else {
-        c.computedLoad = 0.;
+        // do not update computedLoad
     }
-
-    //c.timeInterval = interval;
-    c.timeInterval = (c.totalJiffies2 - c.totalJiffies) * 1000 / HostInfo::USER_HZ;
 }
 
 void HostInfo::getCPUInfo(CPUInfo & info)
 {
-    int numSeconds = 1;
     int posOfColon = -1;
 
     std::ifstream inFile;
@@ -324,19 +325,16 @@ void HostInfo::getCPUInfo(CPUInfo & info)
 
     // Get initial values in case it is the first time
     if (info.overallCpuLoad.timeInterval < 1) {
-        getCPULoad(info.overallCpuLoad, numSeconds);
+        getCPULoad(info.overallCpuLoad);
         for (int i = 0; i < info.numCpus; ++i) {
             info.cpuLoad.push_back(CPULoad());
-            getCPULoad(info.cpuLoad[i], numSeconds);
+            getCPULoad(info.cpuLoad[i]);
         }
-        sleep(numSeconds);
-    } else {
-        numSeconds = info.overallCpuLoad.timeInterval;
     }
 
-    getCPULoad(info.overallCpuLoad, numSeconds);
+    getCPULoad(info.overallCpuLoad);
     for (int i = 0; i < info.numCpus; ++i) {
-        getCPULoad(info.cpuLoad[i], numSeconds);
+        getCPULoad(info.cpuLoad[i]);
     }
 }
 

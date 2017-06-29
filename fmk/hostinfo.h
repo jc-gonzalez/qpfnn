@@ -76,6 +76,8 @@
 class HostInfo {
 
 public:
+    HostInfo();
+
     struct LoadAvg {
         float load1min;
         float load5min;
@@ -129,7 +131,7 @@ public:
 
 private:
     void getLoadAvg(LoadAvg & l);
-    void getCPULoad(CPULoad & c, int interval, int line = 0);
+    void getCPULoad(CPULoad & c, int line = 0);
     void getCPUInfo(CPUInfo & info);
     void getHostInfo();
 
