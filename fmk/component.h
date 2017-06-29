@@ -47,6 +47,9 @@
 
 //------------------------------------------------------------
 // Topic: System headers
+//   - map
+//   - thread
+//   - mutex
 //   - chrono
 //   - ctime
 //------------------------------------------------------------
@@ -67,7 +70,10 @@ using std::chrono::system_clock;
 //   - commnode.h
 //   - sm.h
 //   - config.h
+//   - channels.h
 //   - log.h
+//   - sync.h
+//   - alert.h
 //------------------------------------------------------------
 #include "commnode.h"
 #include "sm.h"
@@ -75,6 +81,7 @@ using std::chrono::system_clock;
 #include "channels.h"
 #include "log.h"
 #include "sync.h"
+#include "alert.h"
 
 #ifdef LogMsg
 
@@ -106,6 +113,17 @@ using std::chrono::system_clock;
 #    define FatalMsg(s)  Log::log(compName, Log::FATAL,   s)
 
 #endif // LogMsg
+
+//------------------------------------------------------------
+// Topic: Alerts
+//   - RaiseSysAlert(a)  - Raises system alert
+//   - RaiseDiagAlert(a) - Raises diagnostics-related alert
+//   - RaiseAlert(a)     - Raises alert with default scope
+//------------------------------------------------------------
+
+#define RaiseSysAlert(a)  raise(a, Alert::System)
+#define RaiseDiagAlert(a) raise(a, Alert::Diagnostics)
+#define RaiseAlert(a)     raise(a)
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -230,6 +248,13 @@ protected:
     virtual void processTskRepDistMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m) {}
+
+protected:
+    //----------------------------------------------------------------------
+    // Method: raise
+    // Raise alert, shows it in the log, and stored in DB
+    //----------------------------------------------------------------------
+    void raise(Alert a, Alert::Group grp = Alert::Undefined);
 
 private:
     //----------------------------------------------------------------------

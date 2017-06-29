@@ -41,13 +41,15 @@
 #include "component.h"
 #include "message.h"
 
-//#include "dbhdlpostgre.h"
-//#include "except.h"
+#include "dbhdlpostgre.h"
+#include "except.h"
 
-//using LibComm::Log;
 //#include "tools.h"
-//#include "str.h"
-//using namespace LibComm;
+#include "str.h"
+
+#include "config.h"
+
+using Configuration::cfg;
 
 //#include <sys/time.h>
 //#include <unistd.h>
@@ -368,5 +370,63 @@ void Component::afterTransition(int fromState, int toState)
     dbHdl->closeConnection();
 */
 }
+
+//----------------------------------------------------------------------
+// Method: Method: raise
+// Raise alert, shows it in the log, and stored in DB
+//----------------------------------------------------------------------
+void Component::raise(Alert a, Alert::Group grp)
+{
+    if (grp != Alert::Undefined) { a.setGroup(grp); }
+
+    std::string alertMsg = a.dump();
+
+    // Store alert in DB
+    std::unique_ptr<DBHandler> dbHdl(new DBHdlPostgreSQL);
+    DBHandler * db = dbHdl.get();
+
+    // Check that connection with the DB is possible
+    try {
+        db->openConnection();
+
+        std::stringstream ss;
+        ss << "INSERT INTO alerts "
+           << "(alert_id, creation, grp, sev, typ, origin, msgs";
+        if (a.getVar() != 0) { ss << ", var"; }
+        ss << ") VALUES ( nextval('alerts_alert_id_seq'), "
+           << str::quoted(a.timeStampString()) << ", "
+           << str::quoted(Alert::GroupName[a.getGroup()]) << ", "
+           << str::quoted(Alert::SeverityName[a.getSeverity()]) << ", "
+           << str::quoted(Alert::TypeName[a.getType()]) << ", "
+           << str::quoted(a.getOrigin()) << ", "
+           << str::quoted(a.allMessages());
+        if (a.getVar() != 0) { ss << ", " << a.varAsTuple(); }
+        ss << ");";
+
+        db->runCmd(ss.str());
+    } catch (RuntimeException & e) {
+        std::cerr << e.what() << std::endl;
+        return;
+    }
+
+    // Close connection
+    db->closeConnection();
+
+    //  Store alert msg in log file
+    Log::LogLevel lvl = Log::WARNING;
+    if (a.getGroup() == Alert::Diagnostics) {
+        if (a.getSeverity() > Alert::Warning) {
+            lvl = Log::ERROR;
+        }
+    } else {
+        if (a.getSeverity() == Alert::Error) {
+            lvl = Log::ERROR;
+        } else if (a.getSeverity() > Alert::Fatal) {
+            lvl = Log::FATAL;
+        }
+    }
+    Log::log(compName, lvl, alertMsg);
+}
+
 
 //}

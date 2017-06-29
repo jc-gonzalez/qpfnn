@@ -56,11 +56,15 @@
 #include "config.h"
 #include "dbg.h"
 #include "str.h"
+#include "qdtrephdl.h"
 #include "urlhdl.h"
 #include "channels.h"
 #include "message.h"
-#include "config.h"
 #include "hostinfo.h"
+
+#include "config.h"
+
+using Configuration::cfg;
 
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
@@ -239,9 +243,20 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
         InfoMsg("Saving outputs...");
         saveProductsToDB(taskInfo.outputs);
 
+        // Try to process the QDT report and get the issues found
+        for (auto & m : taskInfo.outputs.products) {
+            if ((m.procFunc() == "QLA") && (m.fileType() == "JSON")) {
+                QDTReportHandler qdtRep(m.url().substr(7));
+                qdtRep.read();
+                std::vector<Alert*> issues;
+                qdtRep.getIssues(issues);
+                for (auto & v : issues) { RaiseAlert(*v); }
+            }
+        }
+
         InfoMsg("Sending message to register outputs at Orchestrator catalogue");
 
-        Config & cfg = Config::_();
+        //Config & cfg = Config::_();
         if (cfg.flags.sendOutputsToMainArchive()) {
             InfoMsg("Archiving/Registering data at DSS/EAS");
             //std::thread(&DataMng::archiveDSSnEAS, this, std::ref(taskInfo..outputs)).detach();

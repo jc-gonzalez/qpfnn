@@ -12,14 +12,12 @@ include (../common.cmake)
 project (filehdl)
 
 set (libfilehdl_hdr
-  alert.h
   genfhdl.h
   jsonfhdl.h
   qdtrephdl.h
 )
 
 set (libfilehdl_src
-  alert.cpp
   jsonfhdl.cpp
   qdtrephdl.cpp
 )

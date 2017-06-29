@@ -50,10 +50,10 @@
 #define APP_NAME         "QPF"
 
 //! Application release number
-#define APP_RELEASE      "1.2"
+#define APP_RELEASE      "2.0beta"
 
 //! Application release date
-#define APP_DATE         "MAR 2017"
+#define APP_DATE         "OCT 2017"
 
 //! Application developer company
 #define APP_COMPANY      "Euclid SOC Team"

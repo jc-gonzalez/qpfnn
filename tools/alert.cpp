@@ -49,7 +49,7 @@
 //
 // Library namespace
 ////////////////////////////////////////////////////////////////////////////
-namespace QPF {
+// namespace QPF {
 
 #define T(x) #x
 const char * Alert::GroupName    [] = { TLIST_GROUP };
@@ -225,4 +225,4 @@ std::string Alert::dump() const
             TypeName[type] + " " + origin + ": " + allMessages("|"));
 }
 
-}
+// }
