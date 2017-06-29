@@ -46,7 +46,7 @@ set (TOOLS_ROOT_DIR   ${PWD}/tools)
 set (LOG_ROOT_DIR     ${PWD}/log)
 set (STR_ROOT_DIR     ${PWD}/str)
 set (UUID_ROOT_DIR    ${PWD}/uuid)
-set (FILEHDL_ROOT_DIR ${PWD}/fmk)
+set (FILEHDL_ROOT_DIR ${PWD}/filehdl)
 set (FMK_ROOT_DIR     ${PWD}/fmk)
 
 set (MONGOOSEDIR      ${PWD}/mongoose)
