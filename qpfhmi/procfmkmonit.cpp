@@ -121,7 +121,7 @@ void ProcFmkMonitor::timeout()
         // Put new data on graphs
         const Graphs & g = graphs.at(k);
         double mLoad  = ph->hostInfo.loadAvg.load1min;
-        double mCpu   = ph->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        double mCpu   = ph->hostInfo.cpuInfo.overallCpuLoad.computedLoad * .01;
         double mTasks = ph->numTasks;
         g.loadGraph->appendPoint(mLoad);
         g.cpuGraph->appendPoint(mCpu);
