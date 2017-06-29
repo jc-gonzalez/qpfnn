@@ -213,30 +213,64 @@ void HostInfo::getLoadAvg(LoadAvg & l)
 void HostInfo::getCPULoad(CPULoad & c, int interval, int line)
 {
     std::string tag;
-    int j1, j2, j3, j4, j5, j6, j7;
+    //int j1, j2, j3, j4, j5, j6, j7;
+    int _user, _nice, _system, _idle, _iowait, _irq, _softirq, _steal, _guest, _guest_nice;
 
     std::ifstream inFile;
     inFile.open("/proc/stat", std::ifstream::in);
     if (inFile.good()) {
         std::string l;
         for (int i = 0; i < line; ++i) { std::getline(inFile, l); }
-        inFile >> tag >> j1 >> j2 >> j3 >> j4 >> j5 >> j6 >> j7;
+        inFile >> tag
+               >> _user >> _nice >> _system >> _idle >> _iowait >> _irq
+               >> _softirq >> _steal >> _guest >> _guest_nice;
         inFile.close();
     }
 
-    int wJif = c.workJiffies;
-    int tJif = c.totalJiffies;
-    float ival = (float)(interval);
+    /*------------------------------------------------------------
+    // Guest time is already accounted in usertime
+    usertime = usertime - guest;                     # As you see here, it subtracts guest from user time
+    nicetime = nicetime - guestnice;                 # and guest_nice from nice time
+    // Fields existing on kernels >= 2.6
+    // (and RHEL's patched kernel 2.4...)
+    idlealltime = idletime + ioWait;                 # ioWait is added in the idleTime
+    systemalltime = systemtime + irq + softIrq;
+    virtalltime = guest + guestnice;
+    totaltime = usertime + nicetime + systemalltime + idlealltime + steal + virtalltime;
+    And so, from fields listed in the first line of /proc/stat: (see section 1.8 at documentation)
+
+         user    nice   system  idle      iowait irq   softirq  steal  guest  guest_nice
+    cpu  74608   2520   24433   1117073   6176   4054  0        0      0      0
+    Algorithmically, we can calculate the CPU usage percentage like:
+
+    PrevIdle = previdle + previowait
+    Idle = idle + iowait
+
+    PrevNonIdle = prevuser + prevnice + prevsystem + previrq + prevsoftirq + prevsteal
+    NonIdle = user + nice + system + irq + softirq + steal
+
+    PrevTotal = PrevIdle + PrevNonIdle
+    Total = Idle + NonIdle
+
+    # differentiate: actual value minus the previous one
+    totald = Total - PrevTotal
+    idled = Idle - PrevIdle
+
+    CPU_Percentage = (totald - idled)/totald
+    ------------------------------------------------------------*/
 
     c.totalJiffies  = c.totalJiffies2;
     c.workJiffies   = c.workJiffies2;
-    c.totalJiffies2 = j1 + j2 + j3 + j4 + j5 + j6 + j7;
-    c.workJiffies2  = j1 + j2 + j3;
+
+    c.totalJiffies2 = (_user + _nice + _system + _idle + _iowait + _irq +
+                       _softirq + _steal + _guest + _guest_nice);
+    c.workJiffies2  = c.totalJiffies2 - (_idle + _iowait); // total - idle
+
+    float workCPU  = c.workJiffies2  - c.workJiffies;
+    float totalCPU = c.totalJiffies2 - c.totalJiffies;
 
     //if ((c.timeInterval != 0) && (c.totalJiffies2 != c.totalJiffies)) {
     if (c.totalJiffies2 != c.totalJiffies) {
-        float workCPU  = c.workJiffies2  - c.workJiffies;
-        float totalCPU = c.totalJiffies2 - c.totalJiffies;
         c.computedLoad  = (workCPU * 100.) / totalCPU;
     } else {
         c.computedLoad = 0.;
