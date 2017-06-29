@@ -76,16 +76,16 @@ HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void HMIProxy::runEachIteration()
 {
-    // Request task for processing in case the agent is idle
-    if ((iteration % 100) == 0) {
+    if ((iteration % 20) == 0) {
         // Create message and send
         Message<MsgBodyCMD> msg;
         msg.buildHdr(ChnlHMICmd,
-                     ChnlHMICmd,
+                     MsgHMICmd,
                      "1.0",
                      compName,
                      "*",
                      "", "", "");
+        msg["cmd"] = "PING";
 
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         std::string chnl(ChnlHMICmd);
@@ -126,7 +126,8 @@ void HMIProxy::processIncommingMessages()
 //----------------------------------------------------------------------
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    MessageString ack = "Received info from Core: " + m;
+    Message<MsgBodyCMD> msg(m);
+    nodeStates[msg.header.source()] = msg.body.ans();
 }
 
 //----------------------------------------------------------------------
@@ -194,5 +195,12 @@ void HMIProxy::sendNewCfgInfo()
 //    sendMONIT_RQST("*", "set_new_cfg", cfg.str());
 }
 
+//----------------------------------------------------------------------
+// Method: getNodeStates
+//----------------------------------------------------------------------
+std::map<std::string, std::string> HMIProxy::getNodeStates()
+{
+    return nodeStates;
+}
 
 //}

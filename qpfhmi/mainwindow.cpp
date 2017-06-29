@@ -1234,7 +1234,13 @@ QString MainWindow::getState()
 {
     QString s = QString::fromStdString(cfg.sessionId);
     nodeStates.clear();
-    nodeStates = DBManager::getCurrentStates(s);
+    //nodeStates = DBManager::getCurrentStates(s);
+
+    std::map<std::string, std::string> ns = hmiNode->getNodeStates();
+    for (auto & kv : ns) {
+        nodeStates[QString::fromStdString(kv.first)] = QString::fromStdString(kv.second);
+    }
+
     QString stateName = nodeStates["EvtMng"];
     isThereActiveCores = (stateName.toStdString() == getStateName(OPERATIONAL));
     return stateName;

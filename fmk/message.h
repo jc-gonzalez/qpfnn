@@ -69,8 +69,10 @@ public:
     MsgBodyCMD(json v) : JRecord(v) {}
     virtual void dump() {
         DUMPJSTR(cmd);
+        DUMPJSTR(ans);
     }
     JSTR(cmd);
+    JSTR(ans);
 };
 
 //==========================================================================

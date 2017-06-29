@@ -321,6 +321,25 @@ void Component::setStep(int s)
 }
 
 //----------------------------------------------------------------------
+// Method: setStep
+//----------------------------------------------------------------------
+void Component::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
+{
+    Message<MsgBodyCMD> msg(m);
+    std::string cmd(msg.body.cmd());
+    if (cmd == "PING") {
+        msg.body["ans"] = getStateName(getState());
+        msg.buildHdr(ChnlHMICmd,
+                     MsgHMICmd,
+                     "1.0",
+                     compName,
+                     msg.header.source(),
+                     "", "", "");
+        c->setMsgOut(msg.str());
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: defineValidTransitions
 // Define the valid state transitions for the node
 //----------------------------------------------------------------------

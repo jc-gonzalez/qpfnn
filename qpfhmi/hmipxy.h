@@ -111,6 +111,11 @@ public:
     //----------------------------------------------------------------------
     void sendNewCfgInfo();
 
+    //----------------------------------------------------------------------
+    // Method: getNodeStates
+    //----------------------------------------------------------------------
+    std::map<std::string, std::string> getNodeStates();
+
 protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
@@ -137,6 +142,9 @@ protected:
     // Method: processFmkMonMsg
     //----------------------------------------------------------------------
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+private:
+    std::map<std::string, std::string> nodeStates;
 };
 
 //}
