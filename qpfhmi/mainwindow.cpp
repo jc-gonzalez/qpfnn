@@ -249,16 +249,6 @@ void MainWindow::manualSetupUI()
     setUnifiedTitleAndToolBarOnMac(true);
     ui->lblUptime->setText(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz"));
 
-    /*
-    QFrame * frm = new QFrame(0);
-    vlyFrmAgents = new QVBoxLayout;
-    frm->setLayout(vlyFrmAgents);
-    ui->scrollAreaAgents->setWidget(frm);
-    spacerFrmAgents = new QSpacerItem(10, 10,
-                                      QSizePolicy::Minimum,
-                                      QSizePolicy::Expanding);
-    vlyFrmAgents->addSpacerItem(spacerFrmAgents);
-    */
     //== Tab panels handling ==========================================
 
     QTabBar * tb = ui->tabMainWgd->tabBar();
@@ -390,14 +380,14 @@ void MainWindow::readConfig(QString dbUrl)
     for (auto & kv : cfg.network.processingNodes()) {
         TRC(kv.first << ": " << kv.second);
     }
-    //cfg.dump();
     TRC("Config::PATHBase: " << Config::PATHBase);
-
 
     putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfg.cfgFileName)));
 
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
+
+    std::vector<std::string> & agName = cfg.agentNames;
 
     nodeNames << tr("QPFHMI") << tr("EvtMng") << tr("LogMng")
               << tr("DatMng") << tr("TskOrc") << tr("TskMng");
@@ -408,11 +398,13 @@ void MainWindow::readConfig(QString dbUrl)
             QString taName = QString("TskAgent_%1_%2")
                 .arg(h,2,10,QLatin1Char('0'))
                 .arg(i+1,2,10,QLatin1Char('0'));
+            std::string staName = taName.toStdString();
+            agName.push_back(staName);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
-            (*taInfo)["name"]   = taName.toStdString();
+            (*taInfo)["name"]   = staName;
             (*taInfo)["client"] = kv.first;
             (*taInfo)["server"] = kv.first;
-            taskAgentsInfo[taName.toStdString()] = taInfo;
+            taskAgentsInfo[staName] = taInfo;
         }
         ++h;
     }
@@ -1058,15 +1050,6 @@ void MainWindow::processProductsInPath(QString folder)
         m = uh.fromFolder2Inbox();
         //sleep(5);
     }
-//    foreach (const QString & fi, files) {
-//        QFileInfo fs(fi);
-//        std::string dirName  = fs.absolutePath().toStdString();
-//        std::string fileName = fs.fileName().toStdString();
-//        std::string origFile = dirName + "/" + fileName;
-//        std::string newFile = inbox + fileName;
-//        uh.relocate(origFile, newFile, LocalArchiveMethod::LINK);
-//        //sleep(5);
-//    }
 }
 
 //----------------------------------------------------------------------
@@ -1354,6 +1337,10 @@ void MainWindow::showState()
 //----------------------------------------------------------------------
 void MainWindow::updateSystemView()
 {
+    static bool resTask = false;
+    static bool resSysAlert = false;
+    static bool resAlert = false;
+
     //== 0. Ensure database connection is ready, and fetch state
     showState();
 
@@ -1362,17 +1349,26 @@ void MainWindow::updateSystemView()
     //== 1. Processing tasks
     procTaskStatusModel->setFullUpdate(true);
     procTaskStatusModel->refresh();
-    ui->tblvwTaskMonit->resizeColumnsToContents();
+    if ((!resTask) && (ui->tblvwTaskMonit->model()->rowCount() > 0)) {
+        ui->tblvwTaskMonit->resizeColumnsToContents();
+        resTask = true;
+    }
     const int TaskDataCol = 9;
     ui->tblvwTaskMonit->setColumnHidden(TaskDataCol, true);
 
     //== 2. System Alerts
     sysAlertModel->refresh();
-    ui->tblvwSysAlerts->resizeColumnsToContents();
+    if ((!resSysAlert) && (ui->tblvwSysAlerts->model()->rowCount() > 0)) {
+        ui->tblvwSysAlerts->resizeColumnsToContents();
+        resSysAlert = true;
+    }
 
     //== 3. Diagnostics Alerts
     procAlertModel->refresh();
-    ui->tblvwAlerts->resizeColumnsToContents();
+    if ((!resAlert) && (ui->tblvwAlerts->model()->rowCount() > 0)) {
+        ui->tblvwAlerts->resizeColumnsToContents();
+        resAlert = true;
+    }
 
     //== 4. Local Archive
     localarchViewUpdate();
@@ -1432,7 +1428,7 @@ void MainWindow::initLocalArchiveView()
     acArchiveOpenExt = new QMenu(tr("Open with ..."), ui->treevwArchive);
 
     acArchiveShow = new QAction("Show location in local archive", ui->treevwArchive);
-    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openWith()));
+    connect(acArchiveShow, SIGNAL(triggered()), this, SLOT(openLocation()));
 
     acDefault = new QAction("System Default", ui->treevwArchive);
     connect(acDefault, SIGNAL(triggered()), this, SLOT(openWithDefault()));
@@ -1564,7 +1560,21 @@ void MainWindow::openWithDefault()
 
     QModelIndex m = ui->treevwArchive->currentIndex();
     QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
-    QDesktopServices::openUrl(QUrl(url));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(url));
+}
+
+//----------------------------------------------------------------------
+// SLOT: openLocation
+//----------------------------------------------------------------------
+void MainWindow::openLocation()
+{
+    static const int NumOfURLCol = 10;
+
+    QModelIndex m = ui->treevwArchive->currentIndex();
+    QString url = m.model()->index(m.row(), NumOfURLCol, m.parent()).data().toString();
+    QFileInfo fs(url.mid(7));
+    url = fs.absolutePath();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(url));
 }
 
 //----------------------------------------------------------------------
@@ -2201,16 +2211,27 @@ void MainWindow::showTaskMonitContextMenu(const QPoint & p)
 //----------------------------------------------------------------------
 void MainWindow::showWorkDir()
 {
-    QModelIndex idx = ui->tblvwTaskMonit->currentIndex();
-    Q_UNUSED(idx);
-    /*
-      QString treeKey = item->data(0, Qt::UserRole).toString();
-      const Json::Value & v  = processedTasksInfo.value(treeKey);
-      QString bind = QString::fromStdString(v["HostConfig"]["Binds"][0].asString());
-      QString localDir = bind.left(bind.indexOf(":"));
-      QString cmdLine = "nautilus " + localDir + " &";
-      system(cmdLine.toStdString().c_str());
-    */
+    QModelIndex idx        = ui->tblvwTaskMonit->currentIndex();
+    QModelIndex nameExtIdx = ui->tblvwTaskMonit->model()->index(idx.row(), 3);
+    QModelIndex dataIdx    = ui->tblvwTaskMonit->model()->index(idx.row(), 9);
+
+    Json::Reader reader;
+    Json::Value v;
+    reader.parse(procTaskStatusModel->data(dataIdx).toString().toStdString(), v);
+
+    QString localDir = QString::fromStdString(v["Mounts"][2]["Source"].asString());
+
+    std::cerr << "LocalDir: " << localDir.toStdString() << "\n";
+    QFileInfo fs(localDir);
+    if (fs.exists()) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(localDir));
+    } else {
+        int ret = QMessageBox::warning(this, tr("Folder does not exist"),
+                                       tr("The task folder does not exist in, or is not visible from this host.\n"
+                                          "This problem normally appears when the task has been executed in a processing host "
+                                          "that is not the host where the HMI is running"),
+                                       QMessageBox::Ok);
+    }
 }
 
 //----------------------------------------------------------------------

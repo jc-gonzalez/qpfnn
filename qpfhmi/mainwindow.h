@@ -153,6 +153,7 @@ private slots:
     void showVerbLevel();
 
     void openWithDefault();
+    void openLocation();
     void openWith();
     void showArchiveTableContextMenu(const QPoint & p);
     void openLocalArchiveElement(QModelIndex idx);
