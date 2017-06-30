@@ -354,6 +354,8 @@ public:
     bool                  weAreOnMaster;
 
     std::vector<std::string> agentNames;
+    std::vector<std::string> agHost;
+    std::vector<int>         agPortTsk;
 
     struct {
         std::string       inbox;
