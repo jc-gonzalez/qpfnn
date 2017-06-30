@@ -30,6 +30,7 @@ add_subdirectory (mongoose)
 
 add_subdirectory (json)
 add_subdirectory (nncomm)
+add_subdirectory (filehdl)
 add_subdirectory (infix)
 add_subdirectory (log)
 add_subdirectory (str)

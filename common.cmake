@@ -46,6 +46,7 @@ set (TOOLS_ROOT_DIR   ${PWD}/tools)
 set (LOG_ROOT_DIR     ${PWD}/log)
 set (STR_ROOT_DIR     ${PWD}/str)
 set (UUID_ROOT_DIR    ${PWD}/uuid)
+set (FILEHDL_ROOT_DIR ${PWD}/fmk)
 set (FMK_ROOT_DIR     ${PWD}/fmk)
 
 set (MONGOOSEDIR      ${PWD}/mongoose)
@@ -55,6 +56,7 @@ set (MONGOOSEDIR      ${PWD}/mongoose)
 link_directories (
   ${NNMSG_ROOT_DIR}/lib
   ${NNCOMM_ROOT_DIR}
+  ${FILEHDL_ROOT_DIR}
   ${FMK_ROOT_DIR}
   ${TOOLS_ROOT_DIR}
   ${JSON_ROOT_DIR}
