@@ -519,16 +519,14 @@ void Deployer::createElementsNetwork()
             a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
         }
 
-        // CHANNEL EVTMNG Related - Pipeline
+        // CHANNEL EVTMNG Related - PIPELINE
         // - Out/In: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
         chnl     = ChnlEvtMng;
         TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
         connAddr = bindAddr;
-        std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
-        cs.insert(cs.end(), ag.begin(), ag.end());
-        for (auto & c : cs) {
-            c->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
+        for (auto & a : ag) {
+            a->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -602,12 +600,18 @@ void Deployer::createElementsNetwork()
         c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
-    // CHANNEL EVTMNG Related - Pipeline
+    // CHANNEL EVTMNG Related - PIPELINE
     // - Out/In: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
     chnl     = ChnlEvtMng;
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
     m.evtMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
+    connAddr = bindAddr;
+    std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
+    cs.insert(cs.end(), ag.begin(), ag.end());
+    for (auto & c : cs) {
+        c->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
+    }
 
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
