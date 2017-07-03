@@ -509,7 +509,7 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new PubSub(NN_REQ, connAddr));
+            a->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
