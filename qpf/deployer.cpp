@@ -667,6 +667,14 @@ void Deployer::createElementsNetwork()
     //------------------------------------------------------------
     // Build procFmkInfo structure
     //------------------------------------------------------------
+    generateProcFmkInfoStructure();
+}
+
+//----------------------------------------------------------------------
+// generateProcFmkInfoStructure
+//----------------------------------------------------------------------
+void Deployer::generateProcFmkInfoStructure()
+{
     Config::procFmkInfo->numContTasks = 0;
     Config::procFmkInfo->numSrvTasks = 0;
     HostInfo hi;
@@ -685,9 +693,9 @@ void Deployer::createElementsNetwork()
 
         for (int i = 0; i < ph->numAgents; ++i, ++j) {
             AgentInfo agInfo;
-            agInfo.name = agName.at(j);
+            agInfo.name       = cfg.agentNames.at(j);
             agInfo.taskStatus = TaskStatusSpectra();
-            agInfo.load = (rand() % 1000) * 0.01;
+            agInfo.load       = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
             ph->numTasks += agInfo.taskStatus.total;
         }
@@ -695,6 +703,7 @@ void Deployer::createElementsNetwork()
         Config::procFmkInfo->hostsInfo[ph->name] = ph;
         Config::procFmkInfo->numContTasks += ph->numTasks;
     }
+
 
 }
 
