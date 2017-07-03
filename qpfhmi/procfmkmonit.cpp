@@ -115,7 +115,7 @@ void ProcFmkMonitor::timeout()
 
     int k = 0;
     for (auto const & kv : procFmkInfo->hostsInfo) {
-        std::cerr << "UPDATING DATA FOR " << kv.first << "\n";
+        //std::cerr << "UPDATING DATA FOR " << kv.first << "\n";
         ProcessingHostInfo * ph = kv.second;
 
         // Put new data on graphs
