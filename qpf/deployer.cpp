@@ -509,7 +509,7 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            a->addConnection(chnl, new ReqRep(NN_REP, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -578,9 +578,9 @@ void Deployer::createElementsNetwork()
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
     connAddr = bindAddr;
-    m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
+    m.evtMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-        c->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+        c->addConnection(chnl, new ReqRep(NN_REP, connAddr));
     }
 
     // CHANNEL HMICMD - REQREP
