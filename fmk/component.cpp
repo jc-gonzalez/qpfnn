@@ -327,7 +327,8 @@ void Component::setStep(int s)
 //----------------------------------------------------------------------
 void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
 {
-    std::string cmd = JValue(m)["cmd"].asString();
+    Message<MsgBodyCMD> msg(m);
+    std::string cmd = msg.body["cmd"].asString();
 
     if (cmd == CmdQuit) {
 
@@ -335,7 +336,6 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
 
     } else if (cmd == CmdInit) {
 
-        Message<MsgBodyCMD> msg(m);
         std::string sessId = msg.body["sessionId"].asString();
         if (sessId != cfg.sessionId) {
             cfg.synchronizeSessionId(sessId);
@@ -353,12 +353,12 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
 //----------------------------------------------------------------------
 void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 {
-    std::string cmd = JValue(m)["cmd"].asString();
+    Message<MsgBodyCMD> msg(m);
+    std::string cmd = msg.body["cmd"].asString();
 
     if (cmd == CmdPing) { // This is any component but EvtMng
 
         TRC(compName + " received a " + CmdPing + " and sents " + getStateName(getState()));
-        Message<MsgBodyCMD> msg(m);
         MsgBodyCMD body;
         msg.buildHdr(ChnlEvtMng,
                      MsgEvtMng,
@@ -373,7 +373,6 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 
     } else if (cmd == CmdStates) { // This should be EvtMng
 
-        Message<MsgBodyCMD> msg(m);
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
         TRC(compName + " received from " + msg.header.source() + " from " + compName);
 
