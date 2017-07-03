@@ -1098,6 +1098,11 @@ void MainWindow::init()
     // b. Create component connections
     //-----------------------------------------------------------------
 
+    // Ports (in fact, deltas from startingPort)
+    const int PortEvtMng     = 1;
+    const int PortHMICmd     = 2;
+    const int PortTskRepDist = 3;
+
     QString msg = QString("Connecting to %1:%2").arg(masterAddress).arg(startingPort);
     std::string smsg = msg.toStdString();
     TRC(smsg);
@@ -1105,7 +1110,7 @@ void MainWindow::init()
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     std::string chnl     = ChnlHMICmd;
-    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + 1);
+    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + PortHMICmd);
     std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 

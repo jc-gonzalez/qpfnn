@@ -366,7 +366,12 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
         body["cmd"]   = CmdStates;
         body["state"] = getStateName(getState());
         msg.buildBody(body);
-        c->setMsgOut(msg.str());
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        it = connections.find(ChnlEvtMng);
+        if (it != connections.end()) {
+            ScalabilityProtocolRole * conn = it->second;
+            conn->setMsgOut(msg.str());
+        }
 
     } else if (cmd == CmdStates) { // This should be EvtMng
 
