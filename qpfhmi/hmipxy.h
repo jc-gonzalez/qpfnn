@@ -142,9 +142,6 @@ protected:
     // Method: processFmkMonMsg
     //----------------------------------------------------------------------
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-private:
-    std::map<std::string, std::string> nodeStates;
 };
 
 //}

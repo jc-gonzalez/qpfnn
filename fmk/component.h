@@ -238,8 +238,8 @@ protected:
     virtual void afterTransition(int fromState, int toState);
 
 protected:
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m) {}
-    virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);
+    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
+    virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processInDataMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m) {}

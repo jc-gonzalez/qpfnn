@@ -140,20 +140,46 @@ void EvtMng::runEachIteration()
     }
 
     if (((iteration + 1) == 100)) {
+        Message<MsgBodyCMD> msg;
+        MsgBodyCMD body;
+        msg.buildHdr(ChnlCmd,
+                     MsgCmd,
+                     "1.0",
+                     compName,
+                     "*",
+                     "", "", "");
+        body["cmd"] = CmdInit;
+        body["iteration"] = std::to_string(iteration);
+        body["sessionId"] = cfg.sessionId;
+        msg.buildBody(body);
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         it = connections.find(ChnlCmd);
         if (it != connections.end()) {
             ScalabilityProtocolRole * conn = it->second;
-/*
-            char msg[128];
-            sprintf(msg, "Tell me your name for iter.# %d ...", iteration);
-*/
-            json jdata;
-            jdata["cmd"]       = "INIT";
-            jdata["iteration"] = std::to_string(iteration);
-            jdata["sessionId"] = cfg.sessionId;
-            JValue msg(jdata);
             conn->setMsgOut(msg.str());
+        }
+    }
+
+    if ((iteration % 20) == 0) {
+        // Create message and send
+        Message<MsgBodyCMD> msg;
+        MsgBodyCMD body;
+        msg.buildHdr(ChnlCmd,
+                     MsgCmd,
+                     "1.0",
+                     compName,
+                     "*",
+                     "", "", "");
+        body["cmd"] = "PING";
+        msg.buildBody(body);
+
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        std::string chnl(ChnlHMICmd);
+        it = connections.find(chnl);
+        if (it != connections.end()) {
+            ScalabilityProtocolRole * conn = it->second;
+            conn->setMsgOut(msg.str());
+            InfoMsg("Sending request via channel " + chnl);
         }
     }
 
@@ -178,19 +204,26 @@ void EvtMng::runEachIteration()
 //----------------------------------------------------------------------
 void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    // Create message and send
-    Message<MsgBodyCMD> msg;
-    msg.buildHdr(ChnlHMICmd, MsgHMICmd, "1.0",
-                 compName, "*",
-                 "", "", "");
+    std::string cmd = JValue(m)["cmd"].asString();
 
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    std::string chnl(ChnlHMICmd);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
-        InfoMsg("Sending response via channel " + chnl);
+    if (cmd == CmdStates) {
+        // Create message and send
+        Message<MsgBodyCMD> msg;
+        MsgBodyCMD body;
+        msg.buildHdr(ChnlHMICmd,
+                     MsgHMICmd,
+                     "1.0",
+                     compName,
+                     "*",
+                     "", "", "");
+        body["cmd"] = CmdStates;
+        json states;
+        for(auto & kv : cfg.nodeStates) {
+            states[kv.first] = kv.second;
+        }
+        body["states"] = states;
+        msg.buildBody(body);
+        c->setMsgOut(msg.str());
     }
 }
 

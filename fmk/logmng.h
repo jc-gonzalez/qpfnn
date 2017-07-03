@@ -85,11 +85,6 @@ public:
     //----------------------------------------------------------------------
     LogMng(std::string name, std::string addr = std::string(), Synchronizer * s = 0);
 
-protected:
-    //----------------------------------------------------------------------
-    // Method: processCmdMsg
-    //----------------------------------------------------------------------
-    void processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m);
 };
 
 //}

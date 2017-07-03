@@ -134,11 +134,6 @@ protected:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processCmdMsg
-    //----------------------------------------------------------------------
-    void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
-
-    //----------------------------------------------------------------------
     // Method: processInDataMsg
     //----------------------------------------------------------------------
     void processInDataMsg(ScalabilityProtocolRole* c, MessageString & m);

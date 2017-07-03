@@ -203,7 +203,7 @@ void Component::processIncommingMessages()
             std::string tgt(msg.header.target());
             if ((tgt != "*") && (tgt != compName)) { continue; }
             std::string type(msg.header.type());
-            DbgMsg("(FROM component.cpp:)"  + compName + " received the message [" + m + "]");
+            DbgMsg("(FROM component.cpp:) "  + compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
@@ -321,23 +321,48 @@ void Component::setStep(int s)
 }
 
 //----------------------------------------------------------------------
-// Method: setStep
+// Method: processCmdMsg
 //----------------------------------------------------------------------
-void Component::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
+void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
 {
-    Message<MsgBodyCMD> msg(m);
-    std::string cmd(msg.body.cmd());
-    if (cmd == "PING") {
+    std::string cmd = JValue(m)["cmd"].asString();
+
+    if (cmd == CmdQuit) {
+
+        transitTo(RUNNING);
+
+    } else if (cmd == CmdInit) {
+
+        Message<MsgBodyCMD> msg(m);
+        std::string sessId = msg.body["sessionId"].asString();
+        if (sessId != cfg.sessionId) {
+            cfg.synchronizeSessionId(sessId);
+        }
+
+    } else if (cmd == CmdPing) {
+
+        Message<MsgBodyCMD> msg(m);
         MsgBodyCMD body;
-        body["ans"] = getStateName(getState());
-        msg.buildHdr(ChnlHMICmd,
-                     MsgHMICmd,
+        body["cmd"]   = CmdStates;
+        body["state"] = getStateName(getState());
+        msg.buildHdr(ChnlCmd,
+                     MsgCmd,
                      "1.0",
                      compName,
                      msg.header.source(),
                      "", "", "");
         msg.buildBody(body);
         c->setMsgOut(msg.str());
+
+    } else if (cmd == CmdStates) {
+
+        Message<MsgBodyCMD> msg(m);
+        cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
+
+    } else {
+
+        WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
+
     }
 }
 

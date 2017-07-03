@@ -66,18 +66,4 @@ LogMng::LogMng(std::string name, std::string addr, Synchronizer * s)
 {
 }
 
-//----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void LogMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
-{
-    JValue msg(m);
-    std::string cmd = msg["cmd"].asString();
-
-    if (cmd == "QUIT") {
-        transitTo(RUNNING);
-    }
-}
-
-
 //}

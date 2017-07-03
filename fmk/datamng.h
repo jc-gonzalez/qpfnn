@@ -100,11 +100,6 @@ public:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processCmdMsg
-    //----------------------------------------------------------------------
-    virtual void processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m);
-
-    //----------------------------------------------------------------------
     // Method: processInDataMsg
     //----------------------------------------------------------------------
     virtual void processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m);

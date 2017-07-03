@@ -357,6 +357,8 @@ public:
     std::vector<std::string> agHost;
     std::vector<int>         agPortTsk;
 
+    std::map<std::string, std::string> nodeStates;
+
     struct {
         std::string       inbox;
         std::string       archive;
@@ -386,7 +388,6 @@ public:
     static bool           isLive;
 
     static ProcessingFrameworkInfo * procFmkInfo;
-
 };
 
 namespace Configuration {

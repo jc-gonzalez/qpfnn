@@ -156,19 +156,6 @@ void TskOrc::runEachIteration()
 }
 
 //----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void TskOrc::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    JValue msg(m);
-    std::string cmd = msg["cmd"].asString();
-
-    if (cmd == "QUIT") {
-        transitTo(RUNNING);
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processInDataMsg
 //----------------------------------------------------------------------
 void TskOrc::processInDataMsg(ScalabilityProtocolRole* c, MessageString & m)

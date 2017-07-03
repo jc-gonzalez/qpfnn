@@ -132,6 +132,7 @@ void TskMng::processIncommingMessages()
             DBG(compName << " received the message of type " << type
                 << " through the channel " + chnl);
             if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
+            else if (chnl == ChnlHMICmd)   { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
             else if (type == MsgTskRqst)   { processTskRqstMsg(conn, m); }
             else if (type == MsgTskRep)    { processTskRepMsg(conn, m); }
@@ -165,19 +166,6 @@ void TskMng::runEachIteration()
         "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
         "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
         );
-}
-
-//----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void TskMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
-{
-    JValue msg(m);
-    std::string cmd = msg["cmd"].asString();
-
-    if (cmd == "QUIT") {
-        transitTo(RUNNING);
-    }
 }
 
 //----------------------------------------------------------------------

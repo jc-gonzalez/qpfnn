@@ -47,6 +47,10 @@
 #include "str.h"
 #include "hostinfo.h"
 
+#include "config.h"
+
+using Configuration::cfg;
+
 ////////////////////////////////////////////////////////////////////////////
 // Namespace: QPF
 // -----------------------
@@ -76,16 +80,18 @@ HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void HMIProxy::runEachIteration()
 {
-    if ((iteration % 20) == 0) {
+    if ((iteration % 10) == 0) {
         // Create message and send
         Message<MsgBodyCMD> msg;
+        MsgBodyCMD body;
         msg.buildHdr(ChnlHMICmd,
                      MsgHMICmd,
                      "1.0",
                      compName,
                      "*",
                      "", "", "");
-        msg["cmd"] = "PING";
+        body["cmd"] = CmdStates;
+        msg.buildBody(body);
 
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
         std::string chnl(ChnlHMICmd);
@@ -127,7 +133,22 @@ void HMIProxy::processIncommingMessages()
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyCMD> msg(m);
-    nodeStates[msg.header.source()] = msg.body.ans();
+    std::string cmd = msg["cmd"].asString();
+
+    if (cmd == CmdStates) {
+
+        json & mp = msg.body["states"];
+        Json::Value::iterator it = mp.begin();
+        while (it != mp.end()) {
+            std::string node(it.key().asString());
+            std::string stat((*it).asString());
+            TRC(compName + " received the information that " +
+                node + " has state " + stat);
+            cfg.nodeStates[node] = stat;
+            ++it;
+        }
+
+    }
 }
 
 //----------------------------------------------------------------------
@@ -200,7 +221,7 @@ void HMIProxy::sendNewCfgInfo()
 //----------------------------------------------------------------------
 std::map<std::string, std::string> HMIProxy::getNodeStates()
 {
-    return nodeStates;
+    return cfg.nodeStates;
 }
 
 //}

@@ -91,19 +91,6 @@ DataMng::DataMng(std::string name, std::string addr, Synchronizer * s)
 }
 
 //----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void DataMng::processCmdMsg(ScalabilityProtocolRole * conn, MessageString & m)
-{
-    JValue msg(m);
-    std::string cmd = msg["cmd"].asString();
-
-    if (cmd == "QUIT") {
-        transitTo(RUNNING);
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processInDataMsg
 //----------------------------------------------------------------------
 void DataMng::processInDataMsg(ScalabilityProtocolRole * conn, MessageString & m)

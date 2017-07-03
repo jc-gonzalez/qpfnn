@@ -154,6 +154,13 @@ public:
     T body;
 };
 
+
+//==========================================================================
+// Topic: Message and Command identifiers
+//==========================================================================
+
+//-- Message Identifiers --------------------
+
 typedef std::string MessageDescriptor;
 
 const MessageDescriptor MsgCmd        (ChannelAcronym[TX_ID_CMD]);
@@ -166,5 +173,30 @@ const MessageDescriptor MsgTskRep     (ChannelAcronym[TX_ID_TSKREP]);
 const MessageDescriptor MsgHostMon    (ChannelAcronym[TX_ID_HOSTMON]);
 const MessageDescriptor MsgFmkMon     (ChannelAcronym[TX_ID_FMKMON]);
 const MessageDescriptor MsgTskRepDist (ChannelAcronym[TX_ID_TSKREPDIST]);
+
+//-- Command Identifiers ---------------------
+
+typedef std::string CmdDescriptor;
+
+#undef T
+
+#define TLISTOF_CMD_IDS                          \
+        T(INIT),                                     \
+        T(QUIT),                                 \
+        T(PING),                                 \
+        T(STATES)
+
+#define T(x) CMD_ ## x
+enum CmdId { TLISTOF_CMD_IDS };
+#undef T
+
+#define T(x) std::string( #x )
+const CmdDescriptor CmdName[] = { TLISTOF_CMD_IDS };
+#undef T
+
+const CmdDescriptor CmdInit     (CmdName[CMD_INIT]);
+const CmdDescriptor CmdQuit     (CmdName[CMD_QUIT]);
+const CmdDescriptor CmdPing     (CmdName[CMD_PING]);
+const CmdDescriptor CmdStates   (CmdName[CMD_STATES]);
 
 #endif

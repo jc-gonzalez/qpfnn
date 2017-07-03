@@ -131,7 +131,6 @@ protected:
     //----------------------------------------------------------------------
     void processIncommingMessages();
 
-    virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
     virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 private:

@@ -264,27 +264,10 @@ void TskAge::processIncommingMessages()
             DBG(compName << " received the message [" << m
                 << "] through the channel " + chnl);
             if      (chnl == ChnlCmd)     { processCmdMsg(conn, m); }
+            else if (chnl == ChnlHMICmd)  { processHMICmdMsg(conn, m); }
             else if ((type == MsgTskProc) &&
                      (msg.header.target() == compName)) { processTskProcMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
-        }
-    }
-}
-
-//----------------------------------------------------------------------
-// Method: processCmdMsg
-//----------------------------------------------------------------------
-void TskAge::processCmdMsg(ScalabilityProtocolRole* c, MessageString & m)
-{
-    JValue msg(m);
-    std::string cmd = msg["cmd"].asString();
-
-    if (cmd == "QUIT") {
-        transitTo(RUNNING);
-    } else if (cmd == "INIT") {
-        std::string sessId = msg["sessionId"].asString();
-        if (sessId != cfg.sessionId) {
-            cfg.synchronizeSessionId(sessId);
         }
     }
 }
