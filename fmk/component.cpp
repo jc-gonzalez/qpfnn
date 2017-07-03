@@ -262,9 +262,9 @@ void Component::step()
     // Sleep for 'stepSize' milliseconds
     //auto start = std::chrono::high_resolution_clock::now();
     long int msnow =
-        static_cast<long int>(std::chrono::duration_cast<
-                              std::chrono::milliseconds>(
-                                  std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+        static_cast<long int>(
+           std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::high_resolution_clock::now().time_since_epoch()).count());
     long int ms2wait = stepSize - ((msnow + stepSize) % stepSize);
     std::this_thread::sleep_for(std::chrono::milliseconds(ms2wait));
 }
@@ -328,13 +328,15 @@ void Component::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     Message<MsgBodyCMD> msg(m);
     std::string cmd(msg.body.cmd());
     if (cmd == "PING") {
-        msg.body["ans"] = getStateName(getState());
+        MsgBodyCMD body;
+        body["ans"] = getStateName(getState());
         msg.buildHdr(ChnlHMICmd,
                      MsgHMICmd,
                      "1.0",
                      compName,
                      msg.header.source(),
                      "", "", "");
+        msg.buildBody(body);
         c->setMsgOut(msg.str());
     }
 }
