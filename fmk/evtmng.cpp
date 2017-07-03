@@ -145,13 +145,21 @@ void EvtMng::runEachIteration()
 
     if (sendInit || sendPing || sendQuit) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlCmd);
-        ScalabilityProtocolRole * conn = it->second;
-
         Message<MsgBodyCMD> msg;
-        msg.buildHdr(ChnlCmd, MsgCmd, "1.0",
-                     compName, "*",
-                     "", "", "");
+
+        if (sendPing) {
+            it = connections.find(ChnlEvtMng);
+            msg.buildHdr(ChnlEvtMng, MsgEvtMng, "1.0",
+                         compName, "*",
+                         "", "", "");
+        } else {
+            it = connections.find(ChnlCmd);
+            msg.buildHdr(ChnlCmd, MsgCmd, "1.0",
+                         compName, "*",
+                         "", "", "");
+        }
+
+        ScalabilityProtocolRole * conn = it->second;
 
         MsgBodyCMD body;
         body["iteration"] = std::to_string(iteration);

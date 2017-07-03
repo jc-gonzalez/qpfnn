@@ -239,6 +239,7 @@ protected:
 
 protected:
     virtual void processCmdMsg(ScalabilityProtocolRole* c, MessageString & m);
+    virtual void processEvtMngMsg(ScalabilityProtocolRole* c, MessageString & m);
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processInDataMsg(ScalabilityProtocolRole* c, MessageString & m) {}
     virtual void processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m) {}

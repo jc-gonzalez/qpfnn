@@ -164,6 +164,7 @@ public:
 typedef std::string MessageDescriptor;
 
 const MessageDescriptor MsgCmd        (ChannelAcronym[TX_ID_CMD]);
+const MessageDescriptor MsgEvtMng     (ChannelAcronym[TX_ID_EVTMNG]);
 const MessageDescriptor MsgHMICmd     (ChannelAcronym[TX_ID_HMICMD]);
 const MessageDescriptor MsgInData     (ChannelAcronym[TX_ID_INDATA]);
 const MessageDescriptor MsgTskSched   (ChannelAcronym[TX_ID_TSKSCHED]);

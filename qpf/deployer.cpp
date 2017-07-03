@@ -54,6 +54,7 @@
 #include "survey.h"
 #include "pubsub.h"
 #include "reqrep.h"
+#include "pipeline.h"
 
 #include "message.h"
 #include "channels.h"
@@ -453,7 +454,13 @@ void Deployer::createElementsNetwork()
     // Connection addresses and channel
     std::string bindAddr;
     std::string connAddr;
-    std::string chnl;
+
+    ChannelDescriptor chnl;
+
+    // Ports (in fact, deltas from startingPort)
+    const int PortEvtMng     = 1;
+    const int PortHMICmd     = 2;
+    const int PortTskRepDist = 3;
 
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
@@ -501,7 +508,7 @@ void Deployer::createElementsNetwork()
         // c. Create agent connections
         //-----------------------------------------------------------------
 
-        // CHANNEL CMD - SURVEY // PUBSUB // REQREP
+        // CHANNEL CMD - SURVEY
         // - Surveyor: EvtMng
         // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
         chnl     = ChnlCmd;
@@ -509,7 +516,19 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new ReqRep(NN_REP, connAddr));
+            a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        }
+
+        // CHANNEL EVTMNG Related - Pipeline
+        // - Out/In: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
+        chnl     = ChnlEvtMng;
+        TRC("### Connections for channel " << chnl);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
+        connAddr = bindAddr;
+        std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
+        cs.insert(cs.end(), ag.begin(), ag.end());
+        for (auto & c : cs) {
+            c->addConnection(chnl, new Pipeline(NN_PULL, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -559,7 +578,7 @@ void Deployer::createElementsNetwork()
     // c. Create component connections
     //-----------------------------------------------------------------
 
-    // CHANNEL CMD - SURVEY // PUBSUB // REQREP
+    // CHANNEL CMD - SURVEY
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
 /*
@@ -578,16 +597,23 @@ void Deployer::createElementsNetwork()
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
     connAddr = bindAddr;
-    m.evtMng->addConnection(chnl, new ReqRep(NN_REQ, bindAddr));
+    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-        c->addConnection(chnl, new ReqRep(NN_REP, connAddr));
+        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
+
+    // CHANNEL EVTMNG Related - Pipeline
+    // - Out/In: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
+    chnl     = ChnlEvtMng;
+    TRC("### Connections for channel " << chnl);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
+    m.evtMng->addConnection(chnl, new Pipeline(NN_PUSH, bindAddr));
 
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     chnl     = ChnlHMICmd;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + 1);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortHMICmd);
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
 
     // CHANNEL INDATA -  PUBSUB
@@ -630,7 +656,7 @@ void Deployer::createElementsNetwork()
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + 2);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortTskRepDist);
     //bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));

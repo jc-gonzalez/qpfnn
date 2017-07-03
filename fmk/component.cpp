@@ -340,7 +340,26 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
             cfg.synchronizeSessionId(sessId);
         }
 
-    } else if (cmd == CmdPing) {
+    } else if (cmd == CmdStates) {
+
+        Message<MsgBodyCMD> msg(m);
+        cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
+
+    } else {
+
+        WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
+
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: processEvtMngMsg
+//----------------------------------------------------------------------
+void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
+{
+    std::string cmd = JValue(m)["cmd"].asString();
+
+    if (cmd == CmdPing) { // This is any component but EvtMng
 
         Message<MsgBodyCMD> msg(m);
         MsgBodyCMD body;
@@ -355,7 +374,7 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
         msg.buildBody(body);
         c->setMsgOut(msg.str());
 
-    } else if (cmd == CmdStates) {
+    } else if (cmd == CmdStates) { // This should be EvtMng
 
         Message<MsgBodyCMD> msg(m);
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
