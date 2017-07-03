@@ -112,6 +112,7 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     TRC("MSG: " + m);
     if (cmd == CmdStates) {
 
+        cfg.nodeStates.clear();
         json & mp = msg.body["states"];
         Json::Value::iterator it = mp.begin();
         while (it != mp.end()) {
@@ -122,6 +123,7 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             cfg.nodeStates[node] = stat;
             ++it;
         }
+        cfg.nodeStates["QPFHMI"] = getStateName(getState());
 
     }
 }

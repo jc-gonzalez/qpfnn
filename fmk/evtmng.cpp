@@ -197,12 +197,12 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
                      "", "", "");
         body["cmd"] = CmdStates;
         json states;
+        states[compName] = getStateName(getState());
         for(auto & kv : cfg.nodeStates) {
             TRC(kv.first + " => " + kv.second);
             states[kv.first] = kv.second;
         }
-        Json::FastWriter w;
-        TRC(w.write(states));
+        body["states"] = states;
         msg.buildBody(body);
         c->setMsgOut(msg.str());
         TRC("Sending answer via channel " + ChnlHMICmd);

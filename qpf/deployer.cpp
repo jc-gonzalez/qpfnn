@@ -553,11 +553,11 @@ void Deployer::createElementsNetwork()
     //-----------------------------------------------------------------
     // a. Create master node elements
     //-----------------------------------------------------------------
-    m.evtMng = new EvtMng  ("EvtMng",  masterAddress, &synchro);
-    m.datMng = new DataMng ("DataMng", masterAddress, &synchro);
-    m.logMng = new LogMng  ("LogMng",  masterAddress, &synchro);
-    m.tskOrc = new TskOrc  ("TskOrc",  masterAddress, &synchro);
-    m.tskMng = new TskMng  ("TskMng",  masterAddress, &synchro);
+    m.evtMng = new EvtMng  ("EvtMng", masterAddress, &synchro);
+    m.datMng = new DataMng ("DatMng", masterAddress, &synchro);
+    m.logMng = new LogMng  ("LogMng", masterAddress, &synchro);
+    m.tskOrc = new TskOrc  ("TskOrc", masterAddress, &synchro);
+    m.tskMng = new TskMng  ("TskMng", masterAddress, &synchro);
 
     //-----------------------------------------------------------------
     // b. Fill agent vectors for all the declared processing hosts
