@@ -367,11 +367,8 @@ bool TskOrc::sendTaskSchedMsg(Rule * rule,
 
     // Create message and send
     Message<MsgBodyTSK> msg;
-    msg.buildHdr(ChnlTskSched,
-                 ChnlTskSched,
-                 "1.0",
-                 compName,
-                 "*",
+    msg.buildHdr(ChnlTskSched, ChnlTskSched, CHNLS_IF_VERSION,
+                 compName, "*",
                  "", "", "");
 
     MsgBodyTSK body;

@@ -5,6 +5,8 @@
 
 #include "nncomm.h"
 
+#define CHNLS_IF_VERSION  "1.0"
+
 #undef T
 
 #define TLISTOF_TX_IDS                          \

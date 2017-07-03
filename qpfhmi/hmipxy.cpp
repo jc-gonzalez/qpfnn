@@ -84,11 +84,8 @@ void HMIProxy::runEachIteration()
         // Create message and send
         Message<MsgBodyCMD> msg;
         MsgBodyCMD body;
-        msg.buildHdr(ChnlHMICmd,
-                     MsgHMICmd,
-                     "1.0",
-                     compName,
-                     "*",
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "*",
                      "", "", "");
         body["cmd"] = CmdStates;
         msg.buildBody(body);
@@ -99,7 +96,8 @@ void HMIProxy::runEachIteration()
         if (it != connections.end()) {
             ScalabilityProtocolRole * conn = it->second;
             conn->setMsgOut(msg.str());
-            InfoMsg("Sending request via channel " + chnl);
+            TRC("Sending request via channel " + chnl);
+            TRC("with message: " + msg.str());
         }
     }
 }
@@ -110,8 +108,8 @@ void HMIProxy::runEachIteration()
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyCMD> msg(m);
-    std::string cmd = msg["cmd"].asString();
-
+    std::string cmd = msg.body["cmd"].asString();
+    TRC("MSG: " + m);
     if (cmd == CmdStates) {
 
         json & mp = msg.body["states"];

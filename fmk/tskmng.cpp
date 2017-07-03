@@ -173,7 +173,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     DBG("TASK REQUEST FROM " << agName << " RECEIVED");
 
     // Create message
-    msg.buildHdr(ChnlTskProc, MsgTskProc, "1.0",
+    msg.buildHdr(ChnlTskProc, MsgTskProc, CHNLS_IF_VERSION,
                  compName, agName, "", "", "");
 
     MsgBodyTSK body;
@@ -399,7 +399,7 @@ bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgT
     bool retVal = false;
     // Set message header
     Message<MsgBodyTSK> msg(m);
-    msg.buildHdr(ChnlTskRepDist, msgType, "1.0",
+    msg.buildHdr(ChnlTskRepDist, msgType, CHNLS_IF_VERSION,
                  compName, "*", "", "", "");
     // Send msg
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
@@ -429,7 +429,7 @@ void TskMng::sendProcFmkInfoUpdate()
     msg.buildBody(body);
 
     // Set message header
-    msg.buildHdr(ChnlTskRepDist, MsgFmkMon, "1.0",
+    msg.buildHdr(ChnlTskRepDist, MsgFmkMon, CHNLS_IF_VERSION,
                  compName, "*", "", "", "");
     // Send msg
     std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;

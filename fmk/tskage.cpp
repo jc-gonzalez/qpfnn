@@ -162,7 +162,7 @@ void TskAge::runEachIterationForContainers()
         if (idleCycles > idleCyclesBeforeRequest) {
             // Create message and send
             Message<MsgBodyTSK> msg;
-            msg.buildHdr(ChnlTskProc, MsgTskRqst, "1.0",
+            msg.buildHdr(ChnlTskProc, MsgTskRqst, CHNLS_IF_VERSION,
                          compName, "TskMng",
                          "", "", "");
 
@@ -222,7 +222,7 @@ void TskAge::runEachIterationForContainers()
             DBG(hostInfo.toJsonStr());
             body["info"] = hostInfoValue.val();
 
-            msg.buildHdr(ChnlTskProc, MsgHostMon, "1.0",
+            msg.buildHdr(ChnlTskProc, MsgHostMon, CHNLS_IF_VERSION,
                          compName, "TskMng",
                          "", "", "");
             msg.buildBody(body);
@@ -391,7 +391,7 @@ void TskAge::sendTaskReport()
     MsgBodyTSK & body = msg.body;
     body["info"] = task.val();
 
-    msg.buildHdr(ChnlTskProc, MsgTskRep, "1.0",
+    msg.buildHdr(ChnlTskProc, MsgTskRep, CHNLS_IF_VERSION,
                  compName, "TskMng",
                  "", "", "");
     msg.buildBody(body);

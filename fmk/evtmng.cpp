@@ -122,7 +122,7 @@ void EvtMng::runEachIteration()
             }
 
             Message<MsgBodyINDATA> msg;
-            msg.buildHdr(ChnlInData, MsgInData, "1.0",
+            msg.buildHdr(ChnlInData, MsgInData, CHNLS_IF_VERSION,
                          compName, "*",
                          "", "", "");
 
@@ -149,12 +149,12 @@ void EvtMng::runEachIteration()
 
         if (sendPing) {
             it = connections.find(ChnlEvtMng);
-            msg.buildHdr(ChnlEvtMng, MsgEvtMng, "1.0",
+            msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
                          compName, "*",
                          "", "", "");
         } else {
             it = connections.find(ChnlCmd);
-            msg.buildHdr(ChnlCmd, MsgCmd, "1.0",
+            msg.buildHdr(ChnlCmd, MsgCmd, CHNLS_IF_VERSION,
                          compName, "*",
                          "", "", "");
         }
@@ -185,17 +185,15 @@ void EvtMng::runEachIteration()
 //----------------------------------------------------------------------
 void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
-    std::string cmd = JValue(m)["cmd"].asString();
+    Message<MsgBodyCMD> msg(m);
+    std::string cmd = msg.body["cmd"].asString();
+    TRC("MSG: " + m);
 
     if (cmd == CmdStates) {
         // Create message and send
-        Message<MsgBodyCMD> msg;
         MsgBodyCMD body;
-        msg.buildHdr(ChnlHMICmd,
-                     MsgHMICmd,
-                     "1.0",
-                     compName,
-                     "*",
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "*",
                      "", "", "");
         body["cmd"] = CmdStates;
         json states;
@@ -205,6 +203,9 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
         body["states"] = states;
         msg.buildBody(body);
         c->setMsgOut(msg.str());
+        TRC("Sending answer via channel " + ChnlHMICmd);
+        TRC("with message: " + msg.str());
+
     }
 }
 

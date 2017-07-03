@@ -360,11 +360,8 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 
         TRC(compName + " received a " + CmdPing + " and sents " + getStateName(getState()));
         MsgBodyCMD body;
-        msg.buildHdr(ChnlEvtMng,
-                     MsgEvtMng,
-                     "1.0",
-                     compName,
-                     msg.header.source(),
+        msg.buildHdr(ChnlEvtMng, MsgEvtMng, CHNLS_IF_VERSION,
+                     compName, msg.header.source(),
                      "", "", "");
         body["cmd"]   = CmdStates;
         body["state"] = getStateName(getState());
