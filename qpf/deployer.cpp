@@ -501,7 +501,7 @@ void Deployer::createElementsNetwork()
         // c. Create agent connections
         //-----------------------------------------------------------------
 
-        // CHANNEL CMD - SURVEY
+        // CHANNEL CMD - SURVEY // PUBSUB // REQREP
         // - Surveyor: EvtMng
         // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
         chnl     = ChnlCmd;
@@ -509,7 +509,7 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+            a->addConnection(chnl, new PubSub(NN_REQ, connAddr));
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -559,7 +559,7 @@ void Deployer::createElementsNetwork()
     // c. Create component connections
     //-----------------------------------------------------------------
 
-    // CHANNEL CMD - SURVEY
+    // CHANNEL CMD - SURVEY // PUBSUB // REQREP
     // - Surveyor: EvtMng
     // - Respondent: QPFHMI DataMng LogMng, TskOrc TskMng TskAge*
 /*
@@ -578,9 +578,9 @@ void Deployer::createElementsNetwork()
     TRC("### Connections for channel " << chnl);
     bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
     connAddr = bindAddr;
-    m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
+    m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
-        c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+        c->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
     }
 
     // CHANNEL HMICMD - REQREP
