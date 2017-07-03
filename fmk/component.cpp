@@ -357,10 +357,11 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 
     if (cmd == CmdPing) { // This is any component but EvtMng
 
+        TRC(compName + " received a " + CmdPing + " and sents " + getStateName(getState()));
         Message<MsgBodyCMD> msg(m);
         MsgBodyCMD body;
-        msg.buildHdr(ChnlCmd,
-                     MsgCmd,
+        msg.buildHdr(ChnlEvtMng,
+                     MsgEvtMng,
                      "1.0",
                      compName,
                      msg.header.source(),
@@ -374,6 +375,7 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
 
         Message<MsgBodyCMD> msg(m);
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
+        TRC(compName + " received from " + msg.header.source() + " from " + compName);
 
     } else {
 
