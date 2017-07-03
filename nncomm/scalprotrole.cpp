@@ -2,6 +2,8 @@
 #include <cassert>
 #include <sstream>
 
+#include <nanomsg/survey.h>
+
 ScalabilityProtocolRole::ScalabilityProtocolRole()
     : sck(0), readyToGo(false), incMsgsMask(NN_IN | NN_OUT)
 {
@@ -77,17 +79,34 @@ std::string ScalabilityProtocolRole::getAddress()
 
 void ScalabilityProtocolRole::getIncommingMessageStrings()
 {
-    int rev = getevents(sck->fd(), incMsgsMask, 50);
-    //TRC(elemName << ": checking incomming messages... " << rev);
-    //if (rev & NN_IN == NN_IN) {
-    if (rev != 0) {
-        rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);
-        if (rc > 0) {
-            std::unique_lock<std::mutex> ulck(mtxMsgLists);
-            memset((void*)(buf + rc), 0, MAX_MESSAGE_SIZE - rc);
-            iMsgList.push(MessageString(buf));
-        } else {
-            TRC("rc = " << rc);
+    if (elemClass == NN_SURVEYOR) {
+        while (true) {
+            try {
+                rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);
+                if (rc == ETIMEDOUT) { return; }
+                if (rc > 0) {
+                    std::unique_lock<std::mutex> ulck(mtxMsgLists);
+                    memset((void*)(buf + rc), 0, MAX_MESSAGE_SIZE - rc);
+                    iMsgList.push(MessageString(buf));
+                }
+            } catch (...) {
+                return;
+            }
+        }
+    } else {
+        int rev = getevents(sck->fd(), incMsgsMask, 50);
+        //if (rev & NN_IN == NN_IN) {
+        if (rev > 0) {
+            try {
+                rc = sck->recv(buf, MAX_MESSAGE_SIZE, 0);
+            } catch (...) {
+                return;
+            }
+            if (rc > 0) {
+                std::unique_lock<std::mutex> ulck(mtxMsgLists);
+                memset((void*)(buf + rc), 0, MAX_MESSAGE_SIZE - rc);
+                iMsgList.push(MessageString(buf));
+            }
         }
     }
 }

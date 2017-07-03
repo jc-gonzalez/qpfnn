@@ -21,19 +21,28 @@ void Survey::setMsgOut(MessageString m)
     } else {
         if (readyToGo) {
             sck->send((void*)(m.c_str()), m.size(), 0);
+            surveyorWaiting = true;
             DBG("++ Sending msg >> " << m);
             DBG("++ Waiting for answers . . . ");
+            /*
             int numResp = 1;
             try {
                 rc = sck->recv(buf, sizeof(buf), 0);
-                while ((rc > 0) && (numResp < maxRespondents)) {
-                    DBG("++ Received answer: " << std::string(buf));
-                    rc = sck->recv(buf, sizeof(buf), 0);
-                    numResp++;
-                }
+                if (rc == ETIMEDOUT) {
+                    TRC("ETIMEDOUT\n");
+                } else {
+                    while ((rc > 0) && (numResp < maxRespondents)) {
+                        TRC("++ Received answer: " << std::string(buf));
+                        numResp++;
+                        rc = sck->recv(buf, sizeof(buf), 0);
+                        if (rc == ETIMEDOUT) {
+                            TRC("ETIMEDOUT\n");
+                        }
+                    }
+                    }
             } catch (nn::exception & e) {
-                DBG("---- Only " << numResp << " responses");
-            }
+                TRC("---- Only " << numResp << " responses");
+                }*/
         }
     }
 }
@@ -47,6 +56,7 @@ void Survey::init(int elemCls, const char * addr)
 {
     elemClass = elemCls;
     createSocket(elemClass);
+    surveyorWaiting = false;
     if (elemClass == NN_SURVEYOR) {
         //int deadline = WAIT_BINDING;
         //sck->setsockopt(NN_SURVEYOR, NN_SURVEYOR_DEADLINE, &deadline, sizeof(int));
@@ -62,8 +72,10 @@ void Survey::init(int elemCls, const char * addr)
 
 void Survey::getIncommingMessageStrings()
 {
-    if (elemClass == NN_RESPONDENT) {
+    if ((elemClass == NN_RESPONDENT) || (surveyorWaiting)) {
         ScalabilityProtocolRole::getIncommingMessageStrings();
+        surveyorWaiting = ((iMsgList.size() >= maxRespondents) ||
+                           (errno == ETIMEDOUT));
     }
 }
 

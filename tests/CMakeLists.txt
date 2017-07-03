@@ -8,6 +8,7 @@
 #======================================================================
 
 add_subdirectory(simple)
+add_subdirectory(nncomm)
 add_subdirectory(json)
 add_subdirectory(hmi)
 add_subdirectory(fits)

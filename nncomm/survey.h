@@ -23,6 +23,7 @@ protected:
     virtual void processMessageString(MessageString & m);
 private:
     int maxRespondents;
+    bool surveyorWaiting;
 };
 
 #endif
