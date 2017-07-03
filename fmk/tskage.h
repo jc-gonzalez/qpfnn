@@ -127,10 +127,8 @@ protected:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processIncommingMessages
+    // Method: processTskProcMsg
     //----------------------------------------------------------------------
-    void processIncommingMessages();
-
     virtual void processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m);
 
 private:

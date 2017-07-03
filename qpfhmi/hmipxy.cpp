@@ -105,29 +105,6 @@ void HMIProxy::runEachIteration()
 }
 
 //----------------------------------------------------------------------
-// Method: processIncommingMessages
-//----------------------------------------------------------------------
-void HMIProxy::processIncommingMessages()
-{
-    MessageString m;
-    for (auto & kv: connections) {
-        const ChannelDescriptor & chnl = kv.first;
-        ScalabilityProtocolRole * conn = kv.second;
-        while (conn->next(m)) {
-            MessageBase msg(m);
-            std::string tgt(msg.header.target());
-            if ((tgt != "*") && (tgt != compName)) { continue; }
-            std::string type(msg.header.type());
-            DBG(compName << " received the message [" << m << "] through the channel " + chnl);
-            if      (chnl == ChnlHMICmd)    { processHMICmdMsg(conn, m); }
-            else if (type == MsgFmkMon)     { processFmkMonMsg(conn, m); }
-            else if (type == MsgTskRepDist) { processTskRepDistMsg(conn, m); }
-            else    { WarnMsg("Message from unidentified channel " + chnl); }
-        }
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processHMICmdMsg
 //----------------------------------------------------------------------
 void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)

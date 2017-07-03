@@ -117,32 +117,6 @@ void TskMng::fromRunningToOperational()
 }
 
 //----------------------------------------------------------------------
-// Method: processIncommingMessages
-//----------------------------------------------------------------------
-void TskMng::processIncommingMessages()
-{
-    MessageString m;
-    //TRC("TskMng::processIncommingmessages()");
-    for (auto & kv: connections) {
-        const ChannelDescriptor & chnl = kv.first;
-        ScalabilityProtocolRole * conn = kv.second;
-        while (conn->next(m)) {
-            Message<MsgBodyTSK> msg(m);
-            std::string type(msg.header.type());
-            DBG(compName << " received the message of type " << type
-                << " through the channel " + chnl);
-            if      (chnl == ChnlCmd)      { processCmdMsg(conn, m); }
-            else if (chnl == ChnlHMICmd)   { processHMICmdMsg(conn, m); }
-            else if (chnl == ChnlTskSched) { processTskSchedMsg(conn, m); }
-            else if (type == MsgTskRqst)   { processTskRqstMsg(conn, m); }
-            else if (type == MsgTskRep)    { processTskRepMsg(conn, m); }
-            else if (type == MsgHostMon)   { processHostMonMsg(conn, m); }
-            else    { WarnMsg("Message from unidentified channel " + chnl); }
-        }
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: runEachIteration
 //----------------------------------------------------------------------
 void TskMng::runEachIteration()

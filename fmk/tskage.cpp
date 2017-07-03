@@ -247,40 +247,18 @@ void TskAge::runEachIterationForServices()
 }
 
 //----------------------------------------------------------------------
-// Method: processIncommingMessages
-//----------------------------------------------------------------------
-void TskAge::processIncommingMessages()
-{
-    MessageString m;
-    TRC("TskAge::processIncommingmessages() while status is " +
-        ProcStatusName[pStatus] +
-        " at iteration " + std::to_string(iteration));
-    for (auto & kv: connections) {
-        const ChannelDescriptor & chnl = kv.first;
-        ScalabilityProtocolRole * conn = kv.second;
-        while (conn->next(m)) {
-            Message<MsgBodyTSK> msg(m);
-            std::string type(msg.header.type());
-            DBG(compName << " received the message [" << m
-                << "] through the channel " + chnl);
-            if      (chnl == ChnlCmd)     { processCmdMsg(conn, m); }
-            else if (chnl == ChnlHMICmd)  { processHMICmdMsg(conn, m); }
-            else if ((type == MsgTskProc) &&
-                     (msg.header.target() == compName)) { processTskProcMsg(conn, m); }
-            else    { WarnMsg("Message from unidentified channel " + chnl); }
-        }
-    }
-}
-
-//----------------------------------------------------------------------
 // Method: processTskProcMsg
 //----------------------------------------------------------------------
 void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
+    Message<MsgBodyTSK> msg(m);
+
+    // Return if not recipient
+    if (msg.header.target() != compName) { return; }
+
     if (pStatus == WAITING) {
 
         // Define and set task object
-        Message<MsgBodyTSK> msg(m);
         MsgBodyTSK & body = msg.body;
         runningTask = new TaskInfo(body["info"]);
         TaskInfo & task = (*runningTask);

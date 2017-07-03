@@ -212,6 +212,7 @@ void Component::processIncommingMessages()
             else if (type == MsgTskProc)     { processTskProcMsg(conn, m); }
             else if (type == MsgTskRep)      { processTskRepMsg(conn, m); }
             else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
+            else if (type == MsgFmkMon)      { processFmkMonMsg(conn, m); }
             else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
             else    { WarnMsg("Message from unidentified channel " + chnl); }
         }
@@ -343,14 +344,14 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
 
         Message<MsgBodyCMD> msg(m);
         MsgBodyCMD body;
-        body["cmd"]   = CmdStates;
-        body["state"] = getStateName(getState());
         msg.buildHdr(ChnlCmd,
                      MsgCmd,
                      "1.0",
                      compName,
                      msg.header.source(),
                      "", "", "");
+        body["cmd"]   = CmdStates;
+        body["state"] = getStateName(getState());
         msg.buildBody(body);
         c->setMsgOut(msg.str());
 

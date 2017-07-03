@@ -124,11 +124,6 @@ protected:
 
 protected:
     //----------------------------------------------------------------------
-    // Method: processIncommingMessages
-    //----------------------------------------------------------------------
-    void processIncommingMessages();
-
-    //----------------------------------------------------------------------
     // Method: processHMICmdMsg
     //----------------------------------------------------------------------
     virtual void processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m);

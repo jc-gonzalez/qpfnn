@@ -139,63 +139,36 @@ void EvtMng::runEachIteration()
         }
     }
 
-    if (((iteration + 1) == 100)) {
+    bool sendInit = ((iteration + 1) == 100);
+    bool sendPing = ((iteration % 20) == 0);
+    bool sendQuit = (iteration > 1000);
+
+    if (sendInit || sendPing || sendQuit) {
+        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+        it = connections.find(ChnlCmd);
+        ScalabilityProtocolRole * conn = it->second;
+
         Message<MsgBodyCMD> msg;
-        MsgBodyCMD body;
-        msg.buildHdr(ChnlCmd,
-                     MsgCmd,
-                     "1.0",
-                     compName,
-                     "*",
+        msg.buildHdr(ChnlCmd, MsgCmd, "1.0",
+                     compName, "*",
                      "", "", "");
-        body["cmd"] = CmdInit;
+
+        MsgBodyCMD body;
         body["iteration"] = std::to_string(iteration);
-        body["sessionId"] = cfg.sessionId;
+
+        if (sendInit) {
+            body["cmd"] = CmdInit;
+            body["sessionId"] = cfg.sessionId;
+        } else if (sendPing) {
+            body["cmd"] = CmdPing;
+        } else if (sendQuit) {
+            body["cmd"] = CmdQuit;
+        }
+
         msg.buildBody(body);
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlCmd);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-        }
-    }
+        conn->setMsgOut(msg.str());
 
-    if ((iteration % 20) == 0) {
-        // Create message and send
-        Message<MsgBodyCMD> msg;
-        MsgBodyCMD body;
-        msg.buildHdr(ChnlCmd,
-                     MsgCmd,
-                     "1.0",
-                     compName,
-                     "*",
-                     "", "", "");
-        body["cmd"] = "PING";
-        msg.buildBody(body);
-
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        std::string chnl(ChnlHMICmd);
-        it = connections.find(chnl);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-            InfoMsg("Sending request via channel " + chnl);
-        }
-    }
-
-    if (iteration > 1000) {
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        it = connections.find(ChnlCmd);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            json jdata;
-            jdata["cmd"]       = "QUIT";
-            jdata["iteration"] = std::to_string(iteration);
-            JValue msg(jdata);
-            conn->setMsgOut(msg.str());
-        }
-
-        transitTo(RUNNING);
+        if (sendQuit) { transitTo(RUNNING); }
     }
 }
 
