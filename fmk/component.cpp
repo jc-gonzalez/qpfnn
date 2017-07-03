@@ -205,6 +205,7 @@ void Component::processIncommingMessages()
             std::string type(msg.header.type());
             DbgMsg("(FROM component.cpp:) "  + compName + " received the message [" + m + "]");
             if      (chnl == ChnlCmd)        { processCmdMsg(conn, m); }
+            else if (chnl == ChnlEvtMng)     { processEvtMngMsg(conn, m); }
             else if (chnl == ChnlHMICmd)     { processHMICmdMsg(conn, m); }
             else if (chnl == ChnlInData)     { processInDataMsg(conn, m); }
             else if (chnl == ChnlTskSched)   { processTskSchedMsg(conn, m); }
@@ -339,11 +340,6 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
         if (sessId != cfg.sessionId) {
             cfg.synchronizeSessionId(sessId);
         }
-
-    } else if (cmd == CmdStates) {
-
-        Message<MsgBodyCMD> msg(m);
-        cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
 
     } else {
 
