@@ -284,7 +284,7 @@ void Deployer::readConfiguration()
             exit(EXIT_FAILURE);
         }
     }
-    Log::setLogBaseDir(Config::PATHSession);
+    Log::setLogBaseDir(Config::PATHLog);
 }
 
 //----------------------------------------------------------------------
