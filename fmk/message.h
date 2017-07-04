@@ -181,10 +181,11 @@ typedef std::string CmdDescriptor;
 
 #undef T
 
-#define TLISTOF_CMD_IDS                          \
-        T(INIT),                                     \
-        T(QUIT),                                 \
-        T(PING),                                 \
+#define TLISTOF_CMD_IDS                              \
+    T(INIT),                                         \
+        T(SESSION),                                  \
+        T(QUIT),                                     \
+        T(PING),                                     \
         T(STATES)
 
 #define T(x) CMD_ ## x
@@ -196,6 +197,7 @@ const CmdDescriptor CmdName[] = { TLISTOF_CMD_IDS };
 #undef T
 
 const CmdDescriptor CmdInit     (CmdName[CMD_INIT]);
+const CmdDescriptor CmdSession  (CmdName[CMD_SESSION]);
 const CmdDescriptor CmdQuit     (CmdName[CMD_QUIT]);
 const CmdDescriptor CmdPing     (CmdName[CMD_PING]);
 const CmdDescriptor CmdStates   (CmdName[CMD_STATES]);

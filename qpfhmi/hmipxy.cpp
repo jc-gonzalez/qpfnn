@@ -80,26 +80,25 @@ HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void HMIProxy::runEachIteration()
 {
-    if ((iteration % 10) == 0) {
-        // Create message and send
-        Message<MsgBodyCMD> msg;
-        MsgBodyCMD body;
-        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
-                     compName, "*",
-                     "", "", "");
-        body["cmd"] = CmdStates;
-        msg.buildBody(body);
+    Message<MsgBodyCMD> msg;
+    MsgBodyCMD body;
+    msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                 compName, "*",
+                 "", "", "");
 
-        std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-        std::string chnl(ChnlHMICmd);
-        it = connections.find(chnl);
-        if (it != connections.end()) {
-            ScalabilityProtocolRole * conn = it->second;
-            conn->setMsgOut(msg.str());
-            TRC("Sending request via channel " + chnl);
-            TRC("with message: " + msg.str());
-        }
+    if (iteration == 1) { // Request session id
+        // Create message and send
+        body["cmd"] = CmdSession;
     }
+
+    if ((iteration % 10) == 0) { // Request states
+        // Create message and send
+        body["cmd"] = CmdStates;
+    }
+
+    msg.buildBody(body);
+    send(ChnlHMICmd, msg.str());
+
 }
 
 //----------------------------------------------------------------------
@@ -111,7 +110,6 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     std::string cmd = msg.body["cmd"].asString();
     TRC("MSG: " + m);
     if (cmd == CmdStates) {
-
         cfg.nodeStates.clear();
         json & mp = msg.body["states"];
         Json::Value::iterator it = mp.begin();
@@ -124,7 +122,11 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             ++it;
         }
         cfg.nodeStates["QPFHMI"] = getStateName(getState());
-
+    } else if (cmd == CmdSession) {
+        std::string sessId = msg.body["sessionId"].asString();
+        if (sessId != cfg.sessionId) {
+            cfg.synchronizeSessionId(sessId);
+        }
     }
 }
 

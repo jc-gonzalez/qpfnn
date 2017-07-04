@@ -203,12 +203,20 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             states[kv.first] = kv.second;
         }
         body["states"] = states;
-        msg.buildBody(body);
-        c->setMsgOut(msg.str());
-        TRC("Sending answer via channel " + ChnlHMICmd);
-        TRC("with message: " + msg.str());
-
+    } else if (cmd == CmdSession) {
+        // Create message and send
+        MsgBodyCMD body;
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "*",
+                     "", "", "");
+        body["cmd"] = CmdSession;
+        body["session"] = cfg.sessionId;
     }
+
+    msg.buildBody(body);
+    c->setMsgOut(msg.str());
+    TRC("Sending answer via channel " + ChnlHMICmd);
+    TRC("with message: " + msg.str());
 }
 
 //----------------------------------------------------------------------

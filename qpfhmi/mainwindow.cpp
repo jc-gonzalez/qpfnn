@@ -410,7 +410,7 @@ void MainWindow::readConfig(QString dbUrl)
     }
 
 
-    Log::setLogBaseDir(Config::PATHSession);
+    Log::setLogBaseDir(Config::PATHLog);
 
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
     cfg.general["lastAccess"] = lastAccess.toStdString();

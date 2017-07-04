@@ -272,6 +272,23 @@ void Component::step()
 }
 
 //----------------------------------------------------------------------
+// Method: send
+//----------------------------------------------------------------------
+void Component::send(ChannelDescriptor chnl, MessageString m)
+{
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator
+        it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(m);
+        TRC("Sending request via channel " + chnl);
+        TRC("with message: '" + m + "'");
+    } else {
+        WarnMsg("Couldn't send message via channel " + chnl);
+    }
+}
+
+//----------------------------------------------------------------------
 // Method: run
 //----------------------------------------------------------------------
 void Component::run()
