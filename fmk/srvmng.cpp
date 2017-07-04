@@ -100,17 +100,12 @@ bool ServiceMng::initSwarmManager(std::string & addr)
         // }
     }
 
-    line = str::ltrim(lines.at(lines.size() - 4), " \t");
-    std::cerr << line;
-    std::stringstream out(line);
-    out >> managerConnectAddr;
-    line = str::ltrim(lines.at(lines.size() - 5), " \t");
-    std::cerr << line;
-    out.str(line);
-    std::string tokenOpt;
-    out >> tokenOpt >> workerToken;
+    managerConnectAddr = str::trim(lines.at(lines.size() - 4), " \t");
+    std::vector<std::string> tokens;
+    tokens = str::split(str::ltrim(lines.at(lines.size() - 5), " \t"), ' ');
+    workerToken = tokens.at(1);
 
-    std::cerr << managerConnectAddr << " -- " << tokenOpt << "+" << workerToken << "\n";
+    std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
 
     std::cerr << code << "\n";
 
