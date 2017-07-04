@@ -104,12 +104,16 @@ void TskAge::fromRunningToOperational()
         maxWaitingCycles        = 20;
         idleCyclesBeforeRequest = 30;
 
+        TRC("Agent Mode: CONTAINER");
+
     } else {
 
         // Create list of workers
         srvWorkers = cfg.network.serviceNodes();
         srvManager = srvWorkers.at(0);
         srvWorkers.erase(srvWorkers.begin());
+
+        TRC("Agent Mode: SERVICE  - " + srvManager);
 
         // Create Service Manager
         dckMng = new ServiceMng(srvManager, srvWorkers);
