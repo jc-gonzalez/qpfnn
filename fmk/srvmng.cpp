@@ -44,6 +44,7 @@
 #include "str.h"
 
 #include <iostream>
+#include <fstream>
 #include <cassert>
 
 ////////////////////////////////////////////////////////////////////////////
@@ -75,24 +76,30 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 {
     std::string line;
     std::vector<std::string> lines;
+    std::string outFile("/tmp/swarm_init.log");
 
     procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
+    procxx::process tee("tee", outFile);
+    tee.read_from(initSwarm);
     initSwarm.exec();
-
-    std::cerr.rdbuf(std::cout.rdbuf());
-
-    while (std::getline(initSwarm.output(), line)) {
-        lines.push_back(line);
-        std::cerr << line << "\n";
-        if (!initSwarm.running() ||
-            !procxx::running(initSwarm.id()) ||
-            !running(initSwarm)) {
-            break;
-        }
-    }
+    tee.exec();
 
     initSwarm.wait();
+    tee.wait();
     int code = initSwarm.code();
+
+    std::ifstream ifs(outFile, std::ifstream::in);
+
+    while (std::getline(ifs, line)) {
+        lines.push_back(line);
+        std::cerr << line << "\n";
+        // if (!initSwarm.running() ||
+        //     !procxx::running(initSwarm.id()) ||
+        //     !running(initSwarm)) {
+        //     break;
+        // }
+    }
+
 
     std::stringstream out(lines.at(lines.size() - 2));
     out >> managerConnectAddr;
