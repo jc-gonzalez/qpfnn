@@ -79,7 +79,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
     initSwarm.exec();
 
-    std::cout.rdbuf(std::cerr.rdbuf());
+    std::cerr.rdbuf(std::cout.rdbuf());
 
     while (std::getline(initSwarm.output(), line)) {
         lines.push_back(line);
@@ -101,6 +101,8 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     out >> tokenOpt >> workerToken;
 
     std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
+
+    std::cerr << code << "\n";
 
     return (code == 0);
 }
