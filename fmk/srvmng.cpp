@@ -107,7 +107,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     std::string tokenOpt;
     out >> tokenOpt >> workerToken;
 
-    std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
+    std::cerr << managerConnectAddr << " -- " << tokenOpt << "+" << workerToken << "\n";
 
     std::cerr << code << "\n";
 
