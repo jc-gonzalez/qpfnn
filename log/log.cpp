@@ -39,8 +39,6 @@
  ******************************************************************************/
 
 #include "log.h"
-//#include "common.h"
-//#include "tools.h"
 
 #include <iostream>
 #include <cassert>

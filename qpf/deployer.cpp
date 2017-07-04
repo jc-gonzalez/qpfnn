@@ -285,7 +285,6 @@ void Deployer::readConfiguration()
         }
     }
     Log::setLogBaseDir(Config::PATHSession);
-
 }
 
 //----------------------------------------------------------------------

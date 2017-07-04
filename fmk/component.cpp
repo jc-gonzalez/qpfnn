@@ -104,7 +104,7 @@ void Component::init(std::string name, std::string addr, Synchronizer * s)
     session      = ConfigurationInfo::data().session;
     */
     // Define log output
-    Log::setLogBaseDir(Config::PATHBase + "/log");
+    //Log::setLogBaseDir(Config::PATHBase + "/log");
     Log::defineLogSystem(compName);
 
     // Define valid state transitions
@@ -376,7 +376,7 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
     } else if (cmd == CmdStates) { // This should be EvtMng
 
         cfg.nodeStates[msg.header.source()] = msg.body["state"].asString();
-        TRC("^^^^" + compName + " received from " + msg.header.source() + " from " + compName);
+        TRC(compName + " received from " + msg.header.source() + " from " + compName);
 
     } else {
 
