@@ -73,11 +73,14 @@ ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
 //----------------------------------------------------------------------
 bool ServiceMng::initSwarmManager(std::string & addr)
 {
+    std::string line;
+    std::vector<std::string> lines;
+
     procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
     initSwarm.exec();
 
-    std::string line;
-    std::vector<std::string> lines;
+    std::cout.rdbuf(std::cerr.rdbuf());
+
     while (std::getline(initSwarm.output(), line)) {
         lines.push_back(line);
         std::cerr << line << "\n";
@@ -87,6 +90,10 @@ bool ServiceMng::initSwarmManager(std::string & addr)
             break;
         }
     }
+
+    initSwarm.wait();
+    int code = initSwarm.code();
+
     std::stringstream out(lines.at(lines.size() - 2));
     out >> managerConnectAddr;
     out.str(lines.at(lines.size() - 3));
@@ -95,8 +102,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 
     std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
 
-    initSwarm.wait();
-    return (initSwarm.code() == 0);
+    return (code == 0);
 }
 
 //----------------------------------------------------------------------
