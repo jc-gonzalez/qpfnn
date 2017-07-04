@@ -186,12 +186,11 @@ void EvtMng::runEachIteration()
 void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyCMD> msg(m);
+    MsgBodyCMD body;
     std::string cmd = msg.body["cmd"].asString();
     TRC("MSG: " + m);
 
-    if (cmd == CmdStates) {
-        // Create message and send
-        MsgBodyCMD body;
+    if (cmd == CmdStates) { // Component states request
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
@@ -203,9 +202,7 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
             states[kv.first] = kv.second;
         }
         body["states"] = states;
-    } else if (cmd == CmdSession) {
-        // Create message and send
-        MsgBodyCMD body;
+    } else if (cmd == CmdSession) { // Session id. request
         msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
                      compName, "*",
                      "", "", "");
