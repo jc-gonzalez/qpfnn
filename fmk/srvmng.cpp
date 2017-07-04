@@ -80,6 +80,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     std::vector<std::string> lines;
     while (std::getline(initSwarm.output(), line)) {
         lines.push_back(line);
+        std::cerr << line << "\n";
         if (!initSwarm.running() ||
             !procxx::running(initSwarm.id()) ||
             !running(initSwarm)) {
