@@ -63,7 +63,7 @@ using Configuration::cfg;
 // Constructor
 //----------------------------------------------------------------------
 HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)
-    : Component(name, addr, s)
+    : Component(name, addr, s), requestQuit(false)
 {
 }
 
@@ -71,7 +71,7 @@ HMIProxy::HMIProxy(const char * name, const char * addr, Synchronizer * s)
 // Constructor
 //----------------------------------------------------------------------
 HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
-    : Component(name, addr, s)
+    : Component(name, addr, s), requestQuit(false)
 {
 }
 
@@ -80,25 +80,35 @@ HMIProxy::HMIProxy(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void HMIProxy::runEachIteration()
 {
-    Message<MsgBodyCMD> msg;
-    MsgBodyCMD body;
-    msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
-                 compName, "*",
-                 "", "", "");
+    bool rqstSessionId = (iteration == 1); // Request session id
+    bool rqstStates    = ((iteration % 10) == 0); // Request states
 
-    if (iteration == 1) { // Request session id
-        // Create message and send
-        body["cmd"] = CmdSession;
+    if (rqstSessionId || rqstStates || requestQuit) {
+
+        Message<MsgBodyCMD> msg;
+        MsgBodyCMD body;
+        msg.buildHdr(ChnlHMICmd, MsgHMICmd, CHNLS_IF_VERSION,
+                     compName, "*",
+                     "", "", "");
+
+        if (rqstSessionId) {
+            // Create message and send
+            body["cmd"] = CmdSession;
+        }
+
+        if (rqstStates) { // Request states
+            // Create message and send
+            body["cmd"] = CmdStates;
+        }
+
+        if (requestQuit) {
+            // Create message and send
+            body["cmd"] = CmdQuit;
+        }
+
+        msg.buildBody(body);
+        send(ChnlHMICmd, msg.str());
     }
-
-    if ((iteration % 10) == 0) { // Request states
-        // Create message and send
-        body["cmd"] = CmdStates;
-    }
-
-    msg.buildBody(body);
-    send(ChnlHMICmd, msg.str());
-
 }
 
 //----------------------------------------------------------------------
@@ -169,6 +179,16 @@ void HMIProxy::log(std::string s, Log::LogLevel lvl)
 {
     LogMsg(lvl, s);
 }
+
+//----------------------------------------------------------------------
+// Method: quit
+// Sends a message to EvtMng requesting the QUIT for all components
+//----------------------------------------------------------------------
+void HMIProxy::quit()
+{
+    requestQuit = true;
+}
+
 
 //----------------------------------------------------------------------
 // Method: sendCmd

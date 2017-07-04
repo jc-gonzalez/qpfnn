@@ -380,7 +380,25 @@ void MainWindow::readConfig(QString dbUrl)
     for (auto & kv : cfg.network.processingNodes()) {
         TRC(kv.first << ": " << kv.second);
     }
-    TRC("Config::PATHBase: " << Config::PATHBase);
+    TRC("Config::PATHBase:    " << Config::PATHBase);
+    TRC("Config::PATHSession: " << Config::PATHSession);
+    TRC("Config::PATHLog:     " << Config::PATHLog);
+
+    std::vector<std::string> runPaths {
+        Config::PATHSession,
+            Config::PATHLog,
+            Config::PATHRlog,
+            Config::PATHTmp,
+            Config::PATHTsk,
+            Config::PATHMsg };
+    for (auto & p : runPaths) {
+        if (mkdir(p.c_str(), Config::PATHMode) != 0) {
+            std::perror(("mkdir " + p).c_str());
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    Log::setLogBaseDir(Config::PATHLog);
 
     putToSettings("lastCfgFile", QVariant(QString::fromStdString(cfg.cfgFileName)));
 
@@ -408,9 +426,6 @@ void MainWindow::readConfig(QString dbUrl)
         }
         ++h;
     }
-
-
-    Log::setLogBaseDir(Config::PATHLog);
 
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
     cfg.general["lastAccess"] = lastAccess.toStdString();
@@ -1014,7 +1029,8 @@ void MainWindow::quitAllQPF()
     if (ret != QMessageBox::Yes) { return; }
 
     IMsg("Sending quit command to EvtMng . . .");
-    hmiNode->sendCmd("EvtMng", "quit", "");
+    hmiNode->quit();
+    //hmiNode->sendCmd("EvtMng", "quit", "");
     //DBManager::addICommand("QUIT");
 
     statusBar()->showMessage(tr("STOP Signal being sent to all elements . . ."),

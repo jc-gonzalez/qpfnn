@@ -77,6 +77,8 @@ EvtMng::EvtMng(std::string name, std::string addr, Synchronizer * s)
 //----------------------------------------------------------------------
 void EvtMng::fromRunningToOperational()
 {
+    requestQuit = false;
+
     // Install DirWatcher at inbox folder
     dw = new DirWatcher(Config::PATHBase + "/data/inbox");
     InfoMsg("DirW2tcher installed at " + Config::PATHBase + "/data/inbox");
@@ -141,7 +143,7 @@ void EvtMng::runEachIteration()
 
     bool sendInit = ((iteration + 1) == 100);
     bool sendPing = ((iteration % 20) == 0);
-    bool sendQuit = (iteration > 1000);
+    bool sendQuit = (iteration > 1000) || requestQuit;
 
     if (sendInit || sendPing || sendQuit) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
@@ -207,7 +209,10 @@ void EvtMng::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
                      compName, "*",
                      "", "", "");
         body["cmd"] = CmdSession;
-        body["session"] = cfg.sessionId;
+        body["sessionId"] = cfg.sessionId;
+    } else if (cmd == CmdQuit) { // Session id. request
+        requestQuit = true;
+        return;
     }
 
     msg.buildBody(body);

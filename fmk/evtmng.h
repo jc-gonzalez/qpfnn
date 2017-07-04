@@ -117,5 +117,7 @@ private:
     DirWatcher * dw;
 
     std::map<std::string, json> elements;
+
+    bool requestQuit;
 };
 #endif

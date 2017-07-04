@@ -116,6 +116,12 @@ public:
     //----------------------------------------------------------------------
     std::map<std::string, std::string> getNodeStates();
 
+    //----------------------------------------------------------------------
+    // Method: quit
+    // Sends a message to EvtMng requesting the QUIT for all components
+    //----------------------------------------------------------------------
+    void quit();
+
 protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
@@ -137,6 +143,9 @@ protected:
     // Method: processFmkMonMsg
     //----------------------------------------------------------------------
     virtual void processFmkMonMsg(ScalabilityProtocolRole* c, MessageString & m);
+
+private:
+    bool requestQuit;
 };
 
 //}
