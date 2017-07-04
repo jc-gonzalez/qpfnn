@@ -136,7 +136,10 @@ private:
 private:
     std::string managerAddr;
     std::vector<std::string> workerAddrs;
+
+    std::string managerConnectAddr;
     std::string workerToken;
+
 };
 
 //}

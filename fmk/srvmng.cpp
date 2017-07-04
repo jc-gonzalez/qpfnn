@@ -43,6 +43,7 @@
 #include "process.h"
 #include "str.h"
 
+#include <iostream>
 #include <cassert>
 
 ////////////////////////////////////////////////////////////////////////////
@@ -74,6 +75,25 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 {
     procxx::process initSwarm("docker", "swarm", "init", "--advertise-addr", addr);
     initSwarm.exec();
+
+    std::string line;
+    std::vector<std::string> lines;
+    while (std::getline(initSwarm.output(), line)) {
+        lines.push_back(line);
+        if (!initSwarm.running() ||
+            !procxx::running(initSwarm.id()) ||
+            !running(initSwarm)) {
+            break;
+        }
+    }
+    std::stringstream out(lines.at(lines.size() - 2));
+    out >> managerConnectAddr;
+    out.str(lines.at(lines.size() - 3));
+    std::string tokenOpt;
+    out >> tokenOpt >> workerToken;
+
+    std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
+
     initSwarm.wait();
     return (initSwarm.code() == 0);
 }
@@ -85,8 +105,8 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 bool ServiceMng::initSwarmWorker(std::string & addr)
 {
     procxx::process initWorker("ssh", "-Y", "-C", "-l", "eucops", addr,
-                               "docker", "swarm", "init",
-                               "--advertise-addr", addr);
+                               "docker", "swarm", "join",
+                               "--token", workerToken, managerConnectAddr);
     initWorker.exec();
     initWorker.wait();
     return (initWorker.code() == 0);
@@ -166,7 +186,7 @@ bool ServiceMng::kill(std::string srv)
 bool ServiceMng::leaveSwarm(std::string & addr)
 {
     if (addr == managerAddr) {
-        procxx::process swrmLeave("docker", "swarm", "leave");
+        procxx::process swrmLeave("docker", "swarm", "leave", "--force");
         swrmLeave.exec();
         swrmLeave.wait();
         return (swrmLeave.code() == 0);
