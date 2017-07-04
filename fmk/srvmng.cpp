@@ -100,10 +100,13 @@ bool ServiceMng::initSwarmManager(std::string & addr)
         // }
     }
 
-
-    std::stringstream out(lines.at(lines.size() - 4));
+    line = lines.at(lines.size() - 4);
+    std::cerr << line;
+    std::stringstream out(line);
     out >> managerConnectAddr;
-    out.str(lines.at(lines.size() - 5));
+    line = lines.at(lines.size() - 5);
+    std::cerr << line;
+    out.str(line);
     std::string tokenOpt;
     out >> tokenOpt >> workerToken;
 
