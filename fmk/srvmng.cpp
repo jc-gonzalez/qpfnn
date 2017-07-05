@@ -135,6 +135,7 @@ bool ServiceMng::createService(std::string srv, std::string img, int numScale,
 {
     procxx::process srvCreate("docker", "service", "create",
                               "--replicas", str::toStr<int>(numScale),
+                              "--name", srv, img,
                               exe);
     for (auto & a : args) { srvCreate.add_argument(a); }
     srvCreate.exec();

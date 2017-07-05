@@ -118,6 +118,15 @@ void TskAge::fromRunningToOperational()
         // Create Service Manager
         dckMng = new ServiceMng(srvManager, srvWorkers);
 
+        if (serviceInfo == 0) {
+            serviceInfo = new ServiceInfo;
+            serviceInfo->service    = "helloworld";
+            serviceInfo->serviceImg = "alpine";
+            serviceInfo->scale      = 10;
+            serviceInfo->exe        = "ping";
+            serviceInfo->args.push_back("docker.com");
+        }
+
         // Create Service
         dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
                               serviceInfo->scale,
@@ -209,36 +218,12 @@ void TskAge::runEachIterationForContainers()
         break;
     }
 
-    // Every 10 iterations, check if this is the first agent in the
+    // Every N iterations, check if this is the first agent in the
     // host, and if it is update the hostInfo structure, and send it
     // to the TskMng
     if ((iteration % 20) == 0) {
         if (compName.substr(compName.size() - 3) == "_01") {
-            // Update host information
-            hostInfo.update();
-
-            // Prepare message and send it
-            // Define and set task object
-            Message<MsgBodyTSK> msg;
-            MsgBodyTSK & body = msg.body;
-
-            JValue hostInfoValue(hostInfo.toJsonStr());
-            DBG(hostInfo.toJsonStr());
-            body["info"] = hostInfoValue.val();
-
-            msg.buildHdr(ChnlTskProc, MsgHostMon, CHNLS_IF_VERSION,
-                         compName, "TskMng",
-                         "", "", "");
-            msg.buildBody(body);
-
-            // Send msg
-            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-            std::string chnl(ChnlTskProc + "_" + compName);
-            it = connections.find(chnl);
-            if (it != connections.end()) {
-                ScalabilityProtocolRole * conn = it->second;
-                conn->setMsgOut(msg.str());
-            }
+            sendHostInfoUpdate();
         }
     }
 }
@@ -248,6 +233,12 @@ void TskAge::runEachIterationForContainers()
 //----------------------------------------------------------------------
 void TskAge::runEachIterationForServices()
 {
+    // Every N iterations, check if this is the first agent in the
+    // host, and if it is update the hostInfo structure, and send it
+    // to the TskMng
+    if ((iteration % 20) == 0) {
+        sendHostInfoUpdate();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -461,6 +452,38 @@ void TskAge::retrieveOutputProducts()
         }
         task.outputs.products.push_back(m);
         task["outputs"][i] = m.val();
+    }
+}
+
+//----------------------------------------------------------------------
+// Method: sendHostInfoUpdate
+//----------------------------------------------------------------------
+void TskAge::sendHostInfoUpdate()
+{
+    // Update host information
+    hostInfo.update();
+
+    // Prepare message and send it
+    // Define and set task object
+    Message<MsgBodyTSK> msg;
+    MsgBodyTSK & body = msg.body;
+
+    JValue hostInfoValue(hostInfo.toJsonStr());
+    DBG(hostInfo.toJsonStr());
+    body["info"] = hostInfoValue.val();
+
+    msg.buildHdr(ChnlTskProc, MsgHostMon, CHNLS_IF_VERSION,
+                 compName, "TskMng",
+                 "", "", "");
+    msg.buildBody(body);
+
+    // Send msg
+    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
+    std::string chnl(ChnlTskProc + "_" + compName);
+    it = connections.find(chnl);
+    if (it != connections.end()) {
+        ScalabilityProtocolRole * conn = it->second;
+        conn->setMsgOut(msg.str());
     }
 }
 

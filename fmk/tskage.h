@@ -106,6 +106,15 @@ public:
            AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
 
 protected:
+
+#undef T
+#define TLIST_PSTATUS T(IDLE), T(WAITING), T(PROCESSING), T(FINISHING)
+
+#define T(x) x
+    enum ProcStatus { TLIST_PSTATUS };
+#undef T
+    static const std::string ProcStatusName[];
+
     //----------------------------------------------------------------------
     // Method: fromRunningToOperational
     //----------------------------------------------------------------------
@@ -116,16 +125,6 @@ protected:
     //----------------------------------------------------------------------
     virtual void runEachIteration();
 
-protected:
-#undef T
-#define TLIST_PSTATUS T(IDLE), T(WAITING), T(PROCESSING), T(FINISHING)
-
-#define T(x) x
-    enum ProcStatus { TLIST_PSTATUS };
-#undef T
-    static const std::string ProcStatusName[];
-
-protected:
     //----------------------------------------------------------------------
     // Method: processTskProcMsg
     //----------------------------------------------------------------------
@@ -151,6 +150,11 @@ private:
     // Method: retrieveOutputProducts
     //----------------------------------------------------------------------
     void retrieveOutputProducts();
+
+    //----------------------------------------------------------------------
+    // Method: sendHostInfoUpdate
+    //----------------------------------------------------------------------
+    void sendHostInfoUpdate();
 
     Property(TskAge, std::string, workDir, WorkDir);
     Property(TskAge, std::string, sysDir,  SysDir);
