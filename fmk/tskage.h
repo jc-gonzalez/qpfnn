@@ -97,13 +97,17 @@ public:
     // Constructor
     //----------------------------------------------------------------------
     TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+           AgentMode mode = TskAge::CONTAINER,
+           const std::vector<std::string> & nds = std::vector<std::string>(),
+           ServiceInfo * srvInfo = 0);
 
     //----------------------------------------------------------------------
     // Constructor
     //----------------------------------------------------------------------
     TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER, ServiceInfo * srvInfo = 0);
+           AgentMode mode = TskAge::CONTAINER,
+           const std::vector<std::string> & nds = std::vector<std::string>(),
+           ServiceInfo * srvInfo = 0);
 
 protected:
 
@@ -167,7 +171,7 @@ private:
 
     ServiceInfo *            serviceInfo;
     std::string              srvManager;
-    std::vector<std::string> srvWorkers;
+    std::vector<std::string> nodes;
 
     std::string              containerId;
 

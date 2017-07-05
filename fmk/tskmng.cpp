@@ -106,7 +106,7 @@ void TskMng::fromRunningToOperational()
     // provide data files only if we do really need it (swarm services)
     httpSrv = new HttpServer("httpSrv",
                              "cfg.network.httpServerAddress()",
-                             cfg.network.serviceNodes().size() > 0);
+                             cfg.network.swarms().size() > 0);
 
     // Deactivate sending ProcessingFrameworkInfo updates
     sendingPeriodicFmkInfo = false;

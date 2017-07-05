@@ -81,6 +81,29 @@ public:
 };
 
 //==========================================================================
+// Class: CfgGrpSwarm
+//==========================================================================
+class CfgGrpSwarm : public JRecord {
+public:
+    CfgGrpSwarm() {}
+    CfgGrpSwarm(json v) : JRecord(v) {}
+    virtual void dump() {
+        DUMPJSTRVEC(serviceNodes);
+        DUMPJINT(scale);
+        DUMPJSTR(name);
+        DUMPJSTR(image);
+        DUMPJSTR(exec);
+        DUMPJSTRVEC(args);
+    }
+    JSTRVEC(serviceNodes);
+    JINT(scale);
+    JSTR(name);
+    JSTR(image);
+    JSTR(exec);
+    JSTRVEC(args);
+};
+
+//==========================================================================
 // Class: CfgGrpNetwork
 //==========================================================================
 class CfgGrpNetwork : public JRecord {
@@ -91,13 +114,12 @@ public:
         DUMPJSTR(masterNode);
         DUMPJINT(startingPort);
         DUMPJSTRINTMAP(processingNodes);
-        DUMPJSTRVEC(serviceNodes);
+        DUMPJSTRGRPMAP(CfgGrpSwarm, swarms);
     }
     JSTR(masterNode);
     JINT(startingPort);
     JSTRINTMAP(processingNodes);
-    JSTRVEC(serviceNodes);
-    JINT(serviceScale);
+    JSTRGRPMAP(CfgGrpSwarm, swarms);
 };
 
 //==========================================================================

@@ -73,8 +73,9 @@ const std::string TskAge::ProcStatusName[] { TLIST_PSTATUS };
 // Constructor
 //----------------------------------------------------------------------
 TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
-               AgentMode mode, ServiceInfo * srvInfo)
-    : Component(name, addr, s), remote(true), agentMode(mode),
+               AgentMode mode, const std::vector<std::string> & nds,
+               ServiceInfo * srvInfo)
+    : Component(name, addr, s), remote(true), agentMode(mode), nodes(nds),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
 }
@@ -83,8 +84,9 @@ TskAge::TskAge(const char * name, const char * addr, Synchronizer * s,
 // Constructor
 //----------------------------------------------------------------------
 TskAge::TskAge(std::string name, std::string addr, Synchronizer * s,
-               AgentMode mode, ServiceInfo * srvInfo)
-    : Component(name, addr, s), remote(true), agentMode(mode),
+               AgentMode mode, const std::vector<std::string> & nds,
+               ServiceInfo * srvInfo)
+    : Component(name, addr, s), remote(true), agentMode(mode), nodes(nds),
       pStatus(IDLE), serviceInfo(srvInfo)
 {
 }
@@ -100,7 +102,7 @@ void TskAge::fromRunningToOperational()
         dckMng = new ContainerMng;
 
         // Set parameters for requesting tasks and waiting
-        idleCycles              = 0;
+        idleCycles              =  0;
         maxWaitingCycles        = 20;
         idleCyclesBeforeRequest = 30;
 
@@ -109,28 +111,20 @@ void TskAge::fromRunningToOperational()
     } else {
 
         // Create list of workers
-        srvWorkers = cfg.network.serviceNodes();
-        srvManager = srvWorkers.at(0);
-        srvWorkers.erase(srvWorkers.begin());
+        srvManager = nodes.at(0);
+        nodes.erase(nodes.begin());
 
         TRC("Agent Mode: SERVICE  - " + srvManager);
 
         // Create Service Manager
-        dckMng = new ServiceMng(srvManager, srvWorkers);
+        dckMng = new ServiceMng(srvManager, nodes);
 
-        if (serviceInfo == 0) {
-            serviceInfo = new ServiceInfo;
-            serviceInfo->service    = "helloworld";
-            serviceInfo->serviceImg = "alpine";
-            serviceInfo->scale      = 10;
-            serviceInfo->exe        = "ping";
-            serviceInfo->args.push_back("docker.com");
+        if (serviceInfo != 0) {
+            // Create Service
+            dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
+                                 serviceInfo->scale,
+                                 serviceInfo->exe, serviceInfo->args);
         }
-
-        // Create Service
-        dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
-                              serviceInfo->scale,
-                              serviceInfo->exe, serviceInfo->args);
     }
 
     numTask = 0;

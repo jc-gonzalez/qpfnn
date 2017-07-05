@@ -493,13 +493,26 @@ void Deployer::createElementsNetwork()
         //    current host is the first in the list (Swam Manager)
         //-----------------------------------------------------------------
 
-        if (cfg.network.serviceNodes().size() > 0) {
-            if (thisHost == cfg.network.serviceNodes().at(0)) {
-                sprintf(sAgName, "TskAgentSwarm");
-                ag.push_back(new TskAge(sAgName, thisHost, &synchro, TskAge::SERVICE));
-                cfg.agentNames.push_back(sAgName);
-                agName.push_back(std::string(sAgName));
-                agPortTsk.push_back(portnum(startingPort + 10, h, 0));
+        for (auto & it : cfg.network.swarms()) {
+            CfgGrpSwarm & swrm = it.second;
+            if (swrm.serviceNodes().size() > 0) {
+                if (thisHost == swrm.serviceNodes().at(0)) {
+                    TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
+                    serviceInfo->service    = swrm.name();
+                    serviceInfo->serviceImg = swrm.image();
+                    serviceInfo->scale      = swrm.scale();
+                    serviceInfo->exe        = swrm.exec();
+                    for (auto & a: swrm.args()) {
+                        serviceInfo->args.push_back(a);
+                    }
+                    sprintf(sAgName, "Swarm_%s", serviceInfo->service.c_str());
+                    ag.push_back(new TskAge(sAgName, thisHost, &synchro,
+                                            TskAge::SERVICE, swrm.serviceNodes(),
+                                            serviceInfo));
+                    cfg.agentNames.push_back(sAgName);
+                    agName.push_back(std::string(sAgName));
+                    agPortTsk.push_back(portnum(startingPort + 10, h, 0));
+                }
             }
         }
 

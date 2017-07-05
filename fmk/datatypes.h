@@ -119,22 +119,29 @@ typedef Json::Value  json;
 #define JSTRVEC(e) std::vector<std::string> e () {                      \
         json arr = value[ #e ];                                         \
         std::vector<std::string> a;                                     \
-        for (int i = 0; i < arr.size(); ++i) {                          \
+        for (int i = 0; i < arr.size(); ++i) {                           \
             a.push_back(arr[i].asString()); }                           \
         return a; }
 #define JSTRINTMAP(e) std::map<std::string, int> e () {                 \
         json mp = value[ #e ];                                          \
         std::map<std::string, int> m;                                   \
         Json::Value::iterator it = mp.begin();                          \
-        while (it != mp.end()) {                                        \
-            m[it.key().asString()] = (int)((*it).asInt()); ++it; }      \
+        while (it != mp.end()) {                                         \
+            m[it.key().asString()] = (int)((*it).asInt()); ++it; }       \
         return m; }
 #define JSTRSTRMAP(e) std::map<std::string, std::string> e () {         \
         json mp = value[ #e ];                                          \
         std::map<std::string, std::string> m;                           \
         Json::Value::iterator it = mp.begin();                          \
-        while (it != mp.end()) {                                        \
-            m[it.key().asString()] = ((*it).asString()); ++it; }   \
+        while (it != mp.end()) {                                         \
+            m[it.key().asString()] = ((*it).asString()); ++it; }         \
+        return m; }
+#define JSTRGRPMAP(g,e) std::map<std::string, g> e () {                 \
+        json mp = value[ #e ];                                          \
+        std::map<std::string, g> m;                                     \
+        Json::Value::iterator it = mp.begin();                          \
+        while (it != mp.end()) {                                         \
+            m[it.key().asString()] = g(*it); ++it; }                     \
         return m; }
 
 #define JOBJ(e) json  e () { return value[ #e ]; }
@@ -156,27 +163,36 @@ typedef Json::Value  json;
 #define DUMPJDLBIDX(i,e) std::cerr << #e << ": " << value[i][ #e ].asDouble() << std::endl;
 
 #define DUMPJSTRVEC(e) do {                                             \
-        std::cerr << #e << ": [" << std::endl;                          \
-        for (int i = 0; i < value[ #e ].size(); ++i) {                  \
+        std::cerr << #e << ": [" << std::endl;                             \
+        for (int i = 0; i < value[ #e ].size(); ++i) {                   \
             std::cerr << "\t'" << value[ #e ][i].asString() << "'\n"; }    \
         std::cerr << "]" << std::endl; } while(0)
 #define DUMPJSTRINTMAP(e) do {                                          \
         json mp = value[ #e ];                                          \
         Json::Value::iterator it = mp.begin();                          \
-        std::cerr << #e << ": {" << std::endl;                          \
-        while (it != mp.end()) {                                        \
-            std::cerr << '\t' << it.key().asString()                    \
-                      << ": " << (int)((*it).asInt()) << "\n";          \
-            ++it; }                                                     \
+        std::cerr << #e << ": {" << std::endl;                             \
+        while (it != mp.end()) {                                         \
+            std::cerr << '\t' << it.key().asString()                      \
+                      << ": " << (int)((*it).asInt()) << "\n";             \
+            ++it; }                                                      \
         std::cerr << "}" << std::endl; } while(0)
 #define DUMPJSTRSTRMAP(e) do {                                          \
         json mp = value[ #e ];                                          \
         Json::Value::iterator it = mp.begin();                          \
-        std::cerr << #e << ": {" << std::endl;                          \
-        while (it != mp.end()) {                                        \
-            std::cerr << '\t' << it.key().asString()                    \
-                      << ": '" << ((*it).asString()) << "'\n";          \
-            ++it; }                                                     \
+        std::cerr << #e << ": {" << std::endl;                             \
+        while (it != mp.end()) {                                         \
+            std::cerr << '\t' << it.key().asString()                      \
+                      << ": '" << ((*it).asString()) << "'\n";             \
+            ++it; }                                                      \
+        std::cerr << "}" << std::endl; } while(0)
+#define DUMPJSTRGRPMAP(g,e) do {                                \
+        json mp = value[ #e ];                                  \
+        Json::Value::iterator it = mp.begin();                  \
+        std::cerr << #e << ": {" << std::endl;                      \
+        while (it != mp.end()) {                                  \
+            std::cerr << '\t' << it.key().asString() << ":\n";      \
+            g(*it).dump();                                       \
+            ++it; }                                               \
         std::cerr << "}" << std::endl; } while(0)
 
 class JValue {
