@@ -18,6 +18,7 @@ set (libnncomm_hdr
   err.h
   fast.h
   bus.h
+  pair.h
   pipeline.h
   pubsub.h
   reqrep.h
@@ -31,6 +32,7 @@ set (libnncomm_src
   dbg.cpp
   scalprotrole.cpp
   bus.cpp
+  pair.cpp
   pipeline.cpp
   pubsub.cpp
   reqrep.cpp

@@ -1,16 +1,15 @@
 #!/usr/bin/env python
-# -*- coding: ascii -*-
 
 """
 runContainer.py
 
 This module is an example of a wrapper for a Pythoon script/application,
 in change of retrieving information from the Docker Swarm Manager, so that
-the script can be used as a service.  If address is not provided, then the 
-tag option is expected, and the wrapped script is executed in a normal 
+the script can be used as a service.  If address is not provided, then the
+tag option is expected, and the wrapped script is executed in a normal
 container.
 
-The communication is done using a nanomsg REQ-REP connection, and the 
+The communication is done using a nanomsg REQ-REP connection, and the
 script retrieves (in addition and prior to the true script arguments) the
 command options --address, that provides the address where the wrapper is
 to request the next bunch of data to process.
@@ -29,7 +28,7 @@ $ docker run -it -v /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2:/tsk/proc \
       python /tsk/runService.py \
           tag: 20180511T120323 \
           session_dir: /tmp/qpf/run/SESSIONID/tsk/ \
-          processor: /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2/testsrv_driver.py 
+          processor: /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2/testsrv_driver.py
 
 An example of this script being used to create a swarm service would be:
 
@@ -39,7 +38,7 @@ $ docker run -it -v /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2:/tsk/proc \
       python /tsk/runService.py \
           address: 134.23.87.67:5432 \
           session_dir: /tmp/qpf/run/SESSIONID/tsk/ \
-          processor: /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2/testsrv_driver.py 
+          processor: /Users/jcgonzalez/ws/QPFnn/run/pth1/pth2/testsrv_driver.py
 
 """
 
@@ -71,14 +70,14 @@ service_data = {
 @contextlib.contextmanager
 def parse_command_line():
     """Parses command line
-    
+
     This function parses the command line and removes the command line options
-    address:, session_dir: and processor:, that are used exclusively by this script.  
+    address:, session_dir: and processor:, that are used exclusively by this script.
     It yields the modified arguments list to be passed on to the actual service
     application code, and upon completion the arguments are restored.
     """
     global service_data
-    
+
     num_of_args = len(sys.argv)
     if num_of_args < 6:
         print('Usage:  runService.py session_dir: <path> processor: <script.py> '
@@ -88,7 +87,7 @@ def parse_command_line():
               + 'assumed it works as a service, and requests data to the Task '
               + 'Manager via REQ-REP protocol layer.')
         exit(0)
-        
+
     new_args = []
     xr = iter(xrange(num_of_args))
     for i in xr:
@@ -128,7 +127,7 @@ def request_data_and_get_ack(addr, input_path):
     the directory where these data should be placed.  The Task Manager will store the
     data to be processed into that directory, and will answer the request message, in
     order to trigger the service execution start.
-    
+
     Args:
         addr       (str): The address to connect to the Task Manager (IP:PORT)
         input_path (str): Directory where the input data should be stored
@@ -138,26 +137,26 @@ def request_data_and_get_ack(addr, input_path):
     """
     print('address: {}.  input_path: {}'.format(addr, input_path))
     return True
-    
+
     # Create connection and message strings
     conn_addr = 'tcp://' + addr
     msg = b'SERVICE_DATA_REQUEST|input_path={0}'.format(input_path)
-    
+
     with Socket(REQ) as sck:
         # Open connection to REQ-REEP protocol layer
         sck.connect(conn_addr)
         # Send message
-        sck.send(msg)    
+        sck.send(msg)
         # Wait for answer from Task Manager
         ans = sck.recv()
-        
+
     answer = ans.startswith('SERVICE_DATA_ACK', beg=0, end=15)
     return answer
 
-    
+
 def main():
     """Main function
-    
+
     Parses command line arguments, send data request to Task Manager, and starts
     actual wrapped functionality (QDT) in case the data and acknowledge message
     was received back from the manager.
@@ -167,7 +166,7 @@ def main():
         # Define operation mode
         addr = service_data['address']
         run_as_service = addr != None
-        
+
         # Create service specific folder to store input/output data
         if run_as_service:
             tag_date = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
@@ -178,12 +177,12 @@ def main():
         srv_dir_out = '/tsk/' + tag_date + '/out/'
         mkdir_p(srv_dir_in)
         mkdir_p(srv_dir_out)
-        
+
         # Get wrapped module name (driver?)
         module_name = os.path.splitext(os.path.basename(service_data['processor']))[0]
         sys.path.append('/tsk/proc')
         proc_module = __import__(module_name)
-        
+
         # Run the underlying (wrapped) script, requesting data just if executed as
         # a service
         if (not run_as_service) or request_data_and_get_ack(addr, host_dir_in):
