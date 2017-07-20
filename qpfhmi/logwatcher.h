@@ -53,6 +53,7 @@ class LogWatcher : public QObject
 
 public:
   LogWatcher(TextView * txtVw, int lines = 100);
+  ~LogWatcher();
 
   void setFile(QString s);
   QString getFile();

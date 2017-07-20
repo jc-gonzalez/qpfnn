@@ -122,6 +122,12 @@ public:
     //----------------------------------------------------------------------
     void quit();
 
+    //----------------------------------------------------------------------
+    // Method: declareParentConnection
+    //----------------------------------------------------------------------
+    void declareParentConnection(void (*fptr)(void*,std::string,std::string),
+                                 void * context);
+    
 protected:
     //----------------------------------------------------------------------
     // Method: runEachIteration
@@ -146,6 +152,9 @@ protected:
 
 private:
     bool requestQuit;
+
+    void (*doInParent)(void *,std::string,std::string);
+    void * parent;
 };
 
 //}

@@ -118,7 +118,6 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     Message<MsgBodyCMD> msg(m);
     std::string cmd = msg.body["cmd"].asString();
-    TRC("MSG: " + m);
     if (cmd == CmdStates) {
         cfg.nodeStates.clear();
         json & mp = msg.body["states"];
@@ -135,7 +134,8 @@ void HMIProxy::processHMICmdMsg(ScalabilityProtocolRole* c, MessageString & m)
     } else if (cmd == CmdSession) {
         std::string sessId = msg.body["sessionId"].asString();
         if (sessId != cfg.sessionId) {
-            cfg.synchronizeSessionId(sessId);
+            InfoMsg("Trying to monitor folder for master session id " + sessId);
+            doInParent(parent, "linkSessionLogs", sessId);
         }
     }
 }
@@ -221,6 +221,16 @@ void HMIProxy::sendNewCfgInfo()
 std::map<std::string, std::string> HMIProxy::getNodeStates()
 {
     return cfg.nodeStates;
+}
+
+//----------------------------------------------------------------------
+// Method: declareParentConnection
+//----------------------------------------------------------------------
+void HMIProxy::declareParentConnection(void (*fptr)(void*,std::string,std::string),
+                                       void * context)
+{
+    doInParent = fptr;
+    parent     = context;
 }
 
 //}

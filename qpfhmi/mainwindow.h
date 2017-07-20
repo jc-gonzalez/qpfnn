@@ -104,6 +104,8 @@ public:
                         QWidget *parent = 0);
     ~MainWindow();
 
+    void commandFromHMIPxy(std::string command, std::string arg);
+    
 protected:
     void manualSetupUI();
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
@@ -215,7 +217,10 @@ private:
     void getProductsInFolder(QString & path, QStringList & files, bool recursive = true);
 
     void init();
+    void clearMDIArea();    
     void setLogWatch();
+    void addPathToLogWatch(QString & logDir);
+    
     void handleFinishedHMI();
     QString getState();
     void showState();
@@ -358,6 +363,8 @@ private:
 
     bool isProductsCustomFilterActive;
     bool isAlertsCustomFilterActive;
+
+     QString newPathToWatch;
 };
 
 }

@@ -43,6 +43,8 @@
 #include <QDebug>
 #include <memory>
 
+#include <unistd.h>
+
 namespace QPF {
 
 LogWatcher::LogWatcher(TextView * txtVw, int lines)
@@ -52,6 +54,14 @@ LogWatcher::LogWatcher(TextView * txtVw, int lines)
 
   connect(fsWatcher, SIGNAL(fileChanged(const QString &)),
 	  this, SLOT(updateLogView(const QString &)));
+}
+
+LogWatcher::~LogWatcher()
+{
+  foreach (QString s, fsWatcher->directories()) {
+      unlink(s.toStdString().c_str());
+  }
+  delete fsWatcher;
 }
 
 void LogWatcher::setFile(QString s)

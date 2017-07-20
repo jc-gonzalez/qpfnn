@@ -144,6 +144,7 @@ void Config::synchronizeSessionId(std::string newId)
     std::string newPATHSession(PATHRun + "/" + newId);
 
     if (rename(PATHSession.c_str(), newPATHSession.c_str()) != 0) {
+        perror("Change sessionId");
         TRC("Cannot rename PATHSession from " + PATHSession +
             " to " + newPATHSession);
         WarnMsg("Cannot rename PATHSession from " + PATHSession +

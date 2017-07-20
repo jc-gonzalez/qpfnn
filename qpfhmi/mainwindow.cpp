@@ -129,6 +129,11 @@ const std::string MainWindow::INITIALISED_StateName("INITIALISED");
 const std::string MainWindow::RUNNING_StateName("RUNNING");
 const std::string MainWindow::OPERATIONAL_StateName("OPERATIONAL");
 
+    void fwdCommandFromHMIPxy(void* context, std::string cmd, std::string arg) {
+        static_cast<MainWindow*>(context)->commandFromHMIPxy(cmd, arg);
+}
+
+
 //----------------------------------------------------------------------
 // Constructor
 //----------------------------------------------------------------------
@@ -197,6 +202,9 @@ MainWindow::MainWindow(QString url, QString sessionName,
     QTimer * updateSystemViewTimer = new QTimer(this);
     connect(updateSystemViewTimer, SIGNAL(timeout()), this, SLOT(updateSystemView()));
     updateSystemViewTimer->start(1000);
+
+    //== Set log file watchers ========================================
+    setLogWatch();
 }
 
 //----------------------------------------------------------------------
@@ -292,10 +300,6 @@ void MainWindow::manualSetupUI()
 
     connect(ui->lstwdgNav, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(showSelectedInNav(QListWidgetItem*)));
-
-    //== Set log file watchers ========================================
-
-    setLogWatch();
 
     //== Setup views ==================================================
 
@@ -1109,6 +1113,7 @@ void MainWindow::init()
     // a. Create HMI node element
     //-----------------------------------------------------------------
     hmiNode = new HMIProxy("HMIProxy", masterAddress.toStdString(), &synchro);
+    hmiNode->declareParentConnection(fwdCommandFromHMIPxy, (void*)(this));
 
     //-----------------------------------------------------------------
     // b. Create component connections
@@ -1144,13 +1149,10 @@ void MainWindow::init()
 }
 
 //----------------------------------------------------------------------
-// METHOD: setLogWatch
+// METHOD: clearMDIArea
 //----------------------------------------------------------------------
-void MainWindow::setLogWatch()
+void MainWindow::clearMDIArea()
 {
-    statusBar()->showMessage(tr("Establishing log monitoring capture..."),
-                             MessageDelay);
-
     // Clear MDI area
     QList<QMdiSubWindow *> swList = ui->mdiArea->subWindowList();
     for (int i = swList.count() - 1; i >= 0; --i) {
@@ -1158,47 +1160,66 @@ void MainWindow::setLogWatch()
         ui->mdiArea->removeSubWindow(w);
         delete w;
     }
-    nodeLogs.clear();
+}
 
+//----------------------------------------------------------------------
+// METHOD: setLogWatch
+//----------------------------------------------------------------------
+void MainWindow::setLogWatch()
+{
+    statusBar()->showMessage(tr("Establishing log monitoring capture..."),
+                             MessageDelay);
+
+    clearMDIArea();
+    nodeLogs.clear();
+   
     // Get all log files from each log dir (log & rlog), and create a
     // MDI with the log viewer for each of them
+    QString     logDir(QString::fromStdString(Log::getLogBaseDir()));
+
+    addPathToLogWatch(logDir);
+}
+
+//----------------------------------------------------------------------
+// METHOD: addPathToLogWatch
+//----------------------------------------------------------------------
+void MainWindow::addPathToLogWatch(QString & logDir)
+{
     QStringList logExtFilter("*.log");
-    foreach (QString logDirName, QStringList({"log", "rlog"})) {
-        QString logDir = QString::fromStdString(Log::getLogBaseDir()) + "/" + logDirName;
-        QStringList logFiles;
-        logFiles << QDir(logDir).entryList(logExtFilter);
 
-        // Create MDI window with the log file viewer
-        foreach (QString logBaseName, logFiles) {
-            QString logFileName(logDir + "/" + logBaseName);
-            QString bseName(QFileInfo(logFileName).baseName());
+    QStringList logFiles;
+    logFiles << QDir(logDir).entryList(logExtFilter);
 
-            // check that the window for this log does not exist
-            QList<QMdiSubWindow *> sws = ui->mdiArea->subWindowList();
-            bool doesExist = false;
-            foreach (QMdiSubWindow * subw, sws) {
-                TextView * tv = qobject_cast<TextView *>(subw->widget());
-                if (tv->logName() == bseName) {
-                    doesExist = true;
-                    break;
-                }
+    // Create MDI window with the log file viewer
+    foreach (QString logBaseName, logFiles) {
+        QString logFileName(logDir + "/" + logBaseName);
+        QString bseName(QFileInfo(logFileName).baseName());
+      
+        // check that the window for this log does not exist
+        QList<QMdiSubWindow *> sws = ui->mdiArea->subWindowList();
+        bool doesExist = false;
+        foreach (QMdiSubWindow * subw, sws) {
+            TextView * tv = qobject_cast<TextView *>(subw->widget());
+            if (tv->logName() == bseName) {
+                doesExist = true;
+                break;
             }
-            if (doesExist) { continue; }
-
-            activeNodes << bseName;
-
-            TextView * pltxted = new TextView;
-            pltxted->setStyleSheet(FixedWidthStyle);
-            pltxted->setLogName(bseName);
-            LogWatcher * newLog = new LogWatcher(pltxted);
-            newLog->setFile(logFileName);
-            nodeLogs.append(newLog);
-            QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
-            subw->setWindowFlags(Qt::CustomizeWindowHint |
-                                 Qt::WindowTitleHint |
-                                 Qt::WindowMinMaxButtonsHint);
-            connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
         }
+        if (doesExist) { continue; }
+
+        activeNodes << bseName;
+
+        TextView * pltxted = new TextView;
+        pltxted->setStyleSheet(FixedWidthStyle);
+        pltxted->setLogName(bseName);
+        LogWatcher * newLog = new LogWatcher(pltxted);
+        newLog->setFile(logFileName);
+        nodeLogs.append(newLog);
+        QMdiSubWindow * subw = ui->mdiArea->addSubWindow(pltxted);
+        subw->setWindowFlags(Qt::CustomizeWindowHint |
+                             Qt::WindowTitleHint |
+                             Qt::WindowMinMaxButtonsHint);
+        connect(newLog, SIGNAL(logUpdated()), this, SLOT(processPendingEvents()));
     }
 }
 
@@ -1372,6 +1393,12 @@ void MainWindow::updateSystemView()
     showState();
 
     quitAllAct->setEnabled(isThereActiveCores);
+
+    //-- 0b. If received sessionId from master, add files to watch
+    if (!newPathToWatch.isEmpty()) {
+        addPathToLogWatch(newPathToWatch);
+        newPathToWatch.clear();
+    }
 
     //== 1. Processing tasks
     procTaskStatusModel->setFullUpdate(true);
@@ -2791,6 +2818,20 @@ void MainWindow::storeQUTools2Cfg(MapOfUserDefTools qutmap)
     }
 
     cfg.userDefTools.fromStr(JValue(uts).str());
+}
+
+//----------------------------------------------------------------------
+// Method: commandFromHMIPxy
+// Provides a way to do a HMI action ordered by HMI Proxy
+//----------------------------------------------------------------------
+void MainWindow::commandFromHMIPxy(std::string command, std::string arg)
+{
+    if (command == "linkSessionLogs") {
+        // Regenerate log file watchers
+        newPathToWatch = QString::fromStdString(Log::getLogBaseDir());
+        newPathToWatch.replace(QString::fromStdString(cfg.sessionId),
+                               QString::fromStdString(arg));
+    }
 }
 
 /*

@@ -120,6 +120,9 @@ set (qpfGuiLib_qrc
 
 set (qpfGuiBin_src main.cpp)
 
+add_definitions(-DQT_DEBUG)
+add_definitions(-DCMAKE_BUILD_TYPE=Debug)
+
 qt5_wrap_cpp(qpfGuiLib_hdr_moc ${qpfGuiLib_hdr})
 qt5_wrap_ui (qpfGuiLib_ui_moc  ${qpfGuiLib_ui})
 qt5_add_resources(qpfGuiLib_ui_qrc ${qpfGuiLib_qrc})
@@ -165,7 +168,7 @@ target_include_directories (qpfgui PUBLIC .
   ${FMK_ROOT_DIR}
   ${PCRE2LIBDIR}
   ${PSQLLIBDIR})
-target_link_libraries (qpfgui qpfGuiLib
+target_link_libraries (qpfgui qpfGuiLib 
   json infix str log tools uuid fmk nncomm
   nanomsg ${PCRE2LIB} ${PSQLLIB} pthread)
 set_target_properties (qpfgui PROPERTIES LINKER_LANGUAGE CXX)
