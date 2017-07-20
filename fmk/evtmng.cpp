@@ -108,6 +108,7 @@ void EvtMng::runEachIteration()
     // 1. Check DirWatcher events from inbox folder
     DirWatcher::DirWatchEvent e;
     while (dw->nextEvent(e)) {
+
         TraceMsg("New DirWatchEvent: " + e.path + "/" + e.name
                  + (e.isDir ? " DIR " : " ") + std::to_string(e.mask));
 
