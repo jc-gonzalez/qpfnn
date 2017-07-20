@@ -715,11 +715,11 @@ bool DBHdlPostgreSQL::checkSignature(std::string & sgnt, std::string & ver)
 
     std::string cmd("SELECT product_version FROM products_info "
                     "WHERE signature LIKE " + str::quoted(sgnt + "%") +
-                    " AND (NOW() - registration_time) > INTERVAL '5 sec') "
-                    "ORDER BY id "
+                    " AND (NOW() - registration_time) > INTERVAL '10 sec')"
+                    " ORDER BY id "
                     "DESC LIMIT 1;");
 
-    // The 5 sec of margin are taken to avoid to count as existing, by
+    // The 10 sec of margin are taken to avoid to count as existing, by
     // the TskOrc, products that where just inserted, by the DataMng,
     // into the local archive, since TskOrc and DataMng are receiving
     // almost at the same time the same INDATA message
