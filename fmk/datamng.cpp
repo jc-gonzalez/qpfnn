@@ -273,7 +273,7 @@ void DataMng::sanitizeProductVersions(ProductList & prodList)
         for (auto & m : prodList.products) {
             std::string sgnt = m.signature();
             m.dump();
-            std::cerr << "Checking signature " << sgnt << std::endl;
+            TRC("Checking signature " << sgnt << " and version " << ver);
             if (dbHdl->checkSignature(sgnt, ver)) {
                 // Version exists: change minor version number
                 std::string origVer = m.productVersion();
