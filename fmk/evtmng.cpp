@@ -144,7 +144,7 @@ void EvtMng::runEachIteration()
 
     bool sendInit = ((iteration + 1) == 100);
     bool sendPing = ((iteration % 20) == 0);
-    bool sendQuit = (iteration > 1000) || requestQuit;
+    bool sendQuit = requestQuit; //(iteration > 1000) || requestQuit;
 
     if (sendInit || sendPing || sendQuit) {
         std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
