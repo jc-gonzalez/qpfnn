@@ -45,6 +45,7 @@ if (HMI)
 endif()
 
 add_subdirectory (tests)
+add_subdirectory (sample)
 
 #== CPack configuration
 set (CPACK_PACKAGE_VERSION_MAJOR ${QPF_MAJOR})

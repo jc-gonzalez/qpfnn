@@ -1,0 +1,494 @@
+
+File           : EUC_SOC_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SOC
+procFunc       : SOC
+params         : VIS-W-21034-1
+instrument     : VIS
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : SOC_VIS
+signature      : EUC_SOC_VIS-21034-1-W_03.04
+productId      : EUC_SOC_VIS-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SOC_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_SOC_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SOC
+procFunc       : SOC
+params         : NIR-W-21034-1
+instrument     : NIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : SOC_NIR
+signature      : EUC_SOC_NIR-21034-1-W_03.04
+productId      : EUC_SOC_NIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SOC_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_HK_W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : 
+procFunc       : HK
+params         : W-21034-1
+instrument     : 
+obsId          : 21034
+obsMode        : 
+expos          : 1
+productType    : 
+signature      : HK_W-21034-1
+productId      : EUC_HK_W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_HK_W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_SIM_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : SIM
+params         : VIS-W-21034-1
+instrument     : VIS
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : SIM_VIS
+signature      : EUC_SIM_VIS-21034-1-W_03.04
+productId      : EUC_SIM_VIS-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SIM_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_SIM_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : SIM
+params         : NIR-W-21034-1
+instrument     : NIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : SIM_NIR
+signature      : EUC_SIM_NIR-21034-1-W_03.04
+productId      : EUC_SIM_NIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SIM_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_SIM_SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : SIM
+params         : SIR-W-21034-1
+instrument     : SIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : SIM_SIR
+signature      : EUC_SIM_SIR-21034-1-W_03.04
+productId      : EUC_SIM_SIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SIM_SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_LE1_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : LE1
+params         : VIS-W-21034-1
+instrument     : VIS
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : LE1_VIS
+signature      : EUC_LE1_VIS-21034-1-W_03.04
+productId      : EUC_LE1_VIS-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_LE1_VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_LE1_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : LE1
+params         : NIR-W-21034-1
+instrument     : NIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : LE1_NIR
+signature      : EUC_LE1_NIR-21034-1-W_03.04
+productId      : EUC_LE1_NIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_LE1_NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_LE1_SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : LE1
+params         : SIR-W-21034-1
+instrument     : SIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : LE1_SIR
+signature      : EUC_LE1_SIR-21034-1-W_03.04
+productId      : EUC_LE1_SIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_LE1_SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_SIM-VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : QLA
+params         : SIM-VIS-W-21034-1
+instrument     : VIS
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_SIM_VIS
+signature      : EUC_QLA_SIM_VIS-21034-1-W_03.04
+productId      : EUC_QLA_SIM-VIS-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_SIM-VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_SIM-NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : QLA
+params         : SIM-NIR-W-21034-1
+instrument     : NIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_SIM_NIR
+signature      : EUC_QLA_SIM_NIR-21034-1-W_03.04
+productId      : EUC_QLA_SIM-NIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_SIM-NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_SIM-SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : SIM
+procFunc       : QLA
+params         : SIM-SIR-W-21034-1
+instrument     : SIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_SIM_SIR
+signature      : EUC_QLA_SIM_SIR-21034-1-W_03.04
+productId      : EUC_QLA_SIM-SIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_SIM-SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_LE1-VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : QLA
+params         : LE1-VIS-W-21034-1
+instrument     : VIS
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_LE1_VIS
+signature      : EUC_QLA_LE1_VIS-21034-1-W_03.04
+productId      : EUC_QLA_LE1-VIS-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_LE1-VIS-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_LE1-NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : QLA
+params         : LE1-NIR-W-21034-1
+instrument     : NIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_LE1_NIR
+signature      : EUC_QLA_LE1_NIR-21034-1-W_03.04
+productId      : EUC_QLA_LE1-NIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_LE1-NIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_QLA_LE1-SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : LE1
+procFunc       : QLA
+params         : LE1-SIR-W-21034-1
+instrument     : SIR
+obsId          : 21034
+obsMode        : W
+expos          : 1
+productType    : QLA_LE1_SIR
+signature      : EUC_QLA_LE1_SIR-21034-1-W_03.04
+productId      : EUC_QLA_LE1-SIR-W-21034-1_20191212T101212.0Z_03.04
+productVersion : 03.04
+productStatus  : OK
+startTime      : 20191212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_QLA_LE1-SIR-W-21034-1_20191212T101212.0Z_03.04.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_VIS_D-12000-4_20211212T101212.0Z_04.03.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : 
+procFunc       : VIS
+params         : D-12000-4
+instrument     : 
+obsId          : 0
+obsMode        : 
+expos          : 0
+productType    : 
+signature      : EUC_---_04.03
+productId      : EUC_VIS_D-12000-4_20211212T101212.0Z_04.03
+productVersion : 04.03
+productStatus  : OK
+startTime      : 20211212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_VIS_D-12000-4_20211212T101212.0Z_04.03.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_NIR_D-12000-2-J_20211212T101212.0Z_04.03.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : 
+procFunc       : NIR
+params         : D-12000-2-J
+instrument     : 
+obsId          : 0
+obsMode        : 
+expos          : 0
+productType    : 
+signature      : EUC_---_04.03
+productId      : EUC_NIR_D-12000-2-J_20211212T101212.0Z_04.03
+productVersion : 04.03
+productStatus  : OK
+startTime      : 20211212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_NIR_D-12000-2-J_20211212T101212.0Z_04.03.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_NIR_C-12000-4-H_20211212T101212.0Z_04.03.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : 
+procFunc       : NIR
+params         : C-12000-4-H
+instrument     : 
+obsId          : 0
+obsMode        : 
+expos          : 0
+productType    : 
+signature      : EUC_---_04.03
+productId      : EUC_NIR_C-12000-4-H_20211212T101212.0Z_04.03
+productVersion : 04.03
+productStatus  : OK
+startTime      : 20211212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_NIR_C-12000-4-H_20211212T101212.0Z_04.03.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
+
+File           : EUC_SIR_D-12000-2_20211212T101212.0Z_04.03.fits
+----------------------------------------------------------------------
+mission        : EUC
+creator        : EUCLID
+origin         : 
+procFunc       : SIR
+params         : D-12000-2
+instrument     : 
+obsId          : 0
+obsMode        : 
+expos          : 0
+productType    : 
+signature      : EUC_---_04.03
+productId      : EUC_SIR_D-12000-2_20211212T101212.0Z_04.03
+productVersion : 04.03
+productStatus  : OK
+startTime      : 20211212T101212.0Z
+endTime        : 
+regTime        : 20170519T124213
+productSize    : 23713
+fileType       : FITS
+url            : file://EUC_SIR_D-12000-2_20211212T101212.0Z_04.03.fits
+urlSpace       : INBOX
+
+Product size: 23713..........OK
