@@ -7,7 +7,6 @@
 #include <QtGui/QBrush>
 #include <QtGui/QFont>
 #include <QtGui/QPen>
-#include <QtGui/QWidget>
 
 class QSimpleTickerGraph : public QWidget
 {
