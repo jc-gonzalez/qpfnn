@@ -1364,7 +1364,25 @@ void MainWindow::showState()
             }
             ++j;
         }
+        
+        for (auto & it : cfg.network.swarms()) {
+            CfgGrpSwarm & swrm = it.second;
+            if (swrm.serviceNodes().size() > 0) {
+                h += QString("<br><b>%1</b>")
+                    .arg(QString::fromStdString(swrm.serviceNodes().at(0)));
+                p += "<br>";
 
+                QString n = QString("Swarm_%1")
+                    .arg(QString::fromStdString(swrm.name()));
+                std::string ss = nodeStates[n].toStdString();
+                int stateId = getStateIdx(ss);
+                QString color = QString::fromStdString(stateColors[stateId]);
+                p += QString("[%1] <font color=\"%2\">%3</font> ")
+                    .arg(QString::fromStdString(it.first)).arg(color).arg(n);
+            }
+        }
+
+        // Ended - show labels
         ui->lblHosts->setText(h);
         ui->lblNodes->setText(p);
 

@@ -42,6 +42,7 @@
 
 #include "process.h"
 #include "str.h"
+#include "dbg.h"
 
 #include <iostream>
 #include <fstream>
@@ -65,7 +66,9 @@ ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
 
     // Initialize Swarm manager and workers
     assert(initSwarmManager(managerAddr));
-    for (auto & wrkAddr : workerAddrs) { assert(initSwarmWorker(wrkAddr)); }
+    if (workerAddrs.size() > 0) {
+      for (auto & wrkAddr : workerAddrs) { assert(initSwarmWorker(wrkAddr)); }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -74,6 +77,10 @@ ServiceMng::ServiceMng(std::string mngAddr, std::vector<std::string> wrkAddrs)
 //----------------------------------------------------------------------
 bool ServiceMng::initSwarmManager(std::string & addr)
 {
+    // First, leave any swarm the manager could be already handling
+    leaveSwarm(addr);
+
+    // Then, create new swarm with the provided host as manager
     std::string line;
     std::vector<std::string> lines;
     std::string outFile("/tmp/swarm_init.log");
@@ -92,7 +99,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
 
     while (std::getline(ifs, line)) {
         lines.push_back(line);
-        std::cerr << line << "\n";
+        TRC(line);
         // if (!initSwarm.running() ||
         //     !procxx::running(initSwarm.id()) ||
         //     !running(initSwarm)) {
@@ -105,9 +112,7 @@ bool ServiceMng::initSwarmManager(std::string & addr)
     tokens = str::split(str::ltrim(lines.at(lines.size() - 5), " \t"), ' ');
     workerToken = tokens.at(1);
 
-    std::cerr << managerConnectAddr << " -- " << workerToken << "\n";
-
-    std::cerr << code << "\n";
+    TRC(managerConnectAddr << " -- " << workerToken << ": " << code);
 
     return (code == 0);
 }
