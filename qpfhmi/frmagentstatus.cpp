@@ -55,11 +55,10 @@ FrmAgentStatus::~FrmAgentStatus()
     delete ui;
 }
 
-void FrmAgentStatus::updateInfo(AgentInfo & a)
+void FrmAgentStatus::updateInfo(std::string name, TaskStatusSpectra & d)
 {
-    ui->lblTaskAgentName->setText(QString::fromStdString(a.name));
+    ui->lblTaskAgentName->setText(QString::fromStdString(name));
 
-    TaskStatusSpectra & d = a.taskStatus;
     ui->lblRun->setText(QString("%1").arg(d.running));
     ui->lblWait->setText(QString("%1").arg(d.scheduled));
     ui->lblPau->setText(QString("%1").arg(d.paused));
