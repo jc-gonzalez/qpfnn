@@ -446,6 +446,21 @@ void MainWindow::readConfig(QString dbUrl)
         ++h;
     }
 
+    for (auto & kv : cfg.network.swarms()) {
+        CfgGrpSwarm & swrm = kv.second;
+        if (swrm.serviceNodes().size() > 0) {
+            QString n = QString("Swarm_%1")
+                .arg(QString::fromStdString(swrm.name()));
+            std::string staName = n.toStdString();
+            agName.push_back(staName);
+            TaskAgentInfo * taInfo = new TaskAgentInfo;
+            (*taInfo)["name"]   = staName;
+            (*taInfo)["client"] = kv.first;
+            (*taInfo)["server"] = kv.first;
+            taskAgentsInfo[staName] = taInfo;
+        }
+    }
+
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");
     cfg.general["lastAccess"] = lastAccess.toStdString();
     putToSettings("lastAccess", QVariant(lastAccess));
