@@ -118,7 +118,8 @@ struct SwarmInfo : public BasicInfoContainer {
 struct ProcessingFrameworkInfo : public BasicInfoContainer {
     std::map<std::string,
         ProcessingHostInfo*>        hostsInfo;
-    SwarmInfo                       swarmInfo;
+    std::map<std::string,
+        SwarmInfo*>                 swarmInfo;
     int                             numSrvTasks;
     int                             numContTasks;
     virtual std::string toJsonStr();

@@ -164,9 +164,17 @@ std::string ProcessingFrameworkInfo::toJsonStr()
         as += COMMA + "\"" + it->first + "\": " + it->second->toJsonStr();
         ++it;
     }
+    std::map<std::string,
+             SwarmInfo*>::iterator itt = swarmInfo.begin();
+    std::string ass = "\"" + itt->first + "\": " + itt->second->toJsonStr();
+    ++itt;
+    while (itt != swarmInfo.end()) {
+        ass += COMMA + "\"" + itt->first + "\": " + itt->second->toJsonStr();
+        ++itt;
+    }
     return (std::string("{") +
             "\"hostsInfo\": {" + as + "}" + COMMA +
-            "\"swarmInfo\": " + swarmInfo.toJsonStr() + COMMA +
+            "\"swarmInfo\": {" + as + "}" + COMMA +
             FIELDNUM(numSrvTasks) + COMMA +
             FIELDNUM(numContTasks) + std::string("}"));
 }
@@ -177,7 +185,6 @@ void ProcessingFrameworkInfo::fromStr(std::string s)
     JValue pf(s);
     numSrvTasks  = pf["numSrvTasks"].asInt();
     numContTasks = pf["numContTasks"].asInt();
-    swarmInfo.fromStr(fastWriter.write(pf["swarmInfo"]));
     for (Json::ValueIterator itr = pf["hostsInfo"].begin();
          itr != pf["hostsInfo"].end(); ++itr) {
         std::string key = itr.key().asString();
@@ -187,5 +194,15 @@ void ProcessingFrameworkInfo::fromStr(std::string s)
                                    it->second : new ProcessingHostInfo);
         ph->fromStr(fastWriter.write(*itr));
         hostsInfo[key] = ph;
+    }
+    for (Json::ValueIterator itr = pf["swarmInfo"].begin();
+         itr != pf["swarmInfo"].end(); ++itr) {
+        std::string key = itr.key().asString();
+        std::map<std::string,
+                 SwarmInfo*>::iterator it = swarmInfo.find(key);
+        SwarmInfo * sw = ((it != swarmInfo.end()) ?
+                          it->second : new SwarmInfo);
+        sw->fromStr(fastWriter.write(*itr));
+        swarmInfo[key] = sw;
     }
 }

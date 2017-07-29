@@ -338,16 +338,17 @@ void MainWindow::manualSetupUI()
     HostInfo hi;
     hi.update();
 
+    // Create host monitoring widgets for container processing nodes
     int h = 1;
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
         hi.update();
 
         ProcessingHostInfo * ph = new ProcessingHostInfo;
-        ph->name = kv.first;
+        ph->name      = kv.first;
         ph->numAgents = numOfTskAgents;
-        ph->hostInfo = hi;
-        ph->numTasks = 0;
+        ph->hostInfo  = hi;
+        ph->numTasks  = 0;
 
         for (int i = 1; i <= ph->numAgents; ++i) {
             AgentInfo agInfo;
@@ -359,10 +360,24 @@ void MainWindow::manualSetupUI()
             ph->agInfo.push_back(agInfo);
             ph->numTasks += agInfo.taskStatus.total;
         }
-
+        
         Config::procFmkInfo->hostsInfo[ph->name] = ph;
         Config::procFmkInfo->numContTasks += ph->numTasks;
         ++h;
+    }
+
+    // Then, create host monitoring widgets for service nodes
+    for (auto & kv : cfg.network.swarms()) {
+        hi.update();
+
+        SwarmInfo * sw = new SwarmInfo;
+        sw->name       = kv.first;
+        sw->scale      = kv.second.scale();
+        sw->hostInfo   = hi;
+        sw->taskStatus = TaskStatusSpectra();
+
+        Config::procFmkInfo->swarmInfo[sw->name] = sw;
+        Config::procFmkInfo->numSrvTasks += sw->scale;
     }
 
     procFmkMonit = new ProcFmkMonitor(ui->scrollAreaAgents);
