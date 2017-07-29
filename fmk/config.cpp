@@ -220,6 +220,7 @@ void Config::readConfigFromFile()
     std::ifstream cfgFile(cfgFileName);
     std::stringstream buffer;
     buffer << cfgFile.rdbuf();
+    TRC("CONFIG FROM FILE:\n" + buffer.str());
     fromStr(buffer.str());
     fillData();
 }

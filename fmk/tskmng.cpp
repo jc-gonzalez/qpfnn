@@ -124,22 +124,27 @@ void TskMng::runEachIteration()
     // Each iteration the Task Manager, apart from processing incoming
     // messages, performs the following actions:
     // 1. Send Task Status Reports to
-
-    TRC("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
-        "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
-        "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
-        "P(" + std::to_string(serviceTaskStatus[TASK_PAUSED]) + ")" +
-        "S(" + std::to_string(serviceTaskStatus[TASK_STOPPED]) + ")" +
-        "E(" + std::to_string(serviceTaskStatus[TASK_FAILED]) + ")" +
-        "F(" + std::to_string(serviceTaskStatus[TASK_FINISHED]) + ")" +
-        "   CONT.: Q(" + std::to_string(containerTasks.size()) + ")" +
-        "R(" + std::to_string(containerTaskStatus[TASK_RUNNING]) + ")" +
-        "W(" + std::to_string(containerTaskStatus[TASK_SCHEDULED]) + ")" +
-        "P(" + std::to_string(containerTaskStatus[TASK_PAUSED]) + ")" +
-        "S(" + std::to_string(containerTaskStatus[TASK_STOPPED]) + ")" +
-        "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
-        "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
-        );
+    static std::string lastTrace;
+  
+    std::string trace = ("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
+                         "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
+                         "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
+                         "P(" + std::to_string(serviceTaskStatus[TASK_PAUSED]) + ")" +
+                         "S(" + std::to_string(serviceTaskStatus[TASK_STOPPED]) + ")" +
+                         "E(" + std::to_string(serviceTaskStatus[TASK_FAILED]) + ")" +
+                         "F(" + std::to_string(serviceTaskStatus[TASK_FINISHED]) + ")" +
+                         "   CONT.: Q(" + std::to_string(containerTasks.size()) + ")" +
+                         "R(" + std::to_string(containerTaskStatus[TASK_RUNNING]) + ")" +
+                         "W(" + std::to_string(containerTaskStatus[TASK_SCHEDULED]) + ")" +
+                         "P(" + std::to_string(containerTaskStatus[TASK_PAUSED]) + ")" +
+                         "S(" + std::to_string(containerTaskStatus[TASK_STOPPED]) + ")" +
+                         "E(" + std::to_string(containerTaskStatus[TASK_FAILED]) + ")" +
+                         "F(" + std::to_string(containerTaskStatus[TASK_FINISHED]) + ")"
+                         );
+    if (trace != lastTrace) {
+        TRC(trace);
+        lastTrace = trace;
+    }
 }
 
 //----------------------------------------------------------------------
