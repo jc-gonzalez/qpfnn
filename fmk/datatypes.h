@@ -234,6 +234,9 @@ public:
 // Group: Basic datatypes
 //============================================================
 
+// Running mode of the agent.  If SERVICE, a Docker Swarm is created
+enum AgentMode { CONTAINER, SERVICE };
+
 //------------------------------------------------------------
 // Topic: Elementary types
 //------------------------------------------------------------

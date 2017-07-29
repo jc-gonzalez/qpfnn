@@ -288,7 +288,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Place new information in general structure
     consolidateMonitInfo(m);
-    sendProcFmkInfoUpdate();
+    //sendProcFmkInfoUpdate();
 
     // If sending updates is not yet activated, activate it
     if (!sendingPeriodicFmkInfo) {
@@ -379,17 +379,17 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     hostInfo.fromStr(s);
     std::string hostIp = hostInfo.hostIp;
     TRC("Consolidating " + s + " for host " + hostIp);
-    ProcessingHostInfo * procHostInfo = 0;
-    if (Config::procFmkInfo->hostsInfo.find(hostIp) != Config::procFmkInfo->hostsInfo.end()) {
-        ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
-        procHostInfo->hostInfo = hostInfo;
+    switch (Config::agentMode[hostIp]) {
+    case CONTAINER:
+        Config::procFmkInfo->hostsInfo[hostIp]->hostInfo = hostInfo;
         TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@");
-    } else {
-        if (Config::procFmkInfo->swarmInfo.find(hostIp) != Config::procFmkInfo->swarmInfo.end()) {
-            SwarmInfo * swrmInfo = Config::procFmkInfo->swarmInfo[hostIp];
-            swrmInfo->hostInfo = hostInfo;
-            TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@");
-        }
+        break;
+    case SERVICE:
+        Config::procFmkInfo->swarmInfo[hostIp]->hostInfo = hostInfo;
+        TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@");
+        break;
+    default:
+        break;
     }
 }
 

@@ -463,4 +463,6 @@ bool Config::isLive = false;
 
 ProcessingFrameworkInfo * Config::procFmkInfo = new ProcessingFrameworkInfo;
 
+std::map<std::string, AgentMode> Config::agentMode;
+
 //}

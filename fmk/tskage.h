@@ -81,9 +81,6 @@
 class TskAge : public Component {
 
 public:
-    // Running mode of the agent.  If SERVICE, a Docker Swarm is created
-    enum AgentMode { CONTAINER, SERVICE };
-
     // Information on the service to be created, in Docker Swarm
     struct ServiceInfo {
         std::string              service;
@@ -97,7 +94,7 @@ public:
     // Constructor
     //----------------------------------------------------------------------
     TskAge(const char * name, const char * addr = 0, Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER,
+           AgentMode mode = CONTAINER,
            const std::vector<std::string> & nds = std::vector<std::string>(),
            ServiceInfo * srvInfo = 0);
 
@@ -105,7 +102,7 @@ public:
     // Constructor
     //----------------------------------------------------------------------
     TskAge(std::string name, std::string addr = std::string(), Synchronizer * s = 0,
-           AgentMode mode = TskAge::CONTAINER,
+           AgentMode mode = CONTAINER,
            const std::vector<std::string> & nds = std::vector<std::string>(),
            ServiceInfo * srvInfo = 0);
 

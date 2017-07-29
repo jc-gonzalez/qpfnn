@@ -507,7 +507,7 @@ void Deployer::createElementsNetwork()
                     }
                     sprintf(sAgName, "Swarm_%s", serviceInfo->service.c_str());
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro,
-                                            TskAge::SERVICE, swrm.serviceNodes(),
+                                            SERVICE, swrm.serviceNodes(),
                                             serviceInfo));
                     cfg.agentNames.push_back(sAgName);
                     agName.push_back(std::string(sAgName));
@@ -693,13 +693,16 @@ void Deployer::generateProcFmkInfoStructure()
         int numOfTskAgents = ckv.second;
         hi.update();
 
+        std::string ip = ckv.first;
+        
         ProcessingHostInfo * ph = new ProcessingHostInfo;
-        ph->name      = ckv.first;
+        ph->name      = ip;
         ph->numAgents = numOfTskAgents;
         ph->hostInfo  = hi;
         ph->numTasks  = 0;
 
         for (int i = 0; i < ph->numAgents; ++i, ++j) {
+          
             AgentInfo agInfo;
             agInfo.name       = cfg.agentNames.at(j);
             agInfo.taskStatus = TaskStatusSpectra();
@@ -710,19 +713,23 @@ void Deployer::generateProcFmkInfoStructure()
 
         Config::procFmkInfo->hostsInfo[ph->name] = ph;
         Config::procFmkInfo->numContTasks += ph->numTasks;
+        Config::agentMode[ip] = CONTAINER;
     }
 
     for (auto & skv : cfg.network.swarms()) {
         hi.update();
         CfgGrpSwarm & swrm = skv.second;
+        std::string ip = swrm.serviceNodes().at(0);
+
         SwarmInfo * sw = new SwarmInfo;
-        sw->name       = swrm.serviceNodes().at(0);
+        sw->name       = ip;
         sw->scale      = swrm.scale();
         sw->hostInfo   = hi;
         sw->taskStatus = TaskStatusSpectra();
 
-        Config::procFmkInfo->swarmInfo[sw->name] = sw;
+        Config::procFmkInfo->swarmInfo[ip] = sw;
         Config::procFmkInfo->numSrvTasks += sw->scale;
+        Config::agentMode[ip] = SERVICE;
     }
     
     TRC(Config::procFmkInfo->toJsonStr());

@@ -381,6 +381,8 @@ public:
 
     std::map<std::string, std::string> nodeStates;
 
+    static std::map<std::string, AgentMode>   agentMode; 
+    
     struct {
         std::string       inbox;
         std::string       archive;
