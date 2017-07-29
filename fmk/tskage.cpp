@@ -122,8 +122,8 @@ void TskAge::fromRunningToOperational()
         if (serviceInfo != 0) {
             // Create Service
             dckMng->createService(serviceInfo->service, serviceInfo->serviceImg,
-                                 serviceInfo->scale,
-                                 serviceInfo->exe, serviceInfo->args);
+                                  serviceInfo->scale,
+                                  serviceInfo->exe, serviceInfo->args);
         }
     }
 

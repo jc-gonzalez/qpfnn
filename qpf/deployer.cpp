@@ -702,10 +702,10 @@ void Deployer::generateProcFmkInfoStructure()
         hi.update();
 
         ProcessingHostInfo * ph = new ProcessingHostInfo;
-        ph->name = kv.first;
+        ph->name      = kv.first;
         ph->numAgents = numOfTskAgents;
-        ph->hostInfo = hi;
-        ph->numTasks = 0;
+        ph->hostInfo  = hi;
+        ph->numTasks  = 0;
 
         for (int i = 0; i < ph->numAgents; ++i, ++j) {
             AgentInfo agInfo;
@@ -720,6 +720,18 @@ void Deployer::generateProcFmkInfoStructure()
         Config::procFmkInfo->numContTasks += ph->numTasks;
     }
 
+    for (auto & kv : cfg.network.swarms()) {
+        hi.update();
+
+        SwarmInfo * sw = new SwarmInfo;
+        sw->name       = kv.first;
+        sw->scale      = kv.second.scale();
+        sw->hostInfo   = hi;
+        sw->taskStatus = TaskStatusSpectra();
+
+        Config::procFmkInfo->swarmInfo[sw->name] = sw;
+        Config::procFmkInfo->numSrvTasks += sw->scale;
+    }
 
 }
 
