@@ -1154,14 +1154,16 @@ void MainWindow::init()
     const int PortHMICmd     = 2;
     const int PortTskRepDist = 3;
 
-    QString msg = QString("Connecting to %1:%2").arg(masterAddress).arg(startingPort);
-    std::string smsg = msg.toStdString();
-    TRC(smsg);
+    //QString msg = QString("Connecting to %1:%2")
+    //  .arg(masterAddress).arg(startingPort + PortEvtMng);
+    //std::string smsg = msg.toStdString();
+    //TRC(smsg);
 
     // CHANNEL HMICMD - REQREP
     // - Out/In: QPFHMI/EvtMng
     std::string chnl     = ChnlHMICmd;
-    QString qconnAddr    = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + PortHMICmd);
+    QString qconnAddr    = QString("tcp://%1:%2")
+      .arg(masterAddress).arg(startingPort + PortHMICmd);
     std::string connAddr = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
 
@@ -1169,7 +1171,8 @@ void MainWindow::init()
     // - Publisher: TskMng
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl      = ChnlTskRepDist;
-    qconnAddr = QString("tcp://%1:%2").arg(masterAddress).arg(startingPort + 2);
+    qconnAddr = QString("tcp://%1:%2")
+      .arg(masterAddress).arg(startingPort + PortTskRepDist);
     connAddr  = qconnAddr.toStdString();
     hmiNode->addConnection(chnl, new PubSub(NN_SUB, connAddr));
 

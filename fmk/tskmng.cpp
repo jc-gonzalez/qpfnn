@@ -283,7 +283,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Place new information in general structure
     consolidateMonitInfo(m);
-    sendTskRepDistMsg(m, MsgHostMon);
+    sendProcFmkInfoUpdate();
 
     // If sending updates is not yet activated, activate it
     if (!sendingPeriodicFmkInfo) {
@@ -374,9 +374,18 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     hostInfo.fromStr(s);
     std::string hostIp = hostInfo.hostIp;
     TRC("Consolidating " + s + " for host " + hostIp);
-    ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
-    procHostInfo->hostInfo = hostInfo;
-    TRC("@@@@@@@@@@ CONSOLIDATING FMK INFO @@@@@@@@@@");
+    ProcessingHostInfo * procHostInfo = 0;
+    if (Config::procFmkInfo->hostsInfo.find(hostIp) != Config::procFmkInfo->hostsInfo.end()) {
+        ProcessingHostInfo * procHostInfo = Config::procFmkInfo->hostsInfo[hostIp];
+        procHostInfo->hostInfo = hostInfo;
+        TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@");
+    } else {
+        if (Config::procFmkInfo->swarmInfo.find(hostIp) != Config::procFmkInfo->swarmInfo.end()) {
+            SwarmInfo * swrmInfo = Config::procFmkInfo->swarmInfo[hostIp];
+            swrmInfo->hostInfo = hostInfo;
+            TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@");
+        }
+    }
 }
 
 //----------------------------------------------------------------------
@@ -439,6 +448,7 @@ void TskMng::sendProcFmkInfoUpdate()
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
         TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
+        TRC(msg.str());
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
     }

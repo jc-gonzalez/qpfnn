@@ -107,6 +107,7 @@ struct ProcessingHostInfo : public BasicInfoContainer {
 };
 
 struct SwarmInfo : public BasicInfoContainer {
+    std::string       ip;
     std::string       name;
     int               scale;
     HostInfo          hostInfo;

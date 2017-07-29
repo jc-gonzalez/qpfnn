@@ -139,6 +139,7 @@ std::string SwarmInfo::toJsonStr()
     hostInfo.update();
     return (std::string("{") +
             FIELDSTR(name) + COMMA +
+            FIELDSTR(ip) + COMMA +
             FIELDNUM(scale) + COMMA +
             "\"hostInfo\": " + hostInfo.toJsonStr() + COMMA +
             "\"counts\": " + taskStatus.toJsonStr() + std::string("}"));
@@ -149,6 +150,7 @@ void SwarmInfo::fromStr(std::string s)
     Json::FastWriter fastWriter;
     JValue sw(s);
     name  = sw["name"].asString();
+    ip    = sw["ip"].asString();
     scale = sw["scale"].asInt();
     hostInfo.fromStr(fastWriter.write(sw["hostInfo"]));
     taskStatus.fromStr(fastWriter.write(sw["counts"]));
