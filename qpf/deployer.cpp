@@ -445,7 +445,7 @@ void Deployer::createElementsNetwork()
     //======================================================================
 
     // Agent names, hosts and ports (port range starts with startingPort)
-    char sAgName[20];
+    char sAgName[60];
     std::vector<std::string> & agName    = cfg.agentNames;
     std::vector<std::string> & agHost    = cfg.agHost;
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
