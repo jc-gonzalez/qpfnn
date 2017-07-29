@@ -13,6 +13,10 @@ project (qpfGui)
 
 find_package (Qt5Widgets)
 find_package (Qt5Sql)
+find_package (Qt5Network)
+find_package (Qt5Xml)
+find_package (Qt5WebKit)
+find_package (Qt5WebKitWidgets)
 
 set (qpfGuiLib_src
   browser.cpp
@@ -137,8 +141,8 @@ add_library (qpfGuiLib SHARED
   ${qpfGuiLib_hdr_moc}
   ${qpfGuiLib_ui_moc}
   ${qpfGuiLib_ui_qrc})
-#target_link_libraries (qpfGuiLib Qt5::Widgets Qt5::Sql)
-qt5_use_modules(qpfGuiLib Widgets Sql Network Xml)
+target_link_libraries (qpfGuiLib Qt5::Widgets Qt5::Sql Qt5::Network Qt5::Xml Qt5::WebKit Qt5::WebKitWidgets)
+#qt5_use_modules(qpfGuiLib Widgets Sql Network Xml WebKit)
 target_include_directories (qpfGuiLib PUBLIC .
   ${PSQLINCDIR}
   ${NNMSG_ROOT_DIR}/include

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>997</width>
-    <height>648</height>
+    <width>1131</width>
+    <height>713</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -349,8 +349,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>653</width>
-                 <height>414</height>
+                 <width>787</width>
+                 <height>476</height>
                 </rect>
                </property>
               </widget>
@@ -696,7 +696,7 @@
            <enum>Qt::Vertical</enum>
           </property>
           <widget class="Frm_FilterSet" name="wdgAlertFilters" native="true"/>
-          <widget class="QWidget" name="layoutWidget">
+          <widget class="QWidget" name="layoutWidget1">
            <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
              <widget class="QTableView" name="tblvwAlerts">
@@ -789,8 +789,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>997</width>
-     <height>19</height>
+     <width>1131</width>
+     <height>20</height>
     </rect>
    </property>
   </widget>
