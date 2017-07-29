@@ -283,7 +283,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 {
     // Place new information in general structure
     consolidateMonitInfo(m);
-    //sendTskRepDistMsg(m, MsgHostMon);
+    sendTskRepDistMsg(m, MsgHostMon);
 
     // If sending updates is not yet activated, activate it
     if (!sendingPeriodicFmkInfo) {
