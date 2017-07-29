@@ -456,11 +456,12 @@ void Deployer::createElementsNetwork()
 
     ChannelDescriptor chnl;
 
-    // Ports (in fact, deltas from startingPort)
+    // Delta ports (deltas from startingPort)
     const int PortEvtMng     = 1;
     const int PortHMICmd     = 2;
     const int PortTskRepDist = 3;
 
+    
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
 
@@ -514,6 +515,7 @@ void Deployer::createElementsNetwork()
                     agPortTsk.push_back(portnum(startingPort + 10, h, 0));
                 }
             }
+            ++h;
         }
 
         //-----------------------------------------------------------------
@@ -548,14 +550,14 @@ void Deployer::createElementsNetwork()
         // 1. Processing requests
         // 2. Processing status reports
         // 3. Processing completion messages
-        h = 0;
+        int k = 0;
         for (auto & a : ag) {
-            chnl = ChnlTskProc + "_" + agName.at(h);
+            chnl = ChnlTskProc + "_" + agName.at(k);
             TRC("### Connections for channel " << chnl);
-            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(h));
+            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(k));
             ReqRep * r = new ReqRep(NN_REQ, connAddr);
             a->addConnection(chnl, r);
-            ++h;
+            ++k;
         }
 
         return;
