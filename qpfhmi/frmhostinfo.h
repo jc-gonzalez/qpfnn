@@ -21,6 +21,7 @@ public:
     ~FrmHostInfo();
 
     void update(ProcessingHostInfo & ph);
+    void update(SwarmInfo & sw);
     void setGraphs(QSimpleTickerGraph * load,
                    QSimpleTickerGraph * cpu,
                    QSimpleTickerGraph * tasks);

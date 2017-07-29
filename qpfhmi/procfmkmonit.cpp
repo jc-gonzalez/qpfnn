@@ -68,7 +68,7 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
                                                     QSizePolicy::Expanding);
     //vlyFrmAgents->addSpacerItem(spacerFrmAgents);
 
-    // Add widgets for hosts
+    // Add widgets for container hosts/agents
     for (auto & kv : procFmkInfo->hostsInfo) {
         ProcessingHostInfo & ph = (*(kv.second));
         FrmHostInfo * panel = new FrmHostInfo(0);
@@ -95,7 +95,35 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
         panel->update(ph);
         panels.append(panel);
         graphs.append(g);
+    }
 
+    // Add widgets for service swarm managers
+    for (auto & kv : procFmkInfo->swarmInfo) {
+        SwarmInfo & sw = (*(kv.second));
+        FrmHostInfo * panel = new FrmHostInfo(0);
+        vlyFrmAgents->addWidget(panel);
+
+        Graphs g;
+        g.loadGraph = panel->getLoadGraph();
+        g.loadGraph->setUnits("");
+        g.loadGraph->setRange(0, 10);
+        g.loadGraph->setReferencePoints(QList<double>() << 5);
+
+        g.cpuGraph = panel->getCPUGraph();
+        g.cpuGraph->setUnits("%");
+        g.cpuGraph->setRange(0, 150);
+        g.cpuGraph->setReferencePoints(QList<double>() << 100);
+        g.cpuGraph->setBackgroundBrush(QBrush(QColor(10, 0, 72)));
+
+        g.tasksGraph = panel->getTasksGraph();
+        g.tasksGraph->setUnits("");
+        g.tasksGraph->setRange(0, 100);
+        g.tasksGraph->setReferencePoints(QList<double>() << 50);
+        g.tasksGraph->setBackgroundBrush(QBrush(QColor(80, 10, 12)));
+
+        panel->update(sw);
+        panels.append(panel);
+        graphs.append(g);
     }
 
     vlyFrmAgents->addSpacerItem(spacerFrmAgents);

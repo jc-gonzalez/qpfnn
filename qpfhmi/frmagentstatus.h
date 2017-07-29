@@ -61,7 +61,7 @@ public:
     explicit FrmAgentStatus(QWidget *parent = 0);
     ~FrmAgentStatus();
 
-    void updateInfo(AgentInfo & a);
+    void updateInfo(std::string name, TaskStatusSpectra & d);
 
 private:
     Ui::FrmAgentStatus *ui;
