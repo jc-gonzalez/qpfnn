@@ -158,25 +158,30 @@ void SwarmInfo::fromStr(std::string s)
 
 std::string ProcessingFrameworkInfo::toJsonStr()
 {
-    std::map<std::string,
-             ProcessingHostInfo*>::iterator it = hostsInfo.begin();
-    std::string as = "\"" + it->first + "\": " + it->second->toJsonStr();
-    ++it;
-    while (it != hostsInfo.end()) {
-        as += COMMA + "\"" + it->first + "\": " + it->second->toJsonStr();
+    std::string as, ass;
+    if (hostsInfo.begin() != hostsInfo.end()) {
+        std::map<std::string,
+                 ProcessingHostInfo*>::iterator it = hostsInfo.begin();
+        as = "\"" + it->first + "\": " + it->second->toJsonStr();
         ++it;
+        while (it != hostsInfo.end()) {
+            as += COMMA + "\"" + it->first + "\": " + it->second->toJsonStr();
+            ++it;
+        }
     }
-    std::map<std::string,
-             SwarmInfo*>::iterator itt = swarmInfo.begin();
-    std::string ass = "\"" + itt->first + "\": " + itt->second->toJsonStr();
-    ++itt;
-    while (itt != swarmInfo.end()) {
-        ass += COMMA + "\"" + itt->first + "\": " + itt->second->toJsonStr();
+    if (swarmInfo.begin() != swarmInfo.end()) {
+        std::map<std::string,
+                 SwarmInfo*>::iterator itt = swarmInfo.begin();
+        ass = "\"" + itt->first + "\": " + itt->second->toJsonStr();
         ++itt;
+        while (itt != swarmInfo.end()) {
+            ass += COMMA + "\"" + itt->first + "\": " + itt->second->toJsonStr();
+            ++itt;
+        }
     }
     return (std::string("{") +
             "\"hostsInfo\": {" + as + "}" + COMMA +
-            "\"swarmInfo\": {" + as + "}" + COMMA +
+            "\"swarmInfo\": {" + ass + "}" + COMMA +
             FIELDNUM(numSrvTasks) + COMMA +
             FIELDNUM(numContTasks) + std::string("}"));
 }
