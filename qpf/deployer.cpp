@@ -483,7 +483,6 @@ void Deployer::createElementsNetwork()
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
                     TRC("  + " + std::string(sAgName));
-                    cfg.agentNames.push_back(sAgName);
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 10, h, i));
                 }
@@ -512,7 +511,6 @@ void Deployer::createElementsNetwork()
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro,
                                             SERVICE, swrm.serviceNodes(),
                                             serviceInfo));
-                    cfg.agentNames.push_back(sAgName);
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 10, h, 0));
                 }
