@@ -555,7 +555,7 @@ void Deployer::createElementsNetwork()
             chnl = ChnlTskProc + "_" + agName.at(k);
             TRC("### Connections for channel " << chnl);
             connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-            ag.at(0)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            ag.at(k)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
             ++k;
         }
 
