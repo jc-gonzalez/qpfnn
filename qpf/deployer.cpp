@@ -550,13 +550,12 @@ void Deployer::createElementsNetwork()
         // 1. Processing requests
         // 2. Processing status reports
         // 3. Processing completion messages
-        int k = 0;
-        for (auto & a : ag) {
+        k = 0;
+        for (auto & p : agPortTsk) {
             chnl = ChnlTskProc + "_" + agName.at(k);
             TRC("### Connections for channel " << chnl);
-            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(agPortTsk.at(k));
-            ReqRep * r = new ReqRep(NN_REQ, connAddr);
-            a->addConnection(chnl, r);
+            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+            ag.at(0)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
             ++k;
         }
 
@@ -650,13 +649,13 @@ void Deployer::createElementsNetwork()
 
     // CHANNEL TASK-PROCESSING - REQREP
     // - Out/In: TskAge*/TskMng
-    h = 0;
+    k = 0;
     for (auto & p : agPortTsk) {
-        chnl = ChnlTskProc + "_" + agName.at(h);
+        chnl = ChnlTskProc + "_" + agName.at(k);
         TRC("### Connections for channel " << chnl);
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
         m.tskMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
-        ++h;
+        ++k;
     }
 
     // CHANNEL TASK-REPORTING-DISTRIBUTION - PUBSUB
