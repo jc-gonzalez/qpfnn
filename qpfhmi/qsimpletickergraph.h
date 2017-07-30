@@ -58,7 +58,7 @@ public:
     // Adding/clearing data points
     void appendPoint(double point);
     void clear();
-
+    inline double lastPoint() { return mLastPoint; }
 private:
     // Data points
     QQueue<double> mData;
@@ -72,6 +72,7 @@ private:
     // Data range visible in graph
     double mMin;
     double mMax;
+    double mLastPoint;
 
     // Style
     QBrush mBackgroundBrush;

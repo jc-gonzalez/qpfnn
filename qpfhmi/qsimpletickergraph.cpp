@@ -23,6 +23,7 @@ QSimpleTickerGraph::QSimpleTickerGraph(QWidget *parent) : QWidget(parent),
     mDataCount(0),
     mMin(DEFAULT_MIN),
     mMax(DEFAULT_MAX),
+    mLastPoint(DEFAULT_MIN),
     mBackgroundBrush(QBrush(Qt::black)),
     mGridPen(QColor(0, 128, 64)),
     mGridPitch(DEFAULT_GRID_PITCH),
@@ -385,6 +386,7 @@ void QSimpleTickerGraph::setAxisFont(const QFont& font)
 void QSimpleTickerGraph::appendPoint(double point)
 {
     mData.enqueue(point);
+    mLastPoint = point;
     const int dataWidth = mPointWidth * (mData.size() - 1);
     if (dataWidth >= (width() + mPointWidth))
         mData.dequeue();

@@ -151,9 +151,9 @@ void ProcFmkMonitor::timeout()
         double mLoad  = ph->hostInfo.loadAvg.load1min;
         double mCpu   = ph->hostInfo.cpuInfo.overallCpuLoad.computedLoad * .01;
         double mTasks = ph->numTasks;
-        g.loadGraph->appendPoint(mLoad);
-        g.cpuGraph->appendPoint(mCpu);
-        g.tasksGraph->appendPoint(mTasks);
+        if (mLoad > 0.01)  g.loadGraph->appendPoint(mLoad);
+        if (mCpu > 0.01)   g.cpuGraph->appendPoint(mCpu);
+        if (mTasks > 0.01) g.tasksGraph->appendPoint(mTasks);
 
         // Update Host Agents statistics
         panels.at(k)->update(*ph);
