@@ -250,6 +250,10 @@ void Deployer::readConfiguration()
     // Initialize configuration
     cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
+    cfg.startingPort = initialPort;
+
+    cfg.generateProcFmkInfoStructure();
+
     DBG("Master host: " << cfg.network.masterNode());
     DBG("Current host: " << currentHostAddr << "/"
         << cfg.currentHostAddr);
@@ -257,7 +261,6 @@ void Deployer::readConfiguration()
         << std::string(cfg.weAreOnMaster ? "MASTER" : "PROCESSING")
         << " Host.");
 
-    TRC(cfg.str());
     TRC(cfg.general.appName());
     TRC(cfg.network.masterNode());
     for (auto & kv : cfg.network.processingNodes()) {
@@ -421,11 +424,6 @@ void Deployer::installSignalHandlers()
 //----------------------------------------------------------------------
 void Deployer::createElementsNetwork()
 {
-    // Handy lambda to compute ports number, h=1:procHosts, i=0:agentsInHost
-    // We will assume agentsInHost is < 10
-    auto portnum = [](int start, int h, int i) -> int
-        { return start + 10 * (h - 1) + i; };
-
     //======================================================================
     // 1. Gather host information
     //======================================================================
@@ -433,7 +431,6 @@ void Deployer::createElementsNetwork()
     MasterNodeElements & m = masterNodeElems;
     std::vector<CommNode*>  & ag = agentsNodes;
     std::string & thisHost = currentHostAddr;
-    int & startingPort = initialPort;
 
     masterAddress = cfg.network.masterNode();
     isMasterHost = (thisHost == masterAddress);
@@ -444,10 +441,10 @@ void Deployer::createElementsNetwork()
     // 2. Create the elements and connections for the host we are running on
     //======================================================================
 
-    // Agent names, hosts and ports (port range starts with startingPort)
-    char sAgName[100];
+    // Agent names, hosts and ports (port range starts with initialPort)
+    const char * sAgName = 0;
     std::vector<std::string> & agName    = cfg.agentNames;
-    std::vector<std::string> & agHost    = cfg.agHost;
+    //std::vector<std::string> & agHost    = cfg.agHost;
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
 
     // Connection addresses and channel
@@ -456,11 +453,12 @@ void Deployer::createElementsNetwork()
 
     ChannelDescriptor chnl;
 
-    // Delta ports (deltas from startingPort)
+    // Delta ports (deltas from initialPort)
     const int PortEvtMng     = 1;
     const int PortHMICmd     = 2;
     const int PortTskRepDist = 3;
 
+    int j = 0;
     
     //=== If we are running on a processing host ==========================
     if (! isMasterHost) {
@@ -471,23 +469,20 @@ void Deployer::createElementsNetwork()
 
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
+            sAgName = agName.at(j).c_str();
             if (thisHost == kv.first) {
                 int numOfTskAgents = kv.second;
-                TRC("THERE ARE " + std::to_string(numOfTskAgents) + " AGENTS:");
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
-                    sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
                     tskag->setRemote(true);
                     tskag->setSysDir(Config::PATHRun);
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
-                    TRC("  + " + std::string(sAgName));
-                    agName.push_back(std::string(sAgName));
-                    agPortTsk.push_back(portnum(startingPort + 10, h, i));
                 }
             }
             ++h;
+            ++j;
         }
 
         //-----------------------------------------------------------------
@@ -496,6 +491,7 @@ void Deployer::createElementsNetwork()
         //-----------------------------------------------------------------
 
         for (auto & it : cfg.network.swarms()) {
+            sAgName = agName.at(j).c_str();
             CfgGrpSwarm & swrm = it.second;
             if (swrm.serviceNodes().size() > 0) {
                 if (thisHost == swrm.serviceNodes().at(0)) {
@@ -507,15 +503,13 @@ void Deployer::createElementsNetwork()
                     for (auto & a: swrm.args()) {
                         serviceInfo->args.push_back(a);
                     }
-                    sprintf(sAgName, "Swarm_%s", serviceInfo->service.c_str());
                     ag.push_back(new TskAge(sAgName, thisHost, &synchro,
                                             SERVICE, swrm.serviceNodes(),
                                             serviceInfo));
-                    agName.push_back(std::string(sAgName));
-                    agPortTsk.push_back(portnum(startingPort + 10, h, 0));
                 }
             }
             ++h;
+            ++j;
         }
 
         //-----------------------------------------------------------------
@@ -527,7 +521,7 @@ void Deployer::createElementsNetwork()
         // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
         chnl     = ChnlCmd;
         TRC("### Connections for channel " << chnl);
-        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
             a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
@@ -538,7 +532,7 @@ void Deployer::createElementsNetwork()
         // - Respondent: DataMng LogMng TskOrc TskMng TskAge*/EvtMng
         chnl     = ChnlEvtMng;
         TRC("### Connections for channel " << chnl);
-        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
+        bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
         connAddr = bindAddr;
         for (auto & a : ag) {
             a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
@@ -550,13 +544,13 @@ void Deployer::createElementsNetwork()
         // 1. Processing requests
         // 2. Processing status reports
         // 3. Processing completion messages
-        int k = 0;
-        for (auto & p : agPortTsk) {
-            chnl = ChnlTskProc + "_" + agName.at(k);
+        int j = 0;
+        for (auto & p : cfg.agPortTsk) {
+            chnl = ChnlTskProc + "_" + agName.at(j);
             TRC("### Connections for channel " << chnl);
             connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-            ag.at(k)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
-            ++k;
+            ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            ++j;
         }
 
         return;
@@ -573,31 +567,9 @@ void Deployer::createElementsNetwork()
     m.tskOrc = new TskOrc  ("TskOrc", masterAddress, &synchro);
     m.tskMng = new TskMng  ("TskMng", masterAddress, &synchro);
 
-    //-----------------------------------------------------------------
-    // b. Fill agent vectors for all the declared processing hosts
-    //-----------------------------------------------------------------
-    int h = 1;
-    for (auto & kv : cfg.network.processingNodes()) {
-        for (unsigned int i = 0; i < kv.second; ++i) {
-            sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
-            agName.push_back(std::string(sAgName));
-            agPortTsk.push_back(portnum(startingPort + 10, h, i));
-        }
-        ++h;
-    }
 
-    for (auto & it : cfg.network.swarms()) {
-        CfgGrpSwarm & swrm = it.second;
-        if (swrm.serviceNodes().size() > 0) {
-            sprintf(sAgName, "Swarm_%s", swrm.name().c_str());
-            agName.push_back(std::string(sAgName));
-            agPortTsk.push_back(portnum(startingPort + 10, h, 0));
-        }
-        ++h;
-    }
-        
     //-----------------------------------------------------------------
-    // c. Create component connections
+    // b. Create component connections
     //-----------------------------------------------------------------
 
     // CHANNEL CMD - PUBSUB
@@ -605,7 +577,7 @@ void Deployer::createElementsNetwork()
     // - Subscribers: DataMng LogMng, TskOrc TskMng TskAge*
     chnl     = ChnlCmd;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
     connAddr = bindAddr;
     m.evtMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));
     for (auto & c : std::vector<CommNode*> {m.datMng, m.logMng, m.tskOrc, m.tskMng}) {
@@ -617,7 +589,7 @@ void Deployer::createElementsNetwork()
     // - Respondent: DataMng LogMng TskOrc TskMng TskAge*
     chnl     = ChnlEvtMng;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortEvtMng);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
     m.evtMng->addConnection(chnl, new Survey(NN_SURVEYOR, bindAddr));
     connAddr = bindAddr;
     std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
@@ -630,7 +602,7 @@ void Deployer::createElementsNetwork()
     // - Out/In: QPFHMI/EvtMng
     chnl     = ChnlHMICmd;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortHMICmd);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortHMICmd);
     m.evtMng->addConnection(chnl, new ReqRep(NN_REP, bindAddr));
 
     // CHANNEL INDATA -  PUBSUB
@@ -673,7 +645,7 @@ void Deployer::createElementsNetwork()
     // - Subscriber: DataMng EvtMng QPFHMI
     chnl     = ChnlTskRepDist;
     TRC("### Connections for channel " << chnl);
-    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(startingPort + PortTskRepDist);
+    bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortTskRepDist);
     //bindAddr = "inproc://" + chnl;
     connAddr = bindAddr;
     m.tskMng->addConnection(chnl, new PubSub(NN_PUB, bindAddr));

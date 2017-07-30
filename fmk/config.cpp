@@ -132,7 +132,9 @@ void Config::init(std::string fName)
         readConfigFromDB();
         isActualFile = false;
     }
+
     isLive = true;
+
     processConfig();
 }
 
@@ -428,8 +430,6 @@ void Config::processConfig()
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
-
-    generateProcFmkInfoStructure();
 }
 
 //----------------------------------------------------------------------
@@ -438,12 +438,25 @@ void Config::processConfig()
 //----------------------------------------------------------------------
 void Config::generateProcFmkInfoStructure()
 {
-    procFmkInfo->numContTasks = 0;
-    procFmkInfo->numSrvTasks = 0;
+    // Handy lambda to compute ports number, h=1:procHosts, i=0:agentsInHost
+    // We will assume agentsInHost is < 10
+    auto portnum = [](int start, int h, int i) -> int
+        { return start + 10 * (h - 1) + i; };
+
+    char sAgName[100];
+
     HostInfo hi;
     hi.update();
     int j = 0;
 
+    std::vector<std::string> & agName    = cfg.agentNames;
+    std::vector<std::string> & agHost    = cfg.agHost;
+    std::vector<int> &         agPortTsk = cfg.agPortTsk;
+
+    procFmkInfo->numContTasks = 0;
+    procFmkInfo->numSrvTasks = 0;
+
+    int h = 1;
     for (auto & ckv : cfg.network.processingNodes()) {
         int numOfTskAgents = ckv.second;
         hi.update();
@@ -457,6 +470,10 @@ void Config::generateProcFmkInfoStructure()
         ph->numTasks  = 0;
 
         for (int i = 0; i < ph->numAgents; ++i, ++j) {
+            sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
+            agName.push_back(std::string(sAgName));
+            agPortTsk.push_back(portnum(startingPort + 10, h, i));
+
             AgentInfo agInfo;
             agInfo.name       = cfg.agentNames.at(j);
             agInfo.taskStatus = TaskStatusSpectra();
@@ -468,12 +485,17 @@ void Config::generateProcFmkInfoStructure()
         procFmkInfo->hostsInfo[ph->name] = ph;
         procFmkInfo->numContTasks += ph->numTasks;
         agentMode[ip] = CONTAINER;
+        ++h;
     }
 
     for (auto & skv : cfg.network.swarms()) {
         hi.update();
         CfgGrpSwarm & swrm = skv.second;
         std::string ip = swrm.serviceNodes().at(0);
+
+        sprintf(sAgName, "Swarm_%s", ip.c_str());
+        agName.push_back(std::string(sAgName));
+        agPortTsk.push_back(portnum(startingPort + 10, h, 0));
 
         SwarmInfo * sw = new SwarmInfo;
         sw->name       = ip;
@@ -484,6 +506,7 @@ void Config::generateProcFmkInfoStructure()
         procFmkInfo->swarmInfo[ip] = sw;
         procFmkInfo->numSrvTasks += sw->scale;
         agentMode[ip] = SERVICE;
+        ++h;
     }
 }
 

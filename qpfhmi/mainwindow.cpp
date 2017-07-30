@@ -334,22 +334,10 @@ void MainWindow::manualSetupUI()
 
     //== Setup processing hosts monitoring widgets ===================
     /*
-    Config::procFmkInfo->numContTasks = 0;
-    HostInfo hi;
-    hi.update();
-
     // Create host monitoring widgets for container processing nodes
     int h = 1;
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
-        hi.update();
-
-        ProcessingHostInfo * ph = new ProcessingHostInfo;
-        ph->name      = kv.first;
-        ph->numAgents = numOfTskAgents;
-        ph->hostInfo  = hi;
-        ph->numTasks  = 0;
-
         for (int i = 1; i <= ph->numAgents; ++i) {
             AgentInfo agInfo;
             agInfo.name = QString("TskAgent_%1_%2")

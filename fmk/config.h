@@ -317,6 +317,11 @@ public:
     //----------------------------------------------------------------------
     void synchronizeSessionId(std::string newId);
 
+    //----------------------------------------------------------------------
+    // Method: generateProcFmkInfoStructure
+    //----------------------------------------------------------------------
+    void generateProcFmkInfoStructure();
+
 private:
 
     //----------------------------------------------------------------------
@@ -366,11 +371,6 @@ private:
     //----------------------------------------------------------------------
     void fillData();
 
-    //----------------------------------------------------------------------
-    // Method: generateProcFmkInfoStructure
-    //----------------------------------------------------------------------
-    void generateProcFmkInfoStructure();
-
 public:
     std::string           cfgFileName;
     std::string           cfgFilePath;
@@ -379,6 +379,8 @@ public:
     bool                  isActualFile;
     std::string           currentHostAddr;
     bool                  weAreOnMaster;
+
+    int                   startingPort;
 
     std::vector<std::string> agentNames;
     std::vector<std::string> agHost;
