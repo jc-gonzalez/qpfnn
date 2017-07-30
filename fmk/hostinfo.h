@@ -77,6 +77,7 @@ class HostInfo {
 
 public:
     HostInfo();
+    HostInfo(const HostInfo &obj);
 
     struct LoadAvg {
         float load1min;

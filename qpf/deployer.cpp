@@ -586,6 +586,16 @@ void Deployer::createElementsNetwork()
         ++h;
     }
 
+    for (auto & it : cfg.network.swarms()) {
+        CfgGrpSwarm & swrm = it.second;
+        if (swrm.serviceNodes().size() > 0) {
+            sprintf(sAgName, "Swarm_%s", swrm.name().c_str());
+            agName.push_back(std::string(sAgName));
+            agPortTsk.push_back(portnum(startingPort + 10, h, 0));
+        }
+        ++h;
+    }
+        
     //-----------------------------------------------------------------
     // c. Create component connections
     //-----------------------------------------------------------------

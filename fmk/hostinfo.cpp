@@ -65,6 +65,49 @@ HostInfo::HostInfo()
     cpuInfo.overallCpuLoad.timeInterval = 0;
 }
 
+HostInfo::HostInfo(const HostInfo &obj)
+{
+    hostIp = obj.hostIp;
+
+    loadAvg.load1min   = obj.loadAvg.load1min;
+    loadAvg.load5min   = obj.loadAvg.load5min;
+    loadAvg.load15min  = obj.loadAvg.load15min;
+    loadAvg.runProc    = obj.loadAvg.runProc;
+    loadAvg.totalProc  = obj.loadAvg.totalProc;
+    loadAvg.lastPid    = obj.loadAvg.lastPid;
+
+    cpuInfo.vendor            = obj.cpuInfo.vendor;
+    cpuInfo.modelName         = obj.cpuInfo.modelName;
+    cpuInfo.architecture      = obj.cpuInfo.architecture;
+    cpuInfo.cpuFreq           = obj.cpuInfo.cpuFreq;
+    cpuInfo.numCpus           = obj.cpuInfo.numCpus;
+    cpuInfo.numPhysicalCpus   = obj.cpuInfo.numPhysicalCpus;
+    cpuInfo.numCoresPerSocket = obj.cpuInfo.numCoresPerSocket;
+    cpuInfo.numThreadsPerCore = obj.cpuInfo.numThreadsPerCore;
+    cpuInfo.cacheSize         = obj.cpuInfo.cacheSize;
+    cpuInfo.hyperthreading    = obj.cpuInfo.hyperthreading;
+
+    cpuInfo.overallCpuLoad.workJiffies   = obj.cpuInfo.overallCpuLoad.workJiffies;
+    cpuInfo.overallCpuLoad.totalJiffies  = obj.cpuInfo.overallCpuLoad.totalJiffies;
+    cpuInfo.overallCpuLoad.workJiffies2  = obj.cpuInfo.overallCpuLoad.workJiffies2;
+    cpuInfo.overallCpuLoad.totalJiffies2 = obj.cpuInfo.overallCpuLoad.totalJiffies2;
+    cpuInfo.overallCpuLoad.timeInterval  = obj.cpuInfo.overallCpuLoad.timeInterval;
+    cpuInfo.overallCpuLoad.computedLoad  = obj.cpuInfo.overallCpuLoad.computedLoad;
+
+    cpuInfo.cpuLoad.clear();
+    for (int i = 0; i < cpuInfo.numCpus; ++i) {
+        CPULoad c;
+        c.workJiffies   = obj.cpuInfo.cpuLoad[i].workJiffies;
+        c.totalJiffies  = obj.cpuInfo.cpuLoad[i].totalJiffies;
+        c.workJiffies2  = obj.cpuInfo.cpuLoad[i].workJiffies2;
+        c.totalJiffies2 = obj.cpuInfo.cpuLoad[i].totalJiffies2;
+        c.timeInterval  = obj.cpuInfo.cpuLoad[i].timeInterval;
+        c.computedLoad  = obj.cpuInfo.cpuLoad[i].computedLoad;
+        cpuInfo.cpuLoad.push_back(c);
+    }
+}
+
+
 void HostInfo::update()
 {
     getHostInfo();
