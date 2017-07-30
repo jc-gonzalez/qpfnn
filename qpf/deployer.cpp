@@ -447,6 +447,9 @@ void Deployer::createElementsNetwork()
     //std::vector<std::string> & agHost    = cfg.agHost;
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
 
+    for (auto & a : agName) { TRC(" ===>> " << a); }
+    for (auto & ap : agPortTsk) { TRC(" ===>> " << ap); }
+
     // Connection addresses and channel
     std::string bindAddr;
     std::string connAddr;
@@ -470,8 +473,8 @@ void Deployer::createElementsNetwork()
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
             sAgName = agName.at(j).c_str();
+            int numOfTskAgents = kv.second;
             if (thisHost == kv.first) {
-                int numOfTskAgents = kv.second;
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
@@ -479,6 +482,10 @@ void Deployer::createElementsNetwork()
                     tskag->setSysDir(Config::PATHRun);
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
+                }
+            } else {
+                for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+                    ag.push_back(0);
                 }
             }
             ++h;
@@ -493,20 +500,20 @@ void Deployer::createElementsNetwork()
         for (auto & it : cfg.network.swarms()) {
             sAgName = agName.at(j).c_str();
             CfgGrpSwarm & swrm = it.second;
-            if (swrm.serviceNodes().size() > 0) {
-                if (thisHost == swrm.serviceNodes().at(0)) {
-                    TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
-                    serviceInfo->service    = swrm.name();
-                    serviceInfo->serviceImg = swrm.image();
-                    serviceInfo->scale      = swrm.scale();
-                    serviceInfo->exe        = swrm.exec();
-                    for (auto & a: swrm.args()) {
+            if ((thisHost == swrm.serviceNodes().at(0)) && (swrm.serviceNodes().size() > 0)) {
+                TskAge::ServiceInfo * serviceInfo = new TskAge::ServiceInfo;
+                serviceInfo->service    = swrm.name();
+                serviceInfo->serviceImg = swrm.image();
+                serviceInfo->scale      = swrm.scale();
+                serviceInfo->exe        = swrm.exec();
+                for (auto & a: swrm.args()) {
                         serviceInfo->args.push_back(a);
-                    }
-                    ag.push_back(new TskAge(sAgName, thisHost, &synchro,
-                                            SERVICE, swrm.serviceNodes(),
-                                            serviceInfo));
                 }
+                ag.push_back(new TskAge(sAgName, thisHost, &synchro,
+                                        SERVICE, swrm.serviceNodes(),
+                                        serviceInfo));
+            } else {
+                ag.push_back(0);
             }
             ++h;
             ++j;
@@ -524,7 +531,9 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+            if (a != 0) {
+                a->addConnection(chnl, new PubSub(NN_SUB, connAddr));
+            }
         }
 
         // CHANNEL EVTMNG Related - SURVEY
@@ -535,7 +544,9 @@ void Deployer::createElementsNetwork()
         bindAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(initialPort + PortEvtMng);
         connAddr = bindAddr;
         for (auto & a : ag) {
-            a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+            if (a != 0) {
+                a->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+            }
         }
 
         // CHANNEL TASK-PROCESSING - REQREP
@@ -546,10 +557,12 @@ void Deployer::createElementsNetwork()
         // 3. Processing completion messages
         int j = 0;
         for (auto & p : cfg.agPortTsk) {
-            chnl = ChnlTskProc + "_" + agName.at(j);
-            TRC("### Connections for channel " << chnl);
-            connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
-            ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            if (ag.at(j) != 0) {
+                chnl = ChnlTskProc + "_" + agName.at(j);
+                TRC("### Connections for channel " << chnl);
+                connAddr = "tcp://" + masterAddress + ":" + str::toStr<int>(p);
+                ag.at(j)->addConnection(chnl, new ReqRep(NN_REQ, connAddr));
+            }
             ++j;
         }
 
@@ -595,7 +608,9 @@ void Deployer::createElementsNetwork()
     std::vector<CommNode*> cs({m.datMng, m.logMng, m.tskOrc, m.tskMng});
     cs.insert(cs.end(), ag.begin(), ag.end());
     for (auto & c : cs) {
-        c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        if (c != 0) {
+            c->addConnection(chnl, new Survey(NN_RESPONDENT, connAddr));
+        }
     }
 
     // CHANNEL HMICMD - REQREP

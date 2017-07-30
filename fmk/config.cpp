@@ -456,6 +456,9 @@ void Config::generateProcFmkInfoStructure()
     procFmkInfo->numContTasks = 0;
     procFmkInfo->numSrvTasks = 0;
 
+    agName.clear();
+    agPortTsk.clear();
+
     int h = 1;
     for (auto & ckv : cfg.network.processingNodes()) {
         int numOfTskAgents = ckv.second;
@@ -475,7 +478,7 @@ void Config::generateProcFmkInfoStructure()
             agPortTsk.push_back(portnum(startingPort + 10, h, i));
 
             AgentInfo agInfo;
-            agInfo.name       = cfg.agentNames.at(j);
+            agInfo.name       = agName.at(j);
             agInfo.taskStatus = TaskStatusSpectra();
             agInfo.load       = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);
