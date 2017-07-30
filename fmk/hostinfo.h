@@ -51,6 +51,8 @@
 //------------------------------------------------------------
 #include <vector>
 #include <string>
+#include <thread>
+#include <mutex>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -78,6 +80,7 @@ class HostInfo {
 public:
     HostInfo();
     HostInfo(const HostInfo &obj);
+    HostInfo & operator=(const HostInfo & obj);
 
     struct LoadAvg {
         float load1min;
@@ -137,6 +140,8 @@ private:
     void getHostInfo();
 
     bool firstUpdate;
+    std::mutex mtxHostInfo;
+
     static long USER_HZ;
 };
 

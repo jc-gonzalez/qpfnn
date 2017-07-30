@@ -67,6 +67,13 @@ HostInfo::HostInfo() : firstUpdate(true)
 
 HostInfo::HostInfo(const HostInfo &obj)
 {
+    (*this) = obj;
+}
+
+HostInfo & HostInfo::operator=( const HostInfo & obj)
+{
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     hostIp = obj.hostIp;
 
     loadAvg.load1min   = obj.loadAvg.load1min;
@@ -105,8 +112,9 @@ HostInfo::HostInfo(const HostInfo &obj)
         c.computedLoad  = obj.cpuInfo.cpuLoad[i].computedLoad;
         cpuInfo.cpuLoad.push_back(c);
     }
-}
 
+    return *this;
+}
 
 void HostInfo::update()
 {
@@ -170,7 +178,8 @@ std::string HostInfo::toJsonStr()
 
     CPULoad & o = c.overallCpuLoad;
     s << "\"overallCpuLoad\":{"
-      << "\"jiffies\":[" << o.workJiffies << ","
+      << "\"jiffies\":["
+      << o.workJiffies << ","
       << o.totalJiffies << ","
       << o.workJiffies2 << ","
       << o.totalJiffies2 << "],"
@@ -181,7 +190,8 @@ std::string HostInfo::toJsonStr()
     for (int i = 0; i < c.numCpus; ++i) {
         CPULoad & o = c.cpuLoad[i];
         s << "{"
-          << "\"jiffies\":[" << o.workJiffies << ","
+          << "\"jiffies\":["
+          << o.workJiffies << ","
           << o.totalJiffies << ","
           << o.workJiffies2 << ","
           << o.totalJiffies2 << "],"
@@ -196,6 +206,8 @@ std::string HostInfo::toJsonStr()
 
 void HostInfo::fromStr(std::string s)
 {
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
 
@@ -389,6 +401,8 @@ void HostInfo::getCPUInfo(CPUInfo & info)
 //----------------------------------------------------------------------
 void HostInfo::getHostInfo()
 {
+    //std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     getCPUInfo(cpuInfo);
     getLoadAvg(loadAvg);
 }
