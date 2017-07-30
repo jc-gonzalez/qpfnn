@@ -366,6 +366,11 @@ private:
     //----------------------------------------------------------------------
     void fillData();
 
+    //----------------------------------------------------------------------
+    // Method: generateProcFmkInfoStructure
+    //----------------------------------------------------------------------
+    void generateProcFmkInfoStructure();
+
 public:
     std::string           cfgFileName;
     std::string           cfgFilePath;

@@ -681,69 +681,6 @@ void Deployer::createElementsNetwork()
         c->addConnection(chnl, new PubSub(NN_SUB, connAddr));
     }
 
-    //------------------------------------------------------------
-    // Build procFmkInfo structure
-    //------------------------------------------------------------
-    generateProcFmkInfoStructure();
-}
-
-//----------------------------------------------------------------------
-// generateProcFmkInfoStructure
-//----------------------------------------------------------------------
-void Deployer::generateProcFmkInfoStructure()
-{
-    Config::procFmkInfo->numContTasks = 0;
-    Config::procFmkInfo->numSrvTasks = 0;
-    HostInfo hi;
-    hi.update();
-    int j = 0;
-
-    TRC(Config::procFmkInfo->toJsonStr());
-
-    for (auto & ckv : cfg.network.processingNodes()) {
-        int numOfTskAgents = ckv.second;
-        hi.update();
-
-        std::string ip = ckv.first;
-        
-        ProcessingHostInfo * ph = new ProcessingHostInfo;
-        ph->name      = ip;
-        ph->numAgents = numOfTskAgents;
-        ph->hostInfo  = hi;
-        ph->numTasks  = 0;
-
-        for (int i = 0; i < ph->numAgents; ++i, ++j) {
-          
-            AgentInfo agInfo;
-            agInfo.name       = cfg.agentNames.at(j);
-            agInfo.taskStatus = TaskStatusSpectra();
-            agInfo.load       = (rand() % 1000) * 0.01;
-            ph->agInfo.push_back(agInfo);
-            ph->numTasks += agInfo.taskStatus.total;
-        }
-
-        Config::procFmkInfo->hostsInfo[ph->name] = ph;
-        Config::procFmkInfo->numContTasks += ph->numTasks;
-        Config::agentMode[ip] = CONTAINER;
-    }
-
-    for (auto & skv : cfg.network.swarms()) {
-        hi.update();
-        CfgGrpSwarm & swrm = skv.second;
-        std::string ip = swrm.serviceNodes().at(0);
-
-        SwarmInfo * sw = new SwarmInfo;
-        sw->name       = ip;
-        sw->scale      = swrm.scale();
-        sw->hostInfo   = hi;
-        sw->taskStatus = TaskStatusSpectra();
-
-        Config::procFmkInfo->swarmInfo[ip] = sw;
-        Config::procFmkInfo->numSrvTasks += sw->scale;
-        Config::agentMode[ip] = SERVICE;
-    }
-    
-    TRC(Config::procFmkInfo->toJsonStr());
 }
 
 //}

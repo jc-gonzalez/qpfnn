@@ -125,7 +125,7 @@ void TskMng::runEachIteration()
     // messages, performs the following actions:
     // 1. Send Task Status Reports to
     static std::string lastTrace;
-  
+
     std::string trace = ("SWARM: Q(" + std::to_string(serviceTasks.size()) + ")" +
                          "R(" + std::to_string(serviceTaskStatus[TASK_RUNNING]) + ")" +
                          "W(" + std::to_string(serviceTaskStatus[TASK_SCHEDULED]) + ")" +
@@ -371,25 +371,27 @@ std::string TskMng::selectAgent()
 //----------------------------------------------------------------------
 void TskMng::consolidateMonitInfo(MessageString & m)
 {
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     Json::FastWriter fastWriter;
     std::string s(fastWriter.write(body["info"]));
-    HostInfo hostInfo;
-    hostInfo.fromStr(s);
+    HostInfo hostInfo(s);
     std::string hostIp = hostInfo.hostIp;
     TRC("Consolidating " + s + " for host " + hostIp);
     double cpu1, cpu2;
+
     switch (Config::agentMode[hostIp]) {
     case CONTAINER:
         cpu1 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.fromStr(s);
+        Config::procFmkInfo->hostsInfo[hostIp]->hostInfo = hostInfo;
         cpu2 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
         TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
     case SERVICE:
         cpu1 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.fromStr(s);
+        Config::procFmkInfo->swarmInfo[hostIp]->hostInfo = hostInfo;
         cpu2 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
         TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
@@ -438,9 +440,14 @@ bool TskMng::sendTskRepDistMsg(MessageString & m, const MessageDescriptor & msgT
 //----------------------------------------------------------------------
 void TskMng::sendProcFmkInfoUpdate()
 {
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     // Prepare message and send it
     Message<MsgBodyTSK> msg;
     MsgBodyTSK body;
+
+    double cpu = Config::procFmkInfo->hostsInfo.begin()->second->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+    TRC("@@@@@@@@@@  => " << cpu);
 
     std::string s = Config::procFmkInfo->toJsonStr();
     JValue fmkInfoValue(s);
@@ -458,9 +465,7 @@ void TskMng::sendProcFmkInfoUpdate()
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
         TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
-        TRC(msg.str());
         TRC(s);
-        TRC(Config::procFmkInfo->hostsInfo.begin()->second->hostInfo.dump());
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
     }

@@ -333,7 +333,7 @@ void MainWindow::manualSetupUI()
     ui->tblvwTx->setModel(txModel);
 
     //== Setup processing hosts monitoring widgets ===================
-
+    /*
     Config::procFmkInfo->numContTasks = 0;
     HostInfo hi;
     hi.update();
@@ -379,7 +379,7 @@ void MainWindow::manualSetupUI()
         Config::procFmkInfo->swarmInfo[sw->name] = sw;
         Config::procFmkInfo->numSrvTasks += sw->scale;
     }
-
+    */
     procFmkMonit = new ProcFmkMonitor(ui->scrollAreaAgents);
     procFmkMonit->setupHostsInfo(Config::procFmkInfo);
 }

@@ -428,6 +428,63 @@ void Config::processConfig()
     storage.archive  = PATHData + "/archive";
     storage.gateway  = PATHData + "/gateway";
     storage.userArea = PATHData + "/user";
+
+    generateProcFmkInfoStructure();
+}
+
+//----------------------------------------------------------------------
+// Method: generateProcFmkInfoStructure
+// Generates a new ProcFmkInfo structure
+//----------------------------------------------------------------------
+void Config::generateProcFmkInfoStructure()
+{
+    procFmkInfo->numContTasks = 0;
+    procFmkInfo->numSrvTasks = 0;
+    HostInfo hi;
+    hi.update();
+    int j = 0;
+
+    for (auto & ckv : cfg.network.processingNodes()) {
+        int numOfTskAgents = ckv.second;
+        hi.update();
+
+        std::string ip = ckv.first;
+
+        ProcessingHostInfo * ph = new ProcessingHostInfo;
+        ph->name      = ip;
+        ph->numAgents = numOfTskAgents;
+        ph->hostInfo  = hi;
+        ph->numTasks  = 0;
+
+        for (int i = 0; i < ph->numAgents; ++i, ++j) {
+            AgentInfo agInfo;
+            agInfo.name       = cfg.agentNames.at(j);
+            agInfo.taskStatus = TaskStatusSpectra();
+            agInfo.load       = (rand() % 1000) * 0.01;
+            ph->agInfo.push_back(agInfo);
+            ph->numTasks += agInfo.taskStatus.total;
+        }
+
+        procFmkInfo->hostsInfo[ph->name] = ph;
+        procFmkInfo->numContTasks += ph->numTasks;
+        agentMode[ip] = CONTAINER;
+    }
+
+    for (auto & skv : cfg.network.swarms()) {
+        hi.update();
+        CfgGrpSwarm & swrm = skv.second;
+        std::string ip = swrm.serviceNodes().at(0);
+
+        SwarmInfo * sw = new SwarmInfo;
+        sw->name       = ip;
+        sw->scale      = swrm.scale();
+        sw->hostInfo   = hi;
+        sw->taskStatus = TaskStatusSpectra();
+
+        procFmkInfo->swarmInfo[ip] = sw;
+        procFmkInfo->numSrvTasks += sw->scale;
+        agentMode[ip] = SERVICE;
+    }
 }
 
 //----------------------------------------------------------------------

@@ -50,6 +50,8 @@
 //   - list
 //------------------------------------------------------------
 #include <list>
+#include <thread>
+#include <mutex>
 
 //------------------------------------------------------------
 // Topic: External packages
@@ -191,6 +193,8 @@ private:
     std::map<TaskStatusPerAgent, int> containerTaskStatusPerAgent;
 
     HttpServer * httpSrv;
+
+    std::mutex mtxHostInfo;
 
     bool sendingPeriodicFmkInfo;
 
