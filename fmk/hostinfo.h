@@ -79,6 +79,7 @@ class HostInfo {
 
 public:
     HostInfo();
+    HostInfo(std::string s);
     HostInfo(const HostInfo &obj);
     HostInfo & operator=(const HostInfo & obj);
 

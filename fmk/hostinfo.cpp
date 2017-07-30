@@ -65,6 +65,11 @@ HostInfo::HostInfo() : firstUpdate(true)
     cpuInfo.overallCpuLoad.timeInterval = 0;
 }
 
+HostInfo::HostInfo(std::string s)
+{
+    fromStr(s);
+}
+
 HostInfo::HostInfo(const HostInfo &obj)
 {
     (*this) = obj;
