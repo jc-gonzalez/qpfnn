@@ -550,7 +550,7 @@ void Deployer::createElementsNetwork()
         // 1. Processing requests
         // 2. Processing status reports
         // 3. Processing completion messages
-        k = 0;
+        int k = 0;
         for (auto & p : agPortTsk) {
             chnl = ChnlTskProc + "_" + agName.at(k);
             TRC("### Connections for channel " << chnl);
@@ -649,7 +649,7 @@ void Deployer::createElementsNetwork()
 
     // CHANNEL TASK-PROCESSING - REQREP
     // - Out/In: TskAge*/TskMng
-    k = 0;
+    int k = 0;
     for (auto & p : agPortTsk) {
         chnl = ChnlTskProc + "_" + agName.at(k);
         TRC("### Connections for channel " << chnl);
