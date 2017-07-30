@@ -473,6 +473,7 @@ void Deployer::createElementsNetwork()
         for (auto & kv : cfg.network.processingNodes()) {
             if (thisHost == kv.first) {
                 int numOfTskAgents = kv.second;
+                TRC("THERE ARE " + std::to_string(numOfTskAgents) + " AGENTS:");
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
@@ -481,6 +482,7 @@ void Deployer::createElementsNetwork()
                     tskag->setSysDir(Config::PATHRun);
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
+                    TRC("  + " + std::string(sAgName));
                     cfg.agentNames.push_back(sAgName);
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 10, h, i));
