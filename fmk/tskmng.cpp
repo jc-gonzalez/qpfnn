@@ -379,14 +379,19 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     hostInfo.fromStr(s);
     std::string hostIp = hostInfo.hostIp;
     TRC("Consolidating " + s + " for host " + hostIp);
+    double cpu1, cpu2;
     switch (Config::agentMode[hostIp]) {
     case CONTAINER:
-        Config::procFmkInfo->hostsInfo[hostIp]->hostInfo = hostInfo;
-        TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@");
+        cpu1 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.fromStr(s);
+        cpu2 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
     case SERVICE:
-        Config::procFmkInfo->swarmInfo[hostIp]->hostInfo = hostInfo;
-        TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@");
+        cpu1 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.fromStr(s);
+        cpu2 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
     default:
         break;
@@ -454,6 +459,8 @@ void TskMng::sendProcFmkInfoUpdate()
         conn->setMsgOut(msg.str());
         TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
         TRC(msg.str());
+        TRC(s);
+        TRC(Config::procFmkInfo->hostsInfo.begin()->second->hostInfo.dump());
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
     }

@@ -83,9 +83,9 @@ public:
         float load1min;
         float load5min;
         float load15min;
-        int   runProc;
-        int   totalProc;
-        int   lastPid;
+        unsigned int runProc;
+        unsigned int totalProc;
+        unsigned int lastPid;
     };
 
     struct CPULoad {
@@ -96,11 +96,11 @@ public:
             totalJiffies2(0),
             timeInterval(0),
             computedLoad(0.) {}
-        int workJiffies;
-        int totalJiffies;
-        int workJiffies2;
-        int totalJiffies2;
-        int timeInterval;
+        unsigned int workJiffies;
+        unsigned int totalJiffies;
+        unsigned int workJiffies2;
+        unsigned int totalJiffies2;
+        unsigned int timeInterval;
         float computedLoad;
     };
 
@@ -109,11 +109,11 @@ public:
         std::string modelName;
         std::string architecture;
         float cpuFreq; // MHz
-        int numCpus;
-        int numPhysicalCpus;
-        int numCoresPerSocket;
-        int numThreadsPerCore;
-        int cacheSize;
+        unsigned int numCpus;
+        unsigned int numPhysicalCpus;
+        unsigned int numCoresPerSocket;
+        unsigned int numThreadsPerCore;
+        unsigned int cacheSize;
         bool hyperthreading;
         CPULoad overallCpuLoad;
         std::vector<CPULoad> cpuLoad;
@@ -136,6 +136,7 @@ private:
     void getCPUInfo(CPUInfo & info);
     void getHostInfo();
 
+    bool firstUpdate;
     static long USER_HZ;
 };
 

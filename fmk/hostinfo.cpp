@@ -60,7 +60,7 @@
 
 long HostInfo::USER_HZ = sysconf(_SC_CLK_TCK);
 
-HostInfo::HostInfo()
+HostInfo::HostInfo() : firstUpdate(true)
 {
     cpuInfo.overallCpuLoad.timeInterval = 0;
 }
@@ -314,14 +314,17 @@ void HostInfo::getCPULoad(CPULoad & c, int line)
                        _softirq + _steal + _guest + _guest_nice);
     c.workJiffies2  = c.totalJiffies2 - (_idle + _iowait); // total - idle
 
-    float workCPU  = c.workJiffies2  - c.workJiffies;
-    float totalCPU = c.totalJiffies2 - c.totalJiffies;
+    if (((!firstUpdate) && (c.totalJiffies2 - c.totalJiffies))) {
+        float workCPU  = c.workJiffies2  - c.workJiffies;
+        float totalCPU = c.totalJiffies2 - c.totalJiffies;
 
-    if (c.totalJiffies2 > c.totalJiffies) {
-        c.computedLoad  = (workCPU * 100.) / totalCPU;
+        c.computedLoad = (workCPU * 100.) / totalCPU;
         c.timeInterval = (int)(totalCPU * 1000) / HostInfo::USER_HZ;
+        std::cerr << std::string("!!!! >>") << c.computedLoad << "\n";
     } else {
-        // do not update computedLoad
+        c.computedLoad = 0.;
+        c.timeInterval = 1;
+        firstUpdate = false;
     }
 }
 
