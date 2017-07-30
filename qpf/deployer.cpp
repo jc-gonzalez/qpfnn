@@ -445,7 +445,7 @@ void Deployer::createElementsNetwork()
     //======================================================================
 
     // Agent names, hosts and ports (port range starts with startingPort)
-    char sAgName[60];
+    char sAgName[100];
     std::vector<std::string> & agName    = cfg.agentNames;
     std::vector<std::string> & agHost    = cfg.agHost;
     std::vector<int> &         agPortTsk = cfg.agPortTsk;
@@ -475,13 +475,13 @@ void Deployer::createElementsNetwork()
                 int numOfTskAgents = kv.second;
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
                     sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
-                    cfg.agentNames.push_back(sAgName);
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
                     tskag->setRemote(true);
                     tskag->setSysDir(Config::PATHRun);
                     tskag->setWorkDir(Config::PATHTsk);
                     ag.push_back(tskag);
+                    cfg.agentNames.push_back(sAgName);
                     agName.push_back(std::string(sAgName));
                     agPortTsk.push_back(portnum(startingPort + 10, h, i));
                 }
