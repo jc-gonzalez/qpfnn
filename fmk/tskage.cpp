@@ -175,8 +175,16 @@ void TskAge::runEachIterationForContainers()
                          compName, "TskMng",
                          "", "", "");
 
-            std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
             std::string chnl(ChnlTskProc + "_" + compName);
+            send(chnl, msg.str());
+            DBG("Sending request via channel " + chnl);
+            InfoMsg("Sending request via channel " + chnl);
+
+            pStatus = WAITING;
+            InfoMsg("Switching to status " + ProcStatusName[pStatus]);
+            waitingCycles = 0;
+
+            /*    
             DBG("Looking for channel " << chnl);
             it = connections.find(chnl);
             if (it != connections.end()) {
@@ -187,7 +195,8 @@ void TskAge::runEachIterationForContainers()
                 pStatus = WAITING;
                 InfoMsg("Switching to status " + ProcStatusName[pStatus]);
                 waitingCycles = 0;
-            }
+                }*/
+            
         }
         break;
     case WAITING:
