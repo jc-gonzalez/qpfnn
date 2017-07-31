@@ -79,6 +79,7 @@ using std::chrono::system_clock;
 #include "sm.h"
 #include "config.h"
 #include "channels.h"
+#include "message.h"
 #include "log.h"
 #include "sync.h"
 #include "alert.h"
@@ -191,6 +192,16 @@ protected:
     //----------------------------------------------------------------------
     void send(ChannelDescriptor chnl, MessageString m);
 
+    //----------------------------------------------------------------------
+    // Method: sendBodyElem<T>
+    //----------------------------------------------------------------------
+    template<class T>
+    void sendBodyElem(ChannelDescriptor chnl,
+                      ChannelDescriptor actualChnl, MessageDescriptor tag,
+                      std::string from, std::string to,
+                      std::string bodyElem, std::string elemContent,
+                      std::string initialMsgStr);
+ 
     //----------------------------------------------------------------------
     // Method: fromInitialisedToRunning
     //----------------------------------------------------------------------

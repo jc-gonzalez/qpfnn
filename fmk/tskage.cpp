@@ -379,26 +379,11 @@ void TskAge::sendTaskReport()
     // ... and add it as well to the taskData JSON structure
     task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
-    // Define and set task object
-    Message<MsgBodyTSK> msg(origMsgString);
-    MsgBodyTSK & body = msg.body;
-    body["info"] = task.val();
-
-    msg.buildHdr(ChnlTskProc, MsgTskRep, CHNLS_IF_VERSION,
-                 compName, "TskMng",
-                 "", "", "");
-    msg.buildBody(body);
-
-    // Send msg
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    std::string chnl(ChnlTskProc + "_" + compName);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        TRC("Sending report <<" + msg.str() + ">>");
-        conn->setMsgOut(msg.str());
-    }
-
+    sendBodyElem<MsgBodyTSK>(ChnlTskProc,
+                             ChnlTskProc + "_" + compName, MsgTskRep,
+                             compName, "TskMng",
+                             "info", task.str(),
+                             origMsgString);
 }
 
 //----------------------------------------------------------------------
@@ -461,28 +446,10 @@ void TskAge::sendHostInfoUpdate()
     // Update host information
     hostInfo.update();
 
-    // Prepare message and send it
-    // Define and set task object
-    Message<MsgBodyTSK> msg;
-    MsgBodyTSK & body = msg.body;
-
-    JValue hostInfoValue(hostInfo.toJsonStr());
-    DBG(hostInfo.toJsonStr());
-    body["info"] = hostInfoValue.val();
-
-    msg.buildHdr(ChnlTskProc, MsgHostMon, CHNLS_IF_VERSION,
-                 compName, "TskMng",
-                 "", "", "");
-    msg.buildBody(body);
-
-    // Send msg
-    std::map<ChannelDescriptor, ScalabilityProtocolRole*>::iterator it;
-    std::string chnl(ChnlTskProc + "_" + compName);
-    it = connections.find(chnl);
-    if (it != connections.end()) {
-        ScalabilityProtocolRole * conn = it->second;
-        conn->setMsgOut(msg.str());
-    }
+    sendBodyElem<MsgBodyTSK>(ChnlTskProc,
+                             ChnlTskProc + "_" + compName, MsgHostMon,
+                             compName, "TskMng",
+                             "info", hostInfo.toJsonStr(), "");
 
     armHostInfoTimer();
 }

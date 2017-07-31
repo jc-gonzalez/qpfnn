@@ -289,6 +289,38 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
 }
 
 //----------------------------------------------------------------------
+// Method: sendBodyElem<T>
+//----------------------------------------------------------------------
+template<class T>
+void Component::sendBodyElem(ChannelDescriptor chnl,
+                             ChannelDescriptor actualChnl, MessageDescriptor tag,
+                             std::string from, std::string to,
+                             std::string bodyElem, std::string elemContent,
+                             std::string initialMsgStr = std::string())
+{
+      // Prepare message and send it
+    // Define and set task object
+    Message<T> msg(initialMsgStr);
+    JValue jstrValue(elemContent);
+
+    T & body = msg.body;
+    body[bodyElem] = jstrValue.val();
+
+    msg.buildHdr(chnl, tag, CHNLS_IF_VERSION, from, to, "", "", "");
+    msg.buildBody(body);
+
+    this->send(actualChnl, msg.str());
+}
+
+// explicit instantiation
+template
+void Component::sendBodyElem<MsgBodyTSK>(ChannelDescriptor chnl,
+                                         ChannelDescriptor actualChnl, MessageDescriptor tag,
+                                         std::string from, std::string to,
+                                         std::string bodyElem, std::string elemContent,
+                                         std::string initialMsgStr);
+
+//----------------------------------------------------------------------
 // Method: run
 //----------------------------------------------------------------------
 void Component::run()
