@@ -231,12 +231,6 @@ void MainWindow::setAppInfo(QString name, QString rev, QString bld)
 //----------------------------------------------------------------------
 void MainWindow::manualSetupUI()
 {
-//    ui->tabpgEvtInj->setEnabled(false);
-//    ui->btnStopMultInDataEvt->hide();
-
-//    ui->actionActivate_Debug_Info->setEnabled(false);
-//    ui->chkDebugInfo->setEnabled(false);
-
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     connect(ui->mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)),
@@ -333,41 +327,6 @@ void MainWindow::manualSetupUI()
     ui->tblvwTx->setModel(txModel);
 
     //== Setup processing hosts monitoring widgets ===================
-    /*
-    // Create host monitoring widgets for container processing nodes
-    int h = 1;
-    for (auto & kv : cfg.network.processingNodes()) {
-        int numOfTskAgents = kv.second;
-        for (int i = 1; i <= ph->numAgents; ++i) {
-            AgentInfo agInfo;
-            agInfo.name = QString("TskAgent_%1_%2")
-                .arg(h, 2, 10, QLatin1Char('0'))
-                .arg(i, 2, 10, QLatin1Char('0')).toStdString();
-            agInfo.taskStatus = TaskStatusSpectra();
-            agInfo.load = (rand() % 1000) * 0.01;
-            ph->agInfo.push_back(agInfo);
-            ph->numTasks += agInfo.taskStatus.total;
-        }
-        
-        Config::procFmkInfo->hostsInfo[ph->name] = ph;
-        Config::procFmkInfo->numContTasks += ph->numTasks;
-        ++h;
-    }
-
-    // Then, create host monitoring widgets for service nodes
-    for (auto & kv : cfg.network.swarms()) {
-        hi.update();
-
-        SwarmInfo * sw = new SwarmInfo;
-        sw->name       = kv.first;
-        sw->scale      = kv.second.scale();
-        sw->hostInfo   = hi;
-        sw->taskStatus = TaskStatusSpectra();
-
-        Config::procFmkInfo->swarmInfo[sw->name] = sw;
-        Config::procFmkInfo->numSrvTasks += sw->scale;
-    }
-    */
     procFmkMonit = new ProcFmkMonitor(ui->scrollAreaAgents);
     procFmkMonit->setupHostsInfo(Config::procFmkInfo);
 }
@@ -380,6 +339,8 @@ void MainWindow::readConfig(QString dbUrl)
 {
     // Create configuration object and read configuration from DB
     cfg.init(dbUrl.toStdString());
+    cfg.startingPort = startingPort;
+    cfg.generateProcFmkInfoStructure();
 
     TRC(cfg.str());
     TRC(cfg.general.appName());
@@ -417,13 +378,15 @@ void MainWindow::readConfig(QString dbUrl)
     nodeNames << tr("QPFHMI") << tr("EvtMng") << tr("LogMng")
               << tr("DatMng") << tr("TskOrc") << tr("TskMng");
     int h = 1;
+    int j = 0;
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
         for (unsigned int i = 0; i < numOfTskAgents; ++i) {
-            QString taName = QString("TskAgent_%1_%2")
+            /*QString taName = QString("TskAgent_%1_%2")
                 .arg(h,2,10,QLatin1Char('0'))
                 .arg(i+1,2,10,QLatin1Char('0'));
-            std::string staName = taName.toStdString();
+                std::string staName = taName.toStdString(); */
+            std::string & staName = cfg.agentNames.at(j);
             agName.push_back(staName);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
@@ -432,14 +395,16 @@ void MainWindow::readConfig(QString dbUrl)
             taskAgentsInfo[staName] = taInfo;
         }
         ++h;
+        ++j;
     }
 
     for (auto & kv : cfg.network.swarms()) {
         CfgGrpSwarm & swrm = kv.second;
         if (swrm.serviceNodes().size() > 0) {
-            QString n = QString("Swarm_%1")
+            /*QString n = QString("Swarm_%1")
                 .arg(QString::fromStdString(swrm.name()));
-            std::string staName = n.toStdString();
+                std::string staName = n.toStdString();*/
+            std::string & staName = cfg.agentNames.at(j);
             agName.push_back(staName);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
@@ -447,6 +412,7 @@ void MainWindow::readConfig(QString dbUrl)
             (*taInfo)["server"] = kv.first;
             taskAgentsInfo[staName] = taInfo;
         }
+        ++j;
     }
 
     QString lastAccess = QDateTime::currentDateTime().toString("yyyyMMddTHHmmss");

@@ -84,7 +84,8 @@ std::string AgentInfo::toJsonStr()
     return (std::string("{") +
             FIELDSTR(name) + COMMA +
             "\"counts\": " + taskStatus.toJsonStr() + COMMA +
-            FIELDNUM(load) + std::string("}"));
+            "\"load\": " + std::to_string((int)(load * 100)) +
+            std::string("}"));
 }
 
 void AgentInfo::fromStr(std::string s)
@@ -93,12 +94,29 @@ void AgentInfo::fromStr(std::string s)
     JValue a(s);
     name = a["name"].asString();
     taskStatus.fromStr(fastWriter.write(a["counts"]));
-    load = a["load"].asFloat();
+    load = (float)(a["load"].asInt()) * 0.01;
+}
+
+std::string MasterInfo::toJsonStr()
+{
+    //hostInfo.update();
+    std::string as("");
+    return (std::string("{") +
+            FIELDSTR(name) + COMMA +
+            "\"hostInfo\": " + hostInfo.toJsonStr() +
+            std::string("}"));
+}
+
+void MasterInfo::fromStr(std::string s)
+{
+    Json::FastWriter fastWriter;
+    JValue ph(s);
+    name = ph["name"].asString();
+    hostInfo.fromStr(fastWriter.write(ph["hostInfo"]));
 }
 
 std::string ProcessingHostInfo::toJsonStr()
 {
-    hostInfo.update();
     std::string as("");
     numAgents = agInfo.size();
     if (numAgents > 0) {
@@ -109,6 +127,7 @@ std::string ProcessingHostInfo::toJsonStr()
                 agInfo.at(i).toJsonStr();
         }
     }
+    //hostInfo.update();
     return (std::string("{") +
             FIELDSTR(name) + COMMA +
             "\"hostInfo\": " + hostInfo.toJsonStr() + COMMA +
@@ -136,7 +155,7 @@ void ProcessingHostInfo::fromStr(std::string s)
 
 std::string SwarmInfo::toJsonStr()
 {
-    hostInfo.update();
+    //hostInfo.update();
     return (std::string("{") +
             FIELDSTR(name) + COMMA +
             FIELDSTR(ip) + COMMA +
@@ -180,6 +199,7 @@ std::string ProcessingFrameworkInfo::toJsonStr()
         }
     }
     return (std::string("{") +
+            "\"masterInfo\": " + masterInfo.toJsonStr() + COMMA +
             "\"hostsInfo\": {" + as + "}" + COMMA +
             "\"swarmInfo\": {" + ass + "}" + COMMA +
             FIELDNUM(numSrvTasks) + COMMA +
@@ -192,24 +212,37 @@ void ProcessingFrameworkInfo::fromStr(std::string s)
     JValue pf(s);
     numSrvTasks  = pf["numSrvTasks"].asInt();
     numContTasks = pf["numContTasks"].asInt();
+    masterInfo.fromStr(fastWriter.write(pf["masterInfo"]));
+    hostsInfo.clear();
     for (Json::ValueIterator itr = pf["hostsInfo"].begin();
          itr != pf["hostsInfo"].end(); ++itr) {
         std::string key = itr.key().asString();
-        std::map<std::string,
-                 ProcessingHostInfo*>::iterator it = hostsInfo.find(key);
-        ProcessingHostInfo * ph = ((it != hostsInfo.end()) ?
-                                   it->second : new ProcessingHostInfo);
+        std::map<std::string, ProcessingHostInfo*>::iterator it = hostsInfo.find(key);
+        ProcessingHostInfo * ph = 0;
+        TRC(fastWriter.write(*itr));
+        // if (it != hostsInfo.end()) {
+        //     ph = it->second;
+        //     ph->fromStr(fastWriter.write(*itr));
+        // } else {
+        ph = new ProcessingHostInfo;
         ph->fromStr(fastWriter.write(*itr));
         hostsInfo[key] = ph;
+        // }
     }
+    swarmInfo.clear();
     for (Json::ValueIterator itr = pf["swarmInfo"].begin();
          itr != pf["swarmInfo"].end(); ++itr) {
         std::string key = itr.key().asString();
-        std::map<std::string,
-                 SwarmInfo*>::iterator it = swarmInfo.find(key);
-        SwarmInfo * sw = ((it != swarmInfo.end()) ?
-                          it->second : new SwarmInfo);
-        sw->fromStr(fastWriter.write(*itr));
+        std::map<std::string, SwarmInfo*>::iterator it = swarmInfo.find(key);
+        SwarmInfo * sw = 0;
+        TRC(fastWriter.write(*itr));
+        //if (it != swarmInfo.end()) {
+        //    sw = it->second;
+        //    sw->fromStr(fastWriter.write(*itr));
+        // } else {
+        sw = new SwarmInfo;
+        sw->fromStr(fastWriter.write(*itr));            
         swarmInfo[key] = sw;
+        //}
     }
 }

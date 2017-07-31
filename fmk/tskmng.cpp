@@ -303,7 +303,7 @@ void TskMng::processHostMonMsg(ScalabilityProtocolRole* c, MessageString & m)
 //----------------------------------------------------------------------
 void TskMng::armProcFmkInfoMsgTimer()
 {
-    Timer * fmkSender = new Timer(5000, true,
+    Timer * fmkSender = new Timer(3000, true,
                                   &TskMng::sendProcFmkInfoUpdate, this);
 }
 
@@ -445,9 +445,6 @@ void TskMng::sendProcFmkInfoUpdate()
     // Prepare message and send it
     Message<MsgBodyTSK> msg;
     MsgBodyTSK body;
-
-    double cpu = Config::procFmkInfo->hostsInfo.begin()->second->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-    TRC("@@@@@@@@@@  => " << cpu);
 
     std::string s = Config::procFmkInfo->toJsonStr();
     JValue fmkInfoValue(s);

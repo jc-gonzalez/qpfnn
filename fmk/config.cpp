@@ -511,6 +511,8 @@ void Config::generateProcFmkInfoStructure()
         agentMode[ip] = SERVICE;
         ++h;
     }
+
+    dump();
 }
 
 //----------------------------------------------------------------------

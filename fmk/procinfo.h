@@ -96,6 +96,13 @@ struct AgentInfo : public BasicInfoContainer {
     virtual void fromStr(std::string s);
 };
 
+struct MasterInfo : public BasicInfoContainer {
+    std::string            name;
+    HostInfo               hostInfo;
+    virtual std::string toJsonStr();
+    virtual void fromStr(std::string s);
+};
+
 struct ProcessingHostInfo : public BasicInfoContainer {
     std::string            name;
     HostInfo               hostInfo;
@@ -117,6 +124,7 @@ struct SwarmInfo : public BasicInfoContainer {
 };
 
 struct ProcessingFrameworkInfo : public BasicInfoContainer {
+    MasterInfo                      masterInfo;
     std::map<std::string,
         ProcessingHostInfo*>        hostsInfo;
     std::map<std::string,

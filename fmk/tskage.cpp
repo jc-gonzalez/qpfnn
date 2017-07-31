@@ -50,8 +50,8 @@
 
 #include "cntrmng.h"
 #include "srvmng.h"
-
 #include "filenamespec.h"
+#include "timer.h"
 
 #include "config.h"
 
@@ -136,6 +136,8 @@ void TskAge::fromRunningToOperational()
     hostInfo.update();
     hostInfo.cpuInfo.overallCpuLoad.timeInterval = 10;
 
+    armHostInfoTimer();
+
     transitTo(OPERATIONAL);
     InfoMsg("New state: " + getStateName(getState()));
 }
@@ -212,14 +214,6 @@ void TskAge::runEachIterationForContainers()
         break;
     }
 
-    // Every N iterations, check if this is the first agent in the
-    // host, and if it is update the hostInfo structure, and send it
-    // to the TskMng
-    if ((iteration % 20) == 0) {
-        if (compName.substr(compName.size() - 3) == "_01") {
-            sendHostInfoUpdate();
-        }
-    }
 }
 
 //----------------------------------------------------------------------
@@ -233,6 +227,16 @@ void TskAge::runEachIterationForServices()
     if ((iteration % 20) == 0) {
         sendHostInfoUpdate();
     }
+}
+
+//----------------------------------------------------------------------
+// Method: armHostInfoTimer
+// Arm new timer for sending HostInfo updates
+//----------------------------------------------------------------------
+void TskAge::armHostInfoTimer()
+{
+    Timer * hstnfoSender = new Timer(6000, true,
+                                     &TskAge::sendHostInfoUpdate, this);
 }
 
 //----------------------------------------------------------------------
@@ -479,6 +483,8 @@ void TskAge::sendHostInfoUpdate()
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
     }
+
+    armHostInfoTimer();
 }
 
 //}

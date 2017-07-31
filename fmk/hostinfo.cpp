@@ -128,6 +128,8 @@ void HostInfo::update()
 
 std::string HostInfo::dump()
 {
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
     std::stringstream s;
@@ -156,6 +158,8 @@ std::string HostInfo::dump()
 
 std::string HostInfo::toJsonStr()
 {
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     LoadAvg & l = loadAvg;
     CPUInfo & c = cpuInfo;
     std::stringstream s;
@@ -324,6 +328,8 @@ void HostInfo::getCPULoad(CPULoad & c, int line)
     CPU_Percentage = (totald - idled)/totald
     ------------------------------------------------------------*/
 
+    std::unique_lock<std::mutex> ulck(mtxHostInfo);
+
     c.totalJiffies  = c.totalJiffies2;
     c.workJiffies   = c.workJiffies2;
 
@@ -406,8 +412,6 @@ void HostInfo::getCPUInfo(CPUInfo & info)
 //----------------------------------------------------------------------
 void HostInfo::getHostInfo()
 {
-    //std::unique_lock<std::mutex> ulck(mtxHostInfo);
-
     getCPUInfo(cpuInfo);
     getLoadAvg(loadAvg);
 }
