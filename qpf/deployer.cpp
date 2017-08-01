@@ -473,7 +473,7 @@ void Deployer::createElementsNetwork()
         for (auto & kv : cfg.network.processingNodes()) {
             int numOfTskAgents = kv.second;
             if (thisHost == kv.first) {
-                for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
                     sAgName = agName.at(i).c_str();
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
@@ -483,12 +483,11 @@ void Deployer::createElementsNetwork()
                     ag.push_back(tskag);
                 }
             } else {
-                for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+              for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
                     ag.push_back(0);
                 }
             }
             ++h;
-            ++j;
         }
 
         //-----------------------------------------------------------------
