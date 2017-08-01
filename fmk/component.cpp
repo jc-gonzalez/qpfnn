@@ -281,6 +281,7 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(m);
+        TRC("@@@@ >>> " + compName + " :: " + chnl + "\n" + m);
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
     }
