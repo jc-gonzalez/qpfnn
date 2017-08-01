@@ -475,7 +475,7 @@ void Config::generateProcFmkInfoStructure()
             sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
             agName.push_back(std::string(sAgName));
             agPortTsk.push_back(portnum(startingPort + 10, h, i));
-
+            TRC("Creating CONT node name: " + agName.back());
             AgentInfo agInfo;
             agInfo.name       = agName.back();
             agInfo.taskStatus = TaskStatusSpectra();
@@ -498,7 +498,7 @@ void Config::generateProcFmkInfoStructure()
         sprintf(sAgName, "Swarm_%s", ip.c_str());
         agName.push_back(std::string(sAgName));
         agPortTsk.push_back(portnum(startingPort + 10, h, 0));
-
+        TRC("Creating SRV node name: " + agName.back());
         SwarmInfo * sw = new SwarmInfo;
         sw->name       = ip;
         sw->scale      = swrm.scale();
