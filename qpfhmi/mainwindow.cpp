@@ -373,21 +373,18 @@ void MainWindow::readConfig(QString dbUrl)
     // Get the name of the different Task Agents
     taskAgentsInfo.clear();
 
-    std::vector<std::string> & agName = cfg.agentNames;
-    
     nodeNames << tr("QPFHMI") << tr("EvtMng") << tr("LogMng")
               << tr("DatMng") << tr("TskOrc") << tr("TskMng");
     int h = 1;
     int j = 0;
     for (auto & kv : cfg.network.processingNodes()) {
         int numOfTskAgents = kv.second;
-        for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+        for (unsigned int i = 0; i < numOfTskAgents; ++i, ++j) {
             /*QString taName = QString("TskAgent_%1_%2")
                 .arg(h,2,10,QLatin1Char('0'))
                 .arg(i+1,2,10,QLatin1Char('0'));
                 std::string staName = taName.toStdString(); */
             std::string & staName = cfg.agentNames.at(j);
-            agName.push_back(staName);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
             (*taInfo)["client"] = kv.first;
@@ -395,7 +392,6 @@ void MainWindow::readConfig(QString dbUrl)
             taskAgentsInfo[staName] = taInfo;
         }
         ++h;
-        ++j;
     }
 
     for (auto & kv : cfg.network.swarms()) {
@@ -405,7 +401,6 @@ void MainWindow::readConfig(QString dbUrl)
                 .arg(QString::fromStdString(swrm.name()));
                 std::string staName = n.toStdString();*/
             std::string & staName = cfg.agentNames.at(j);
-            agName.push_back(staName);
             TaskAgentInfo * taInfo = new TaskAgentInfo;
             (*taInfo)["name"]   = staName;
             (*taInfo)["client"] = kv.first;
