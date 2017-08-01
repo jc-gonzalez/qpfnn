@@ -147,7 +147,8 @@ bool ProcTaskManager::getTasksInfo(int offset = 0, QMap<QString, QJsonObject> & 
             */
             QString key = qry.value(pos_id).toString();
             QJsonObject v = qry.value(pos_task_data).toJsonValue();
-            v["ZUpdatable"] = true;                                                                   newTasks[key] = v;
+            v["ZUpdatable"] = true;
+            newTasks[key] = v;
         }
         return true;
     }
