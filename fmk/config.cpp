@@ -257,30 +257,27 @@ void Config::readConfigFromDB()
         // Get config table and Transfer DB config info to JSON value
         dbHdl->getTable("configuration", config);
         unsigned int lastConfig = config.size() - 1;
-        //Json::Reader reader;
-            //reader.parse(config.at(lastConfig).at(1), cfg);
         dateCreated = config.at(lastConfig).at(0);
-            std::string configData(config.at(lastConfig).at(1));
-            TRC("Retrieved config. data: " << configData);
-            cfg.fromStr(configData);
+        std::string configData(config.at(lastConfig).at(1));
+        cfg.fromStr(configData);
         cfgFileName = "<internalDB> " + Config::DBName + "::configuration";
     } catch (RuntimeException & e) {
-            TRC("ERROR Trying to retrieve configuration table");
+        TRC("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR, e.what());
         return;
     } catch (...) {
-            TRC("ERROR Trying to retrieve configuration table");
+        TRC("ERROR Trying to retrieve configuration table");
         Log::log("SYSTEM", Log::ERROR,
-                          "Unexpected error accessing "
-                          "database for retrieval of system configuration");
+                 "Unexpected error accessing "
+                 "database for retrieval of system configuration");
         return;
     }
-
+    
     // Modificar fecha de último accesso
     std::string now = timeTag();
     std::string cmd("UPDATE configuration SET last_accessed = '" + now + "' "
                     "WHERE created='" + dateCreated + "'");
-
+    
     try {
         dbHdl->runCmd(cmd);
     } catch (RuntimeException & e) {
@@ -288,8 +285,8 @@ void Config::readConfigFromDB()
         return;
     } catch (...) {
         Log::log("SYSTEM", Log::ERROR,
-                          "Unexpected error accessing "
-                          "database for retrieval of system configuration");
+                 "Unexpected error accessing "
+                 "database for retrieval of system configuration");
         return;
     }
 
@@ -304,8 +301,8 @@ void Config::readConfigFromDB()
             }
         } catch (...) {
             Log::log("SYSTEM", Log::ERROR,
-                              "Unexpected error accessing "
-                              "database for retrieval of session name");
+                     "Unexpected error accessing "
+                     "database for retrieval of session name");
             return;
         }
     }
@@ -423,8 +420,8 @@ void Config::processConfig()
     PATHMsg     = PATHSession + "/msg";
 
     for (auto & p : std::vector<std::string>
-        { PATHSession, PATHLog, PATHRlog,
-                PATHTmp, PATHTsk, PATHMsg }) { TRC(p); }
+                      { PATHSession, PATHLog, PATHRlog,
+                        PATHTmp, PATHTsk, PATHMsg }) { TRC(p); }
 
     storage.inbox    = PATHData + "/inbox";
     storage.archive  = PATHData + "/archive";
@@ -475,7 +472,7 @@ void Config::generateProcFmkInfoStructure()
             sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
             agName.push_back(std::string(sAgName));
             agPortTsk.push_back(portnum(startingPort + 10, h, i));
-            TRC("Creating CONT node name: " + agName.back());
+
             AgentInfo agInfo;
             agInfo.name       = agName.back();
             agInfo.taskStatus = TaskStatusSpectra();
@@ -498,7 +495,7 @@ void Config::generateProcFmkInfoStructure()
         sprintf(sAgName, "Swarm_%s", ip.c_str());
         agName.push_back(std::string(sAgName));
         agPortTsk.push_back(portnum(startingPort + 10, h, 0));
-        TRC("Creating SRV node name: " + agName.back());
+
         SwarmInfo * sw = new SwarmInfo;
         sw->name       = ip;
         sw->scale      = swrm.scale();

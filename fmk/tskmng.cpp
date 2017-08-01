@@ -379,21 +379,16 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     std::string s(fastWriter.write(body["info"]));
     HostInfo hostInfo(s);
     std::string hostIp = hostInfo.hostIp;
-    TRC("Consolidating " + s + " for host " + hostIp);
-    double cpu1, cpu2;
+    TRC("Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
+                                " (CONT) " :
+                                " (SRV) ") + " for host " + hostIp);
 
     switch (Config::agentMode[hostIp]) {
     case CONTAINER:
-        cpu1 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
         Config::procFmkInfo->hostsInfo[hostIp]->hostInfo = hostInfo;
-        cpu2 = Config::procFmkInfo->hostsInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        TRC("@@@@@@@@@@ CONSOLIDATING CONT FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
     case SERVICE:
-        cpu1 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
         Config::procFmkInfo->swarmInfo[hostIp]->hostInfo = hostInfo;
-        cpu2 = Config::procFmkInfo->swarmInfo[hostIp]->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        TRC("@@@@@@@@@@ CONSOLIDATING SRV FMK INFO @@@@@@@@@@ " << cpu1 << " => " << cpu2);
         break;
     default:
         break;
