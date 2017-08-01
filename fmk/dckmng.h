@@ -118,6 +118,12 @@ public:
     virtual bool reScaleService(std::string srv, int newScale) {}
 
     //----------------------------------------------------------------------
+    // Method: getDockerInfo
+    // Retrieves information about Docker running instance
+    //----------------------------------------------------------------------
+    virtual bool getDockerInfo(std::stringstream & info, std::string filt);
+
+    //----------------------------------------------------------------------
     // Method: getInfo
     // Retrieves information about running service
     //----------------------------------------------------------------------
