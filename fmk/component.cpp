@@ -281,8 +281,6 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(m);
-        TRC("Sending request via channel " + chnl);
-        TRC("with message: '" + m + "'");
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
     }
@@ -298,8 +296,7 @@ void Component::sendBodyElem(ChannelDescriptor chnl,
                              std::string bodyElem, std::string elemContent,
                              std::string initialMsgStr = std::string())
 {
-      // Prepare message and send it
-    // Define and set task object
+    // Prepare message and send it
     Message<T> msg(initialMsgStr);
     JValue jstrValue(elemContent);
 

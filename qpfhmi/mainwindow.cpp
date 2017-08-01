@@ -374,7 +374,7 @@ void MainWindow::readConfig(QString dbUrl)
     taskAgentsInfo.clear();
 
     std::vector<std::string> & agName = cfg.agentNames;
-
+    
     nodeNames << tr("QPFHMI") << tr("EvtMng") << tr("LogMng")
               << tr("DatMng") << tr("TskOrc") << tr("TskMng");
     int h = 1;
