@@ -447,7 +447,6 @@ void Config::generateProcFmkInfoStructure()
 
     HostInfo hi;
     hi.update();
-    int j = 0;
 
     std::vector<std::string> & agName    = cfg.agentNames;
     std::vector<std::string> & agHost    = cfg.agHost;
@@ -472,13 +471,13 @@ void Config::generateProcFmkInfoStructure()
         ph->hostInfo  = hi;
         ph->numTasks  = 0;
 
-        for (int i = 0; i < ph->numAgents; ++i, ++j) {
+        for (int i = 0; i < ph->numAgents; ++i) {
             sprintf(sAgName, "TskAgent_%02d_%02d", h, i + 1);
             agName.push_back(std::string(sAgName));
             agPortTsk.push_back(portnum(startingPort + 10, h, i));
 
             AgentInfo agInfo;
-            agInfo.name       = agName.at(j);
+            agInfo.name       = agName.back();
             agInfo.taskStatus = TaskStatusSpectra();
             agInfo.load       = (rand() % 1000) * 0.01;
             ph->agInfo.push_back(agInfo);

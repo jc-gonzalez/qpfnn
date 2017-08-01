@@ -251,7 +251,6 @@ void Deployer::readConfiguration()
     cfg.setCurrentHostAddress(currentHostAddr);
     cfg.init(cfgFileName);
     cfg.startingPort = initialPort;
-
     cfg.generateProcFmkInfoStructure();
 
     DBG("Master host: " << cfg.network.masterNode());
@@ -472,10 +471,10 @@ void Deployer::createElementsNetwork()
 
         int h = 1;
         for (auto & kv : cfg.network.processingNodes()) {
-            sAgName = agName.at(j).c_str();
             int numOfTskAgents = kv.second;
             if (thisHost == kv.first) {
                 for (unsigned int i = 0; i < numOfTskAgents; ++i) {
+                    sAgName = agName.at(i).c_str();
                     TskAge * tskag = new TskAge(sAgName, thisHost, &synchro);
                     // By default, task agents are assumed to live in remote hosts
                     tskag->setRemote(true);
