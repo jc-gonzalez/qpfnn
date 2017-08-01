@@ -382,7 +382,15 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     TRC("Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
                                 " (CONT) " :
                                 " (SRV) ") + " for host " + hostIp);
-
+    RaiseSysAlert(Alert(Alert::System,
+                        Alert::Warning,
+                        Alert::Comms,
+                        std::string(__FILE__ ":" Stringify(__LINE__)),
+                        "Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
+                                " (CONT) " :
+                                " (SRV) ") + " for host " + hostIp,
+                        0));
+    
     switch (Config::agentMode[hostIp]) {
     case CONTAINER:
         Config::procFmkInfo->hostsInfo[hostIp]->hostInfo = hostInfo;
@@ -456,6 +464,12 @@ void TskMng::sendProcFmkInfoUpdate()
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Sending update of FMK INFO",
+                            0));
         TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
         TRC(s);
     } else {

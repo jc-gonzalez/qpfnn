@@ -237,7 +237,7 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
                 qdtRep.read();
                 std::vector<Alert*> issues;
                 qdtRep.getIssues(issues);
-                for (auto & v : issues) { RaiseAlert(*v); }
+                for (auto & v : issues) { RaiseDiagAlert(*v); }
             }
         }
 

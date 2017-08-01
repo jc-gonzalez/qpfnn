@@ -86,7 +86,7 @@ public:
 
 #define TLIST_GROUP T(Undefined), T(System), T(Diagnostics)
 #define TLIST_SEVERITY T(Warning), T(Error), T(Fatal)
-#define TLIST_TYPE T(Resource), T(OutOfRange), T(Diagnostic)
+#define TLIST_TYPE T(Resource), T(OutOfRange), T(Diagnostic), T(Comms)
 #define TLIST_VARTYPE T(Int), T(Float), T(Double), T(Generic)
 
 #define T(x) x
