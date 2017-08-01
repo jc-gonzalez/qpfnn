@@ -215,7 +215,15 @@ void Component::processIncommingMessages()
             else if (type == MsgHostMon)     { processHostMonMsg(conn, m); }
             else if (type == MsgFmkMon)      { processFmkMonMsg(conn, m); }
             else if (type == MsgTskRepDist)  { processTskRepDistMsg(conn, m); }
-            else    { WarnMsg("Message from unidentified channel " + chnl); }
+            else    {
+                WarnMsg("Message from unidentified channel " + chnl);
+                RaiseSysAlert(Alert(Alert::System,
+                                    Alert::Warning,
+                                    Alert::Comms,
+                                    std::string(__FILE__ ":" Stringify(__LINE__)),
+                                    "Message from unidentified channel " + chnl,
+                                    0));
+            }
         }
     }
 }
@@ -283,6 +291,13 @@ void Component::send(ChannelDescriptor chnl, MessageString m)
         conn->setMsgOut(m);
     } else {
         WarnMsg("Couldn't send message via channel " + chnl);
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Couldn't send message via channel: " + chnl,
+                            0));
+
     }
 }
 
@@ -390,6 +405,12 @@ void Component::processCmdMsg(ScalabilityProtocolRole * c, MessageString & m)
     } else {
 
         WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Unknown command " + cmd + " at channel " + ChnlCmd,
+                            0));
 
     }
 }
@@ -427,6 +448,12 @@ void Component::processEvtMngMsg(ScalabilityProtocolRole * c, MessageString & m)
     } else {
 
         WarnMsg("Unknown command " + cmd + " at channel " + ChnlCmd);
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Unknown command " + cmd + " at channel " + ChnlCmd,
+                            0));
 
     }
 }

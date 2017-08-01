@@ -163,7 +163,14 @@ void TskMng::processTskSchedMsg(ScalabilityProtocolRole* c, MessageString & m)
     } else if (task.taskSet() == "SERVICE") {
         serviceTasks.push_back(task);
     } else {
-        WarnMsg("Badly assigned set for task: " + task.taskSet());
+        WarnMsg("Task not identified neither for Container nor Services: " + task.taskSet());
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Warning,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Task not identified neither for Container nor Services: "
+                            + task.taskSet(),
+                            0));
     }
 }
 
@@ -382,14 +389,6 @@ void TskMng::consolidateMonitInfo(MessageString & m)
     TRC("Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
                                 " (CONT) " :
                                 " (SRV) ") + " for host " + hostIp);
-    RaiseSysAlert(Alert(Alert::System,
-                        Alert::Warning,
-                        Alert::Comms,
-                        std::string(__FILE__ ":" Stringify(__LINE__)),
-                        "Consolidating " + s + (Config::agentMode[hostIp] == CONTAINER ?
-                                " (CONT) " :
-                                " (SRV) ") + " for host " + hostIp,
-                        0));
     
     switch (Config::agentMode[hostIp]) {
     case CONTAINER:
@@ -464,16 +463,16 @@ void TskMng::sendProcFmkInfoUpdate()
     if (it != connections.end()) {
         ScalabilityProtocolRole * conn = it->second;
         conn->setMsgOut(msg.str());
-        RaiseSysAlert(Alert(Alert::System,
-                            Alert::Warning,
-                            Alert::Comms,
-                            std::string(__FILE__ ":" Stringify(__LINE__)),
-                            "Sending update of FMK INFO",
-                            0));
-        TRC("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
+        DBG("@@@@@@@@@@ SENDING UPDATE OF FMK INFO @@@@@@@@@@");
         TRC(s);
     } else {
         ErrMsg("Couldn't send updated ProcessingFrameworkInfo data.");
+        RaiseSysAlert(Alert(Alert::System,
+                            Alert::Error,
+                            Alert::Comms,
+                            std::string(__FILE__ ":" Stringify(__LINE__)),
+                            "Couldn't send updated ProcFmkInfo data",
+                            0));
     }
 
     // Arm new timer
