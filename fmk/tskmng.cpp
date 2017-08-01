@@ -184,7 +184,7 @@ void TskMng::processTskRqstMsg(ScalabilityProtocolRole* c, MessageString & m)
     MsgBodyTSK body;
 
     // Select task to send
-    bool isSrvRqst = (agName == "TskAgentSwarm");
+    bool isSrvRqst = (agName.find("Swarm") != std::string::npos);
     std::list<TaskInfo> * listOfTasks = (isSrvRqst) ? &serviceTasks : &containerTasks;
 
     bool isTaskSent = false;

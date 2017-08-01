@@ -375,6 +375,7 @@ void TskAge::sendTaskReport()
     // ... and add it as well to the taskData JSON structure
     task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
+    TRC("XXXXX>>> " + compName + " tries to send msg in channel " + ChnlTskProc + "_" + compName + "." + MsgTskRep);
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
                              ChnlTskProc + "_" + compName, MsgTskRep,
                              compName, "TskMng",
@@ -442,6 +443,7 @@ void TskAge::sendHostInfoUpdate()
     // Update host information
     hostInfo.update();
 
+    TRC("XXXXX>>> " + compName + " tries to send msg in channel " + ChnlTskProc + "_" + compName + "." + MsgHostMon);
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
                              ChnlTskProc + "_" + compName, MsgHostMon,
                              compName, "TskMng",
