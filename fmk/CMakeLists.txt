@@ -52,6 +52,7 @@ set (libfmk_src
   tskage.cpp
   tskmng.cpp
   tskorc.cpp
+  dckmng.cpp
   srvmng.cpp
   cntrmng.cpp
   httpserver.cpp
