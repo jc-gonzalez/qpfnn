@@ -543,7 +543,8 @@ void Component::raise(Alert a, Alert::Group grp)
 
         db->runCmd(ss.str());
     } catch (RuntimeException & e) {
-        std::cerr << e.what() << std::endl;
+        ErrMsg(e.what());
+        DBG(e.what());
         return;
     }
 

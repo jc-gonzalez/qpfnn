@@ -343,7 +343,6 @@ void HostInfo::getCPULoad(CPULoad & c, int line)
 
         c.computedLoad = (workCPU * 100.) / totalCPU;
         c.timeInterval = (int)(totalCPU * 1000) / HostInfo::USER_HZ;
-        std::cerr << std::string("!!!! >>") << c.computedLoad << "\n";
     } else {
         c.computedLoad = 0.;
         c.timeInterval = 1;
