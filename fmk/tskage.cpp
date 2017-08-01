@@ -183,20 +183,6 @@ void TskAge::runEachIterationForContainers()
             pStatus = WAITING;
             InfoMsg("Switching to status " + ProcStatusName[pStatus]);
             waitingCycles = 0;
-
-            /*    
-            DBG("Looking for channel " << chnl);
-            it = connections.find(chnl);
-            if (it != connections.end()) {
-                ScalabilityProtocolRole * conn = it->second;
-                conn->setMsgOut(msg.str());
-                DBG("Sending request via channel " + chnl);
-                InfoMsg("Sending request via channel " + chnl);
-                pStatus = WAITING;
-                InfoMsg("Switching to status " + ProcStatusName[pStatus]);
-                waitingCycles = 0;
-                }*/
-            
         }
         break;
     case WAITING:
@@ -233,9 +219,10 @@ void TskAge::runEachIterationForServices()
     // Every N iterations, check if this is the first agent in the
     // host, and if it is update the hostInfo structure, and send it
     // to the TskMng
-    if ((iteration % 20) == 0) {
-        sendHostInfoUpdate();
-    }
+    
+    //if ((iteration % 20) == 0) {
+    //    sendHostInfoUpdate();
+    //}
 }
 
 //----------------------------------------------------------------------

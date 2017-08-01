@@ -74,6 +74,9 @@ public:
 protected slots:
     void timeout();
 
+ private:
+    void appendPoint(QSimpleTickerGraph * grph, double value);
+
 private:
     QScrollArea * scrollArea;
     QTimer *      mTimer;

@@ -119,6 +119,7 @@ struct SwarmInfo : public BasicInfoContainer {
     int               scale;
     HostInfo          hostInfo;
     TaskStatusSpectra taskStatus;
+    int               numTasks;
     virtual std::string toJsonStr();
     virtual void fromStr(std::string s);
 };

@@ -82,8 +82,8 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
 
         g.cpuGraph = panel->getCPUGraph();
         g.cpuGraph->setUnits("%");
-        g.cpuGraph->setRange(0, 150);
-        g.cpuGraph->setReferencePoints(QList<double>() << 100);
+        g.cpuGraph->setRange(0, 100);
+        //g.cpuGraph->setReferencePoints(QList<double>() << 100);
         g.cpuGraph->setBackgroundBrush(QBrush(QColor(10, 0, 72)));
 
         g.tasksGraph = panel->getTasksGraph();
@@ -111,8 +111,8 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
 
         g.cpuGraph = panel->getCPUGraph();
         g.cpuGraph->setUnits("%");
-        g.cpuGraph->setRange(0, 150);
-        g.cpuGraph->setReferencePoints(QList<double>() << 100);
+        g.cpuGraph->setRange(0, 100);
+        //g.cpuGraph->setReferencePoints(QList<double>() << 100);
         g.cpuGraph->setBackgroundBrush(QBrush(QColor(10, 0, 72)));
 
         g.tasksGraph = panel->getTasksGraph();
@@ -135,13 +135,8 @@ void ProcFmkMonitor::setupHostsInfo(ProcessingFrameworkInfo * q)
 
 void ProcFmkMonitor::timeout()
 {
-    /*
-    mVoltage += 9.0 - double(qrand() % 1000) / 50.0 + 0.02 * (100.0 - mVoltage);
-    mTemperature += 0.5 - double(qrand() % 1000) / 1000.0 + 0.02 * (20.0 - mTemperature);
-    mSpeed += 4.9 - double(qrand() % 1000) / 100.0 + 0.02 * (100.0 - mSpeed + 0.3 * mVoltage);
-    */
-
     int k = 0;
+    // Update panels related to container-based agents
     for (auto const & kv : procFmkInfo->hostsInfo) {
         //std::cerr << "UPDATING DATA FOR " << kv.first << "\n";
         ProcessingHostInfo * ph = kv.second;
@@ -150,16 +145,59 @@ void ProcFmkMonitor::timeout()
         const Graphs & g = graphs.at(k);
         double mLoad  = ph->hostInfo.loadAvg.load1min;
         double mCpu   = ph->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
-        double mTasks = ph->numTasks;
-        if (mLoad > 0.01)  g.loadGraph->appendPoint(mLoad);
-        if (mCpu > 0.01)   g.cpuGraph->appendPoint(mCpu);
-        if (mTasks > 0.01) g.tasksGraph->appendPoint(mTasks);
+        double mTasks = ph->hostInfo.loadAvg.runProc;
+        if (mLoad > 0.01)  appendPoint(g.loadGraph,  mLoad);
+        if (mCpu > 0.01)   appendPoint(g.cpuGraph,   mCpu);
+        if (mTasks > 0.01) appendPoint(g.tasksGraph, mTasks);
 
         // Update Host Agents statistics
         panels.at(k)->update(*ph);
+        ++k;
+    }
 
+    // Update panels related to service-based agents (swarms)
+    for (auto const & kv : procFmkInfo->swarmInfo) {
+        //std::cerr << "UPDATING DATA FOR " << kv.first << "\n";
+        SwarmInfo * sw = kv.second;
+
+        // Put new data on graphs
+        const Graphs & g = graphs.at(k);
+        double mLoad  = sw->hostInfo.loadAvg.load1min;
+        double mCpu   = sw->hostInfo.cpuInfo.overallCpuLoad.computedLoad;
+        double mTasks = sw->hostInfo.loadAvg.runProc;
+        if (mLoad > 0.01)  appendPoint(g.loadGraph,  mLoad);
+        if (mCpu > 0.01)   appendPoint(g.cpuGraph,   mCpu);
+        if (mTasks > 0.01) appendPoint(g.tasksGraph, mTasks);
+
+        // Update Host Agents statistics
+        panels.at(k)->update(*sw);
         ++k;
     }
 }
 
+void ProcFmkMonitor::appendPoint(QSimpleTickerGraph * grph, double value)
+{
+    QPair<double, double> range = grph->range();
+    double low  = range.first;
+    double high = range.second;
+    bool change  = false;
+        
+    if (value > high) {
+        double lg  = log10(value);
+        double nm  = pow(10., lg + 0.1);
+        high       = (int)(nm / pow(10., int(lg)) + 0.5) * pow(10., int(lg));
+        change     = true;
+    }
+    if (value < low) {
+        double lg  = log10(value);
+        double nm  = pow(10., lg - 0.1);
+        low        = (int)(nm / pow(10., int(lg)) - 0.5) * pow(10., int(lg));
+        change     = true;
+    }
+    
+    if (change) { grph->setRange(low, high); }
+    
+    grph->appendPoint(value);
+}
+    
 }
