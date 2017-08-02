@@ -380,7 +380,7 @@ void TskAge::sendTaskReport()
     addInfo["TaskName"] = task.taskName();
     addInfo["Agent"] = compName;
     addInfo["Proc"] = task.taskPath();
-    task["Info"] = addInfo;
+    task["taskData"]["Info"] = addInfo;
     
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
                              ChnlTskProc + "_" + compName, MsgTskRep,
