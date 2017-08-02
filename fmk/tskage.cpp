@@ -375,6 +375,13 @@ void TskAge::sendTaskReport()
     // ... and add it as well to the taskData JSON structure
     task["taskData"]["State"]["TaskStatus"] = taskStatus;
 
+    // Include additional info
+    json addInfo;
+    addInfo["TaskName"] = task.taskName();
+    addInfo["Agent"] = compName;
+    addInfo["Proc"] = task.taskPath();
+    task["Info"] = addInfo;
+    
     sendBodyElem<MsgBodyTSK>(ChnlTskProc,
                              ChnlTskProc + "_" + compName, MsgTskRep,
                              compName, "TskMng",

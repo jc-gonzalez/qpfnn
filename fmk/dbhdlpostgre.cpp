@@ -255,7 +255,8 @@ bool DBHdlPostgreSQL::storeTask(TaskInfo & task)
        << 0 << ", "
        << str::quoted(registrationTime) << ", "
        << str::quoted(taskData) << ")";
-
+    TRC("PSQL> " << ss.str());
+        
     try { result = runCmd(ss.str()); } catch(...) { throw; }
 
     PQclear(res);
@@ -282,51 +283,6 @@ bool DBHdlPostgreSQL::checkTask(std::string taskId)
 }
 
 //----------------------------------------------------------------------
-// Method: updateTable<int>
-// Instantiation of template updateTable<> for ints
-//----------------------------------------------------------------------
-template<>
-bool DBHdlPostgreSQL::updateTable<int>(std::string table, std::string cond,
-                                       std::string field, int value)
-{
-    return updTable(table, cond, field, str::toStr<int>(value));
-}
-
-//----------------------------------------------------------------------
-// Method: updateTable<int>
-// Instantiation of template updateTable<> for doubles
-//----------------------------------------------------------------------
-template<>
-bool DBHdlPostgreSQL::updateTable<double>(std::string table, std::string cond,
-                                          std::string field, double value)
-{
-    return updTable(table, cond, field, str::toStr<double>(value));
-}
-
-//----------------------------------------------------------------------
-// Method: updateTable<int>
-// Instantiation of template updateTable<> for char strings
-//----------------------------------------------------------------------
-template<>
-bool DBHdlPostgreSQL::updateTable<std::string>(std::string table, std::string cond,
-                                               std::string field, std::string value)
-{
-    return updTable(table, cond, field, str::quoted(value));
-}
-
-//----------------------------------------------------------------------
-// Method: updateTable<int>
-// Instantiation of template updateTable<> for JSON values
-//----------------------------------------------------------------------
-template<>
-bool DBHdlPostgreSQL::updateTable<Json::Value>(std::string table, std::string cond,
-                                               std::string field, Json::Value value)
-{
-    Json::StyledWriter writer;
-    return updTable(table, cond, field, str::quoted(writer.write(value)));
-}
-
-//----------------------------------------------------------------------
 // Method: updateTask
 // Updates the information for a given task in the database
 //----------------------------------------------------------------------
@@ -338,28 +294,34 @@ bool DBHdlPostgreSQL::updateTask(TaskInfo & task)
     std::string taskName = task.taskName().substr(15);
     json taskData  = task["taskData"];
     std::string id = taskData["Id"].asString();
+
+    std::vector<std::string> updates {eqKeyValue("task_id", id)};
+        
     if (checkTask(taskName)) {
         // Present, so this is task registered with old name as ID,
         // that must change to the actual ID
-        result = updateTable<std::string>("tasks_info",
-                                          "task_id=" + str::quoted(taskName),
-                                          "task_id", id);
+        result = updateTable("tasks_info",
+                             eqKeyValue("task_id",taskName),
+                             updates);
         // Once changed the task_id, the update must still be done
     }
 
-    std::string filter("task_id=" + str::quoted(id));
-    result &= updateTable<int>("tasks_info", filter,
-                               "task_status_id", (int)(task.taskStatus()));
-    result &= updateTable<std::string>("tasks_info", filter,
-                                       "start_time", task.taskStart());
-    if (!task.taskEnd().empty()) {
-        result &= updateTable<std::string>("tasks_info", filter,
-                                           "end_time", task.taskEnd());
+    if (result) {
+        updates.clear();
+        updates.push_back(eqKeyValue("task_status_id", (int)(task.taskStatus())));
+        updates.push_back(eqKeyValue("start_time", task.taskStart()));
+        if (!task.taskEnd().empty()) {
+            updates.push_back(eqKeyValue("end_time", task.taskEnd()));
+        }
+        updates.push_back(eqKeyValue("task_path", task.taskPath())); 
+        updates.push_back(eqKeyValue("task_data", task["taskData"]));
+        
+        result &= updateTable("tasks_info",
+                              eqKeyValue("task_id", id),
+                              updates);
     }
-    result &= updateTable<Json::Value>("tasks_info", filter,
-                                       "task_data", task["taskData"]);
+     
     PQclear(res);
-
     return result;
 }
 
@@ -672,16 +634,36 @@ bool DBHdlPostgreSQL::fillWithResult(std::vector< std::vector<std::string> > & t
 }
 
 //----------------------------------------------------------------------
-// Method: updTable
-// Update a single field in a given table
+// Method: quotedValue
+// Returns the value used in the update string
 //----------------------------------------------------------------------
-bool DBHdlPostgreSQL::updTable(std::string table, std::string cond,
-                               std::string field, std::string value)
+std::string DBHdlPostgreSQL::eqKeyValue(std::string k, int x) 
+{ return k + " = " + std::to_string(x); }
+
+std::string DBHdlPostgreSQL::eqKeyValue(std::string k, double x) 
+{ return k + " = " + std::to_string(x); }
+
+std::string DBHdlPostgreSQL::eqKeyValue(std::string k, std::string x) 
+{ return k + " = " + str::quoted(x); }
+
+std::string DBHdlPostgreSQL::eqKeyValue(std::string k, Json::Value x) 
+{   Json::StyledWriter writer;
+    return k + " = " + str::quoted(writer.write(x)); }
+
+//----------------------------------------------------------------------
+// Method: updateTable
+// Method to update a series of fields of a table
+//----------------------------------------------------------------------
+bool DBHdlPostgreSQL::updateTable(std::string table, std::string cond,
+                                  std::vector<std::string> & newValues)
 {
-    std::string cmd("UPDATE " + table + " SET " + field + " = " + value);
-    if (!cond.empty()) {
-        cmd += " WHERE " + cond;
+    std::string newValStr = newValues.at(0);
+    for (int i = 1; i < newValues.size(); ++i) {
+        newValStr += ", " + newValues.at(i);
     }
+    std::string cmd("UPDATE " + table + " SET " + newValStr);
+    if (!cond.empty()) { cmd += " WHERE " + cond; }
+    TRC("PSQL> " << cmd);
     return runCmd(cmd);
 }
 

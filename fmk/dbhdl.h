@@ -117,7 +117,7 @@ public:
     //----------------------------------------------------------------------
     // Method: closeConnection
     // Closes the connection to the database
-    //-------------------------------DBHdlPostgreSQL::---------------------------------------
+    //----------------------------------------------------------------------
     virtual bool closeConnection(const char * data = 0)=0;
 
     //----------------------------------------------------------------------
@@ -267,14 +267,6 @@ public:
     // Check if a product with the same signature exists in the archive
     //----------------------------------------------------------------------
     virtual bool checkSignature(std::string & sgnt, std::string & ver)=0;
-
-    //----------------------------------------------------------------------
-    // Method: updateTable<T>
-    // Template method to update a single field of a table
-    //----------------------------------------------------------------------
-    template<class T>
-    bool updateTable(std::string table, std::string cond,
-                             std::string field, T value);
 
 protected:
     bool connectionParamsSet;

@@ -185,7 +185,6 @@ void DataMng::saveTaskToDB(MessageString & m, bool initialStore)
     // Ensure 0-ended char arrays
     if (m.at(m.size() - 1) < 32) { m[m.size() - 1] = 0; }
 
-    //DBG("SAVE-TASK-TO-DB:\n" + m); return;
     Message<MsgBodyTSK> msg(m);
     MsgBodyTSK & body = msg.body;
     TaskInfo taskInfo(body["info"]);

@@ -246,21 +246,23 @@ public:
     //----------------------------------------------------------------------
     virtual bool checkSignature(std::string & sgnt, std::string & ver);
 
-    //----------------------------------------------------------------------
-    // Method: updateTable<T>
-    // Template method to update a single field of a table
-    //----------------------------------------------------------------------
-    template<class T>
-    bool updateTable(std::string table, std::string cond,
-                             std::string field, T value);
-
 private:
+
     //----------------------------------------------------------------------
-    // Method: updTable
-    // Update a single field in a given table
+    // Method: eqKeyValue
+    // Returns the value used in the update string
     //----------------------------------------------------------------------
-    bool updTable(std::string table, std::string cond,
-                  std::string field, std::string value);
+    std::string eqKeyValue(std::string k, int x);
+    std::string eqKeyValue(std::string k, double x);
+    std::string eqKeyValue(std::string k, std::string x);
+    std::string eqKeyValue(std::string k, Json::Value x);
+
+    //----------------------------------------------------------------------
+    // Method: updateTable
+    // Method to update a series of fields of a table
+    //----------------------------------------------------------------------
+    bool updateTable(std::string table, std::string cond,
+                     std::vector<std::string> & newValues);
 
 private:
     PGconn     * conn;
