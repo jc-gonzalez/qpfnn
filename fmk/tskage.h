@@ -186,6 +186,8 @@ private:
     std::string              exchgOut;
     std::string              exchgLog;
 
+    std::string              ruleBasedName;
+    
     MessageString            origMsgString;
 
     int                      numTask;
@@ -195,6 +197,8 @@ private:
     int                      idleCyclesBeforeRequest;
     int                      workingDuring;
 
+    int                      progress;
+    
     URLHandler               urlh;
 
     HostInfo                 hostInfo;

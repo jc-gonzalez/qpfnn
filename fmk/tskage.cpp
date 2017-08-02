@@ -311,7 +311,8 @@ void TskAge::processTskProcMsg(ScalabilityProtocolRole* c, MessageString & m)
             // Set processing status
             pStatus = PROCESSING;
             workingDuring = 0;
-
+            progress = 0;
+            
             // Send back information to Task Manager
             sendTaskReport();
 
@@ -364,10 +365,13 @@ void TskAge::sendTaskReport()
         InfoMsg("Switching to status " + ProcStatusName[pStatus]);
     } else {
         workingDuring++;
+        progress = (int)(100. * (1. - 1. / (float)(workingDuring)));
+        task["taskData"]["State"]["Progress"] = std::to_string(progress);
     }
 
     if (taskStatus == TASK_FINISHED) {
         retrieveOutputProducts();
+        task["taskData"]["State"]["Progress"] = "100";
     }
 
     // Put declared status in task info structure...
